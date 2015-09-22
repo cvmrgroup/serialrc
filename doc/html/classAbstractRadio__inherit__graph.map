@@ -1,0 +1,4 @@
+<map id="AbstractRadio" name="AbstractRadio">
+<area shape="rect" id="node2" href="$classCrazyRadio.html" title="{CrazyRadio\n||+ CrazyRadio()\l+ ~CrazyRadio()\l+ setControls()\l+ toggleSender()\l+ turnSenderOn()\l+ turnSenderOff()\l+ setBindSignal()\l+ toggleSuspension()\l+ suspend()\l+ setArmSignal()\l+ setDisarmSignal()\l+ toggleCh5()\l+ toggleCh6()\l}" alt="" coords="5,393,153,627"/>
+<area shape="rect" id="node3" href="$classDSMXRadio.html" title="{DSMXRadio\n||+ DSMXRadio()\l+ ~DSMXRadio()\l+ toggleSender()\l+ turnSenderOn()\l+ turnSenderOff()\l+ suspend()\l+ toggleSuspension()\l+ setBindSignal()\l+ setControls()\l+ toggleCh5()\l+ toggleCh6()\l+ setArmSignal()\l+ setDisarmSignal()\l}" alt="" coords="177,393,325,627"/>
+</map>
