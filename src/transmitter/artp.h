@@ -31,26 +31,23 @@
  */
 class ArTP: public ArXX
 {
-    Q_OBJECT
     
 public:
     
     /// Constructor.
-    ArTP(QString serial);
+    ArTP(const std::string name, std::string serial, boost::shared_ptr<boost::asio::io_service> io_service);
     
     /// Destructor.
     virtual ~ArTP();
-    
-public slots:
-    
-    void readData();
-    
+
 private:
-    
+
+    void onData(const char *frame, size_t length);
+
     /**
      *  write data to serial port
      */
-    void writeData(unsigned int id = 0);
+    void writeData();
     
     static const int maxRadios = 5;
     
@@ -85,7 +82,7 @@ private:
     static const int ch6_full_range = 0x1754;
     
     /// Frame with copter commands sent to arduino via serial connection.
-    unsigned char frame[n_tx*command_length];
+    unsigned char frame[n_tx * command_length];
 };
 
 #endif /* ARTP_H */

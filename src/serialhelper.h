@@ -25,12 +25,13 @@
  */
 class SerialHelper
 {
-    
+
 public:
-    
+
     static unsigned char loByte(int value);
+
     static unsigned char hiByte(int value);
-    
+
     static int joinHiLoBytes(unsigned char hi, unsigned char lo);
 };
 

@@ -5,9 +5,12 @@
 #ifndef ICARUS_INPUTMANAGER_H
 #define ICARUS_INPUTMANAGER_H
 
-#include <QObject>
-#include <QTimer>
-#include <QCoreApplication>
+#include <exception>
+
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+#include <boost/log/trivial.hpp>
 
 #include <gamepad.h>
 
@@ -20,31 +23,38 @@
 #include <radio/commands/togglesuspensioncommand.h>
 #include <radio/commands/toggletransmittercommand.h>
 
-class InputManager: public QObject
+#include <radioexception.h>
+
+class InputManager
 {
-Q_OBJECT
 public:
 
-    InputManager(int source, int copterId, IRadio *radio);
+    InputManager(int source, int copterId, IRadio *radio, boost::shared_ptr<boost::asio::io_service> io_service);
+
+private:
+
+    void update(const boost::system::error_code &ec);
+
+    void updateGamepad();
+
+    void invokeTimer();
+
+public:
 
     void start();
 
     void stop();
-
-private slots:
-
-    void update();
 
 private:
 
     int source;
     int copterId;
 
-    QTimer timer;
-
+    IRadio *radio;
     Gamepad gamepad;
 
-    IRadio *radio;
+    boost::shared_ptr<boost::asio::io_service> io_service;
+    boost::shared_ptr<boost::asio::deadline_timer> timer;
 
 };
 

@@ -40,3 +40,6 @@ target_link_libraries(${TARGET}
 
 # set the compile definition for the BOOST Log
 target_compile_definitions(${TARGET} PUBLIC "-DBOOST_LOG_DYN_LINK")
+
+# add C++11 as compile option
+target_compile_options(${TARGET} PUBLIC -std=c++11)

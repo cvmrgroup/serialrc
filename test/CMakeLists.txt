@@ -6,7 +6,6 @@ set(TARGET multiradio_test)
 project(${TARGET})
 
 find_package(Boost COMPONENTS program_options REQUIRED)
-find_package(Qt5Core REQUIRED)
 
 file(GLOB_RECURSE ${TARGET}_HEADERS src/*.h)
 file(GLOB_RECURSE ${TARGET}_SOURCES src/*.cpp)
@@ -20,13 +19,11 @@ target_include_directories(${TARGET} PUBLIC
         inputdevices
         src
         ${Boost_INCLUDE_DIRS}
-        ${Qt5Core_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
         multiradio
         inputdevices
-        Qt5::Core
         ${Boost_LIBRARIES}
 )
 

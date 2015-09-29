@@ -17,42 +17,41 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#ifndef CRAZYRADIOTHREAD_H
-#define CRAZYRADIOTHREAD_H
-
-#include <iostream>
-
-#include <QThread>
-
-#include <opencv2/core.hpp>
-
-#include <cflie/CCrazyflie.h>
+#ifndef CRAZYRADIO_H
+#define CRAZYRADIO_H
 
 #include "abstractradio.h"
 
-class CrazyRadioThread: public QThread
+class CrazyRadio : public AbstractRadio
 {
-    Q_OBJECT
-    
+
 public:
-    
-    CrazyRadioThread();
-    virtual ~CrazyRadioThread();
-    
-    bool open();
-    void run();
-    void stop();
-    
-    void setRadio(AbstractRadio* radio);
-    
-private:
-    
-    CCrazyRadio* radio;
-    CCrazyflie* copter;
-    
-    AbstractRadio* radiotransmitter;
-    
-    volatile bool doRun;
+
+    CrazyRadio(unsigned int id, unsigned int txId);
+
+    virtual ~CrazyRadio();
+
+    void setControls(double throttle, double roll, double pitch, double yaw);
+
+    void toggleSender();
+
+    void turnSenderOn();
+
+    void turnSenderOff();
+
+    void setBindSignal();
+
+    void toggleSuspension();
+
+    void suspend(bool suspend);
+
+    void setArmSignal();
+
+    void setDisarmSignal();
+
+    void toggleCh5();
+
+    void toggleCh6();
 };
 
-#endif /* CRAZYRADIOTHREAD_H */
+#endif /* CRAZYRADIO_H */

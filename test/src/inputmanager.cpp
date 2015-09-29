@@ -4,31 +4,74 @@
 
 #include "inputmanager.h"
 
-InputManager::InputManager(int source, int copterId, IRadio *radio) : QObject(NULL)
+InputManager::InputManager(int source, int copterId, IRadio *radio,
+                           boost::shared_ptr<boost::asio::io_service> io_service)
 {
+    this->radio = radio;
     this->source = source;
     this->copterId = copterId;
-    this->radio = radio;
+    this->io_service = io_service;
+    this->timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(*io_service));
 }
 
 void InputManager::start()
 {
-    this->gamepad.open();
+    // open the gamepad
+    if (!this->gamepad.open())
+    {
+        BOOST_LOG_TRIVIAL(error) << "fail to open gamepad";
+        return;
+    }
+    // invoke the timer
+    this->invokeTimer();
+}
 
-    QObject::connect(&this->timer, SIGNAL(timeout()), this, SLOT(update()));
-    this->timer.start(10);
+void InputManager::stop()
+{
+    // check if the timer exists
+    if (this->timer)
+    {
+        // stop the timer
+        this->timer->cancel();
+    }
+    // close the gamepad
+    this->gamepad.close();
+}
+
+// ########################################################################################
+
+void InputManager::invokeTimer()
+{
+    // get a delay from 10 ms
+    boost::posix_time::milliseconds timeout(10);
+    this->timer->expires_from_now(timeout);
+    // add the async callback for the timer
+    this->timer->async_wait(boost::bind(&InputManager::update, this, boost::asio::placeholders::error));
 
 }
 
-#include <iostream>
-
-void InputManager::update()
+void InputManager::update(const boost::system::error_code &ec)
 {
-    if (!this->gamepad.update())
+    // check if an error happens
+    if (ec)
     {
-        return;
+        std::string ex = str(boost::format("fail to update input manager, because [ %1% ]") % ec.message());
+        // display error
+        BOOST_LOG_TRIVIAL(error) << ex;
+        // throw the exception
+        throw RadioException(ex);
     }
 
+    if (this->gamepad.update())
+    {
+        this->updateGamepad();
+    }
+
+    this->invokeTimer();
+}
+
+void InputManager::updateGamepad()
+{
     if (this->gamepad.buttonToggled(BUTTON_START))
     {
         // toggle play/pause
@@ -43,14 +86,9 @@ void InputManager::update()
 
     if (this->gamepad.buttonToggled(BUTTON_SELECT))
     {
-        QCoreApplication::exit(0);
+        this->io_service->stop();
+        BOOST_LOG_TRIVIAL(info) << "stop";
     }
-
-    if (this->gamepad.buttonToggled(BUTTON_TRIANGLE))
-    {
-        std::cout << "kk" << std::endl;
-    }
-
 
     IRadioCommand *command = NULL;
 
@@ -83,8 +121,3 @@ void InputManager::update()
     }
 }
 
-void InputManager::stop()
-{
-    this->timer.stop();
-    this->gamepad.close();
-}

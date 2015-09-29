@@ -27,34 +27,35 @@
  *  nano   +roll / +yaw
  *  superx -roll / -yaw
  */
-class DSMXRadio: public AbstractRadio
+class DSMXRadio : public AbstractRadio
 {
-    
+
 public:
-    
-    DSMXRadio(unsigned int id, unsigned int txId, std::string identifier);
+
+    DSMXRadio(unsigned int id, unsigned int txId);
+
     virtual ~DSMXRadio();
-    
+
     void toggleSender();
-    
+
     void turnSenderOn();
-    
+
     void turnSenderOff();
-    
+
     void suspend(bool suspended);
-    
+
     void toggleSuspension();
-    
+
     void setBindSignal();
-    
+
     void setControls(double throttle, double roll, double pitch, double yaw);
-    
+
     void toggleCh5();
-    
+
     void toggleCh6();
-    
+
     void setArmSignal();
-    
+
     void setDisarmSignal();
 };
 

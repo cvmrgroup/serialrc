@@ -19,6 +19,11 @@ private:
 
 public:
 
+    /**
+     * loads all RadioConfigurations from the given file
+     * @param the file to the configuration
+     * @return a vector with all loaded RadioConfigurations
+     */
     static std::vector<RadioConfiguration> loadConfig(const std::string &file);
 };
 

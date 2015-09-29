@@ -19,10 +19,8 @@
 
 #include "crazyradio.h"
 
-using namespace std;
-
-CrazyRadio::CrazyRadio(unsigned int id, unsigned int txId, std::string identifier) :
-AbstractRadio(id, txId, identifier)
+CrazyRadio::CrazyRadio(unsigned int id, unsigned int txId) :
+        AbstractRadio(id, txId)
 {
     throttle = 0;
     roll = 0;
@@ -38,11 +36,11 @@ void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, doub
 {
     int throttle_center_value_offset = 30000;
     int throttle_value_range_scale = 60000;
-    
-    throttle = (int)(throttle_center_value_offset + _throttle * throttle_value_range_scale);
-    roll = (float)(_roll*-45);
-    pitch = (float)(_pitch*45);
-    yaw = (float)(_yaw*-180);
+
+    throttle = (int) (throttle_center_value_offset + _throttle * throttle_value_range_scale);
+    roll = (float) (_roll * -45);
+    pitch = (float) (_pitch * 45);
+    yaw = (float) (_yaw * -180);
 }
 
 void CrazyRadio::toggleSender()

@@ -19,15 +19,15 @@
 
 #include "dsmxradio.h"
 
-DSMXRadio::DSMXRadio(unsigned int id, unsigned int txId, std::string identifier) :
-AbstractRadio(id, txId, identifier)
+DSMXRadio::DSMXRadio(unsigned int id, unsigned int txId) :
+        AbstractRadio(id, txId)
 {
     // default values
     throttle = -1.0;
-    roll =  0.0;
-    pitch =  0.0;
-    yaw =  0.0;
-    ch5 =  1.0; // -1.0 for copters other than nano 3d
+    roll = 0.0;
+    pitch = 0.0;
+    yaw = 0.0;
+    ch5 = 1.0; // -1.0 for copters other than nano 3d
     ch6 = -1.0; // todo 1.0 for initial horizon mode when using superx
 }
 
@@ -69,7 +69,7 @@ void DSMXRadio::setBindSignal()
 void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw)
 {
     binding = false;
-    
+
     throttle = _throttle;
     roll = _roll;
     pitch = _pitch;
@@ -89,7 +89,7 @@ void DSMXRadio::toggleCh6()
 void DSMXRadio::setArmSignal()
 {
     throttle = -1.0;
-    yaw =  1.0;
+    yaw = 1.0;
 }
 
 void DSMXRadio::setDisarmSignal()
