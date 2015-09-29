@@ -1,0 +1,8 @@
+//
+// Created by lasse on 28.09.15.
+//
+
+#ifndef ICARUS_RADIOCONFIGURATION_H
+#define ICARUS_RADIOCONFIGURATION_H
+
+#endif //ICARUS_RADIOCONFIGURATION_H
