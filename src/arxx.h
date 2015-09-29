@@ -24,7 +24,7 @@
 
 #include <opencv2/core.hpp>
 
-#include <QWidget>
+#include <QObject>
 #include <QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 

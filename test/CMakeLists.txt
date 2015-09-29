@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(TARGET core_test)
+set(CMAKE_AUTOMOC ON)
+
+set(TARGET multiradio_test)
 project(${TARGET})
 
 find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 file(GLOB_RECURSE ${TARGET}_HEADERS src/*.h)
 file(GLOB_RECURSE ${TARGET}_SOURCES src/*.cpp)
@@ -13,12 +16,17 @@ add_executable(${TARGET}
         ${${TARGET}_HEADERS})
 
 target_include_directories(${TARGET} PUBLIC
-        core
+        multiradio
+        inputdevices
+        src
         ${Boost_INCLUDE_DIRS}
+        ${Qt5Core_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
-        core
+        multiradio
+        inputdevices
+        Qt5::Core
         ${Boost_LIBRARIES}
 )
 

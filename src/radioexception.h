@@ -5,10 +5,20 @@
 #ifndef ICARUS_RADIOEXCEPTION_H
 #define ICARUS_RADIOEXCEPTION_H
 
+#include <string>
+#include <exception>
 
-class radioexception
+class RadioException : public std::exception
 {
 
+public:
+    RadioException(const std::string exception);
+
+    virtual const char *what() const throw();
+
+private:
+
+    std::string exception;
 };
 
 
