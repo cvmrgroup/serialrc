@@ -8,8 +8,9 @@ set(CMAKE_AUTOMOC ON)
 find_package(libusb-1.0 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(CFlie REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5SerialPort REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system log thread regex date_time)
+
+add_definitions(-DBOOST_LOG_DYN_LINK)
 
 file(GLOB_RECURSE ${TARGET}_HEADERS src/*.h)
 file(GLOB_RECURSE ${TARGET}_SOURCES src/*.cpp)
@@ -28,8 +29,7 @@ target_include_directories(${TARGET} PUBLIC
 	)
 
 target_link_libraries(${TARGET}
-	Qt5::Widgets
-	Qt5::SerialPort
+	${Boost_LIBRARIES}
 	${OpenCV_LIBS}
 	${CFlie_LIBRARY}
 	${LIBUSB_1_LIBRARIES}

@@ -21,8 +21,8 @@
 
 using namespace std;
 
-CrazyRadio::CrazyRadio(unsigned int id, unsigned int txId, std::string identifier) :
-AbstractRadio(id, txId, identifier)
+CrazyRadio::CrazyRadio(unsigned int id, unsigned int txId) :
+AbstractRadio(id, txId)
 {
     throttle = 0;
     roll = 0;

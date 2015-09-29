@@ -21,8 +21,7 @@
 
 using namespace std;
 
-CrazyRadioThread::CrazyRadioThread() :
-QThread()
+CrazyRadioThread::CrazyRadioThread()
 {
     radio = 0;
     copter = 0;
@@ -95,11 +94,6 @@ void CrazyRadioThread::run()
                 float pitch = (float) radiotransmitter->getPitch();
                 float yaw = (float) radiotransmitter->getYaw();
                 
-                if(radiotransmitter->isSuspended())
-                {
-                    throttle = 0;
-                }
-                
                 copter->setThrust(throttle);
                 copter->setRoll(roll);
                 copter->setPitch(pitch);
@@ -107,7 +101,7 @@ void CrazyRadioThread::run()
             }
         }
         
-        msleep(10);
+        // todo msleep(10);
     }
 }
 

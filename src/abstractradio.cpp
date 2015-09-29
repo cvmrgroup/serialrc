@@ -19,11 +19,10 @@
 
 #include "abstractradio.h"
 
-AbstractRadio::AbstractRadio(unsigned int _id, unsigned int _txId, std::string _identifier)
+AbstractRadio::AbstractRadio(unsigned int _id, unsigned int _txId)
 {
     id = _id;
     txId = _txId;
-    identifier = _identifier;
     
     binding = false;
     enabled = false;
@@ -42,11 +41,6 @@ unsigned int AbstractRadio::getId()
 unsigned int AbstractRadio::getTxId()
 {
     return txId;
-}
-
-std::string AbstractRadio::getIdentifier()
-{
-    return identifier;
 }
 
 bool AbstractRadio::isEnabled()

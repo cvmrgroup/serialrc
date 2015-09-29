@@ -22,8 +22,6 @@
 
 #include <iostream>
 
-#include <QThread>
-
 #include <opencv2/core.hpp>
 
 #include <cflie/CCrazyflie.h>
@@ -35,7 +33,7 @@ class CrazyRadio: public AbstractRadio
     
 public:
     
-    CrazyRadio(unsigned int id, unsigned int txId, std::string identifier);
+    CrazyRadio(unsigned int id, unsigned int txId);
     virtual ~CrazyRadio();
     
     void setControls(double throttle, double roll, double pitch, double yaw);

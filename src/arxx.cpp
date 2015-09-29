@@ -22,89 +22,54 @@
 using namespace cv;
 using namespace std;
 
-ArXX::ArXX(int maxRadios, QString _serialNumber)
+ArXX::ArXX(int maxRadios, string _serialNumber)
 {
     maxNumberOfRadios = maxRadios;
-    serial = 0;
+    serialPort = 0;
     serialNumber = _serialNumber;
 }
 
 ArXX::~ArXX()
 {
-    if(serial->isOpen())
+    if(serialPort->is_open())
     {
-        serial->close();
+        serialPort->close();
     }
 }
 
-bool ArXX::open()
+bool ArXX::open(boost::asio::io_service *io)
 {
-    bool arduinoFound = false;
-    bool success = false;
+    serialPort = new boost::asio::serial_port(*io);
     
-    QString portName;
-    QString description;
+    boost::system::error_code ec;
+    serialPort->open("/dev/cu.usbmodem1421", ec);
     
-    foreach (const QSerialPortInfo& info, QSerialPortInfo::availablePorts())
+    if(ec)
     {
-        description = info.description();
-        
-//        cout << "--------------" << endl;
-//        cout << info.description().toStdString() << endl;
-//        cout << info.hasProductIdentifier() << endl;
-//        cout << info.hasVendorIdentifier() << endl;
-//        cout << info.manufacturer().toStdString() << endl;
-//        cout << info.portName().toStdString() << endl;
-//        cout << info.productIdentifier() << endl;
-//        cout << info.serialNumber().toStdString() << endl;
-//        cout << info.systemLocation().toStdString() << endl;
-//        cout << info.vendorIdentifier() << endl;
-//        cout << "--------------" << endl;
-        
-        //if (description.split(" ")[0] == "Arduino")
-        if(info.serialNumber() == serialNumber)
-        {
-            portName = info.portName();
-            arduinoFound = true;
-            break;
-        }
+        BOOST_LOG_TRIVIAL(error) << ec.message();
+        return false;
     }
     
-    serial = new QSerialPort();
+    serialPort->set_option(boost::asio::serial_port::baud_rate(115200));
+    serialPort->set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
+    serialPort->set_option(boost::asio::serial_port::character_size(boost::asio::serial_port::character_size(8)));
+    serialPort->set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
+    serialPort->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
     
-    if(arduinoFound)
+    boost::asio::async_read_until(*serialPort, buf, XON, boost::bind(&ArXX::readData, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+    
+    return true;
+}
+
+void ArXX::handle_write(boost::system::error_code ec, size_t bytes)
+{
+    if(ec)
     {
-        cout << portName.toStdString() << " connected." << endl;
-        
-        QString realPortName;
-        
-        // todo portname prefix may be fixed in upcoming Qt 5.5
-#ifdef _WIN32
-        realPortName = portName;
-#elif __APPLE__
-        realPortName = "/dev/cu." + portName;
-#elif __linux
-        realPortName = "/dev/" + portName;
-#endif
-        
-        serial->setPortName(realPortName);
-        serial->setBaudRate(QSerialPort::Baud115200);
-        serial->setDataBits(QSerialPort::Data8);
-        serial->setParity(QSerialPort::NoParity);
-        serial->setStopBits(QSerialPort::OneStop);
-        serial->setFlowControl(QSerialPort::NoFlowControl);
-        
-        if (serial->open(QIODevice::ReadWrite))
-        {
-            serial->clear();
-            connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-            
-            cout << "serial port " << description.toStdString() << " opened." << endl;
-            success = true;
-        }
+        BOOST_LOG_TRIVIAL(error) << ec.message();
+        return;
     }
     
-    return success;
+    // BOOST_LOG_TRIVIAL(info) << bytes << " written.";
 }
 
 void ArXX::close()
@@ -122,14 +87,14 @@ int ArXX::getNumberOfRadios()
     return radios.size();
 }
 
-bool ArXX::hasCapacity()
-{
-    return radios.size() < maxNumberOfRadios;
-}
-
 void ArXX::addRadio(AbstractRadio* radio)
 {
     radios.push_back(radio);
+}
+
+bool ArXX::hasCapacity()
+{
+    return radios.size() < maxNumberOfRadios;
 }
 
 void ArXX::suspendAll()

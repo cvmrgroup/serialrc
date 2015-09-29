@@ -19,8 +19,8 @@
 
 #include "dsmxradio.h"
 
-DSMXRadio::DSMXRadio(unsigned int id, unsigned int txId, std::string identifier) :
-AbstractRadio(id, txId, identifier)
+DSMXRadio::DSMXRadio(unsigned int id, unsigned int txId) :
+AbstractRadio(id, txId)
 {
     // default values
     throttle = -1.0;

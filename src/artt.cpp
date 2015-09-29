@@ -22,7 +22,7 @@
 using namespace cv;
 using namespace std;
 
-ArTT::ArTT(QString serial) :
+ArTT::ArTT(string serial) :
 ArXX(maxRadios, serial)
 {
     token = 0;
@@ -32,16 +32,31 @@ ArTT::~ArTT()
 {
 }
 
-void ArTT::readData()
+void ArTT::readData(boost::system::error_code ec, size_t bytes)
 {
-    char c;
-    int length = serial->read(&c, 1);
+    if(ec)
+    {
+        BOOST_LOG_TRIVIAL(error) << ec.message();
+        return;
+    }
     
-    if (length > 0 && c == XON)
+    std::istream in(&buf);
+    
+    char c;
+    in.read(reinterpret_cast<char *>(&c), sizeof(c));
+    
+    if (c == XON)
     {
         token = (token+1) % radios.size();
         writeData(token);
     }
+    else
+    {
+        BOOST_LOG_TRIVIAL(error) << "no XON received.";
+        return;
+    }
+    
+    boost::asio::async_read_until(*serialPort, buf, XON, boost::bind(&ArXX::readData, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 void ArTT::writeData(unsigned int id)
@@ -87,9 +102,8 @@ void ArTT::writeData(unsigned int id)
     frame[channel_6_hi] = SerialHelper::hiByte(ch6);
     frame[channel_6_lo] = SerialHelper::loByte(ch6);
     
-    // convert to qt byte array and write to serial port
-    QByteArray databuf = QByteArray((char *)frame, command_length);
-    serial->write(databuf);
+    // write to serial port
+    boost::asio::async_write(*serialPort, boost::asio::buffer(frame, command_length), boost::bind(&ArXX::handle_write, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 void ArTT::getRelayStates(vector<bool>& enabled)

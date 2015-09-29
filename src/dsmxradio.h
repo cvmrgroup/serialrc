@@ -32,7 +32,7 @@ class DSMXRadio: public AbstractRadio
     
 public:
     
-    DSMXRadio(unsigned int id, unsigned int txId, std::string identifier);
+    DSMXRadio(unsigned int id, unsigned int txId);
     virtual ~DSMXRadio();
     
     void toggleSender();

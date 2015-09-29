@@ -20,14 +20,12 @@
 #ifndef ABSTRACTRADIO_H
 #define ABSTRACTRADIO_H
 
-#include <string>
-
 class AbstractRadio
 {
     
 public:
     
-    AbstractRadio(unsigned int id, unsigned int txId, std::string identifier);
+    AbstractRadio(unsigned int id, unsigned int txId);
     virtual ~AbstractRadio();
     
     /**
@@ -130,15 +128,11 @@ public:
     double getCh5();
     double getCh6();
     
-    std::string getIdentifier();
-    
 protected:
     
     int id;
     
     int txId;
-    
-    std::string identifier;
     
     bool binding;
     bool enabled;

@@ -28,14 +28,13 @@
  */
 class ArTT: public ArXX
 {
-    Q_OBJECT
     
 public:
     
     /**
      * @brief Constructor.
      */
-    ArTT(QString serial);
+    ArTT(std::string serial);
     
     /**
      * @brief Destructor.
@@ -44,9 +43,7 @@ public:
     
     void getRelayStates(std::vector<bool>& enabled);
     
-public slots:
-    
-    void readData();
+    void readData(boost::system::error_code ec, size_t bytes);
     
 private:
     
@@ -55,7 +52,7 @@ private:
      */
     void writeData(unsigned int id = 0);
     
-    static const int maxRadios = 2;
+    static const int maxRadios = 3;
     
     /// length of a single transmitter command
     static const int command_length = 16;

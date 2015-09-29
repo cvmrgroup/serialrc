@@ -31,19 +31,16 @@
  */
 class ArTP: public ArXX
 {
-    Q_OBJECT
     
 public:
     
     /// Constructor.
-    ArTP(QString serial);
+    ArTP(std::string serial);
     
     /// Destructor.
     virtual ~ArTP();
     
-public slots:
-    
-    void readData();
+    void readData(boost::system::error_code ec, size_t bytes);
     
 private:
     

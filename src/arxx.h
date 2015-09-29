@@ -21,12 +21,24 @@
 #define ARXX_H
 
 #include <iostream>
+#include <string>
 
 #include <opencv2/core.hpp>
 
-#include <QWidget>
-#include <QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+#include <boost/thread.hpp>
+#include <boost/asio.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/read_until.hpp>
+#include <boost/asio/streambuf.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/bind.hpp>
+
+#include <boost/log/trivial.hpp>
 
 #include "serialhelper.h"
 #include "dsmxradio.h"
@@ -41,16 +53,15 @@
  * @brief Software-side class for communication with the software running on the
  * arduino triple transmission built-in arduino board.
  */
-class ArXX : public QObject
+class ArXX
 {
-    Q_OBJECT
     
 public:
     
     /**
      * @brief Constructor.
      */
-    ArXX(int maxNumberOfRadios, QString serialNumber);
+    ArXX(int maxNumberOfRadios, std::string serialNumber);
     
     /**
      * @brief Destructor.
@@ -60,7 +71,7 @@ public:
     /**
      *  @brief initialize the serial port.
      */
-    bool open();
+    bool open(boost::asio::io_service* io);
     
     /**
      * @brief finalize serial port.
@@ -74,12 +85,12 @@ public:
     void suspendAll();
     void getSuspendedTxs(std::vector<bool>& suspended);
     
-public slots:
-    
     /**
      *  @brief read data from serial port.
      */
-    virtual void readData() = 0;
+    virtual void readData(boost::system::error_code ec, size_t bytes) = 0;
+    
+    void handle_write(boost::system::error_code ec, size_t bytes);
     
 protected:
     
@@ -88,12 +99,11 @@ protected:
      */
     virtual void writeData(unsigned int id = 0) = 0;
     
-    /**
-     *  Qt's serial port implementation.
-     */
-    QSerialPort *serial;
+    boost::asio::serial_port* serialPort;
     
-    QString serialNumber;
+    boost::asio::streambuf buf;
+    
+    std::string serialNumber;
     
     /**
      *  max number of radios.

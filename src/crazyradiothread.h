@@ -22,17 +22,14 @@
 
 #include <iostream>
 
-#include <QThread>
-
-#include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 
 #include <cflie/CCrazyflie.h>
 
 #include "abstractradio.h"
 
-class CrazyRadioThread: public QThread
+class CrazyRadioThread
 {
-    Q_OBJECT
     
 public:
     
