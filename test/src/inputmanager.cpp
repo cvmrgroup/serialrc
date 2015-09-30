@@ -4,12 +4,13 @@
 
 #include "inputmanager.h"
 
-InputManager::InputManager(int source, int copterId, IRadio *radio,
+InputManager::InputManager(int source, std::vector<RadioConfiguration> confs, IRadio *radio,
                            boost::shared_ptr<boost::asio::io_service> io_service)
 {
+    this->confId = 0;
     this->radio = radio;
+    this->confs = confs;
     this->source = source;
-    this->copterId = copterId;
     this->io_service = io_service;
     this->timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(*io_service));
 }
@@ -62,7 +63,7 @@ void InputManager::update(const boost::system::error_code &ec)
         throw RadioException(ex);
     }
 
-    if (this->gamepad.update())
+    if (this->gamepad.update() && !this->confs.empty())
     {
         this->updateGamepad();
     }
@@ -72,22 +73,34 @@ void InputManager::update(const boost::system::error_code &ec)
 
 void InputManager::updateGamepad()
 {
+    RadioConfiguration conf = this->confs[this->confId];
+
     if (this->gamepad.buttonToggled(BUTTON_START))
     {
         // toggle play/pause
-        radio->fireRadioCommand(new ToggleSuspensionCommand(this->source, this->copterId));
+        radio->fireRadioCommand(new ToggleSuspensionCommand(this->source, conf.copterId));
     }
 
     if (this->gamepad.buttonToggled(BUTTON_SQUARE))
     {
         // toggle tansmitter on/off
-        radio->fireRadioCommand(new ToggleTransmitterCommand(this->source, this->copterId));
+        radio->fireRadioCommand(new ToggleTransmitterCommand(this->source, conf.copterId));
+    }
+
+    if (this->gamepad.buttonToggled(BUTTON_TRIANGLE) && this->confs.size() > 1)
+    {
+        radio->fireRadioCommand(new SuspendCopterCommand(this->source, conf.copterId));
+        this->confId = (this->confId + 1) % this->confs.size();
+        conf = this->confs[this->confId];
+
+        BOOST_LOG_TRIVIAL(info) << "switch copter to [ id: " << conf.copterId << ", sender: "
+                                << conf.sender << ", txId: " << conf.txId << " ]";
+
     }
 
     if (this->gamepad.buttonToggled(BUTTON_SELECT))
     {
         this->io_service->stop();
-        BOOST_LOG_TRIVIAL(info) << "stop";
     }
 
     IRadioCommand *command = NULL;
@@ -95,22 +108,22 @@ void InputManager::updateGamepad()
     if (this->gamepad.buttonPressed(BUTTON_RIGHT))
     {
         // set bind header
-        command = new BindTransmitterCommand(this->source, this->copterId);
+        command = new BindTransmitterCommand(this->source, conf.copterId);
     }
     else if (this->gamepad.buttonPressed(BUTTON_UP))
     {
         // arm multiwii
-        command = new ArmCommand(this->source, this->copterId);
+        command = new ArmCommand(this->source, conf.copterId);
     }
     else if (this->gamepad.buttonPressed(BUTTON_DOWN))
     {
-        command = new DisarmCommand(this->source, this->copterId);
+        command = new DisarmCommand(this->source, conf.copterId);
     }
     else
     {
         // set control signals
         cv::Vec4d u = this->gamepad.getAxisControls();
-        command = new ControlCommand(this->source, this->copterId, u);
+        command = new ControlCommand(this->source, conf.copterId, u);
     }
 
     // check if the command is not null

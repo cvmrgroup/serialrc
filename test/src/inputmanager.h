@@ -5,6 +5,7 @@
 #ifndef ICARUS_INPUTMANAGER_H
 #define ICARUS_INPUTMANAGER_H
 
+#include <vector>
 #include <exception>
 
 #include <boost/asio.hpp>
@@ -23,13 +24,15 @@
 #include <radio/commands/togglesuspensioncommand.h>
 #include <radio/commands/toggletransmittercommand.h>
 
+#include <config/radioconfiguration.h>
+
 #include <radioexception.h>
 
 class InputManager
 {
 public:
 
-    InputManager(int source, int copterId, IRadio *radio, boost::shared_ptr<boost::asio::io_service> io_service);
+    InputManager(int source, std::vector<RadioConfiguration> confs, IRadio *radio, boost::shared_ptr<boost::asio::io_service> io_service);
 
 private:
 
@@ -48,10 +51,12 @@ public:
 private:
 
     int source;
-    int copterId;
+    int confId;
 
     IRadio *radio;
     Gamepad gamepad;
+
+    std::vector<RadioConfiguration> confs;
 
     boost::shared_ptr<boost::asio::io_service> io_service;
     boost::shared_ptr<boost::asio::deadline_timer> timer;

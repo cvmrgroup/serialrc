@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<opencv_storage>
+    <n_copter>3</n_copter>
+
+    <!--
+    <copter_0>
+        <sender>crazy</sender>
+        <tx_id>0</tx_id>
+    </copter_0>
+    -->
+
+    <!--
+    <copter_0>
+        <sender>artp</sender>
+        <tx_id>0</tx_id>
+    </copter_0>
+    -->
+
+    <copter_0>
+        <sender>artt</sender>
+        <tx_id>0</tx_id>
+    </copter_0>
+    <copter_1>
+        <sender>artt</sender>
+        <tx_id>1</tx_id>
+    </copter_1>
+    <copter_2>
+        <sender>crazy</sender>
+        <tx_id>0</tx_id>
+    </copter_2>
+
+</opencv_storage>

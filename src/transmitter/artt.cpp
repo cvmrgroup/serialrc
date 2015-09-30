@@ -76,7 +76,7 @@ void ArTT::writeData(unsigned int id)
     unsigned char frame[command_length];
 
     frame[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
-    frame[header_2] = 0; // TODO set the correct value ask marc
+    frame[header_2] = header_2_default;
     frame[relay_state] = radio->isEnabled() ? relay_state_on : relay_state_off;
     frame[tx_id] = (unsigned char) id;
 
