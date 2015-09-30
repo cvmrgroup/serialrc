@@ -40,7 +40,7 @@ void ArXX::open()
         // create the exception string
         std::string ex = str(boost::format("can't find device with serial number [ %1% ]") % this->serialNumber);
         // display the error
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -61,7 +61,7 @@ void ArXX::open()
         std::string ex =
                 str(boost::format("can't open serial device [ %1% ], because [ %2% ]") % deviceName % ec.message());
         // display the error
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -144,7 +144,7 @@ void ArXX::onDataRead(boost::system::error_code ec, boost::shared_ptr<boost::asi
                 str(boost::format("fail to read data on serial port with serial number [ %1% ], because [ %2% ]") %
                     this->serialNumber % ec.message());
         // display the error
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -203,7 +203,7 @@ void ArXX::onDataWritten(boost::system::error_code ec, boost::shared_ptr<boost::
                 str(boost::format("fail to write through the serial port with serial number [ %1% ], because [ %2% ]") %
                     this->serialNumber % ec.message());
         // display the error
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -250,7 +250,7 @@ void ArXX::addRadio(AbstractRadio *radio)
                 boost::format("can't add radio with trasmitter id [ %1% ] to serial [ %2% ], because no radio capacity available") %
                 txId % this->serialNumber);
         // display the error
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }

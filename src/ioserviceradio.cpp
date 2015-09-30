@@ -69,7 +69,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
         // create the exception string
         std::string ex = str(boost::format("can't create transmitter for unknown sender type [ %1% ]") % sender);
         // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
         throw RadioException(ex);
     }
@@ -88,7 +88,7 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
         // create the exception string
         std::string ex = str(boost::format("copter [ %1% ] already configured") % copterId);
         // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
+        //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
         throw RadioException(ex);
     }
@@ -114,6 +114,8 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     transmitter->addRadio(radio);
     // add the radio to the copter
     this->radios[copterId] = radio;
+    // notify about the loaded radio
+    this->fireRadioEvent(radio);
 }
 
 void IOServiceRadio::start()
@@ -159,6 +161,22 @@ void IOServiceRadio::stop()
 
 // ############################################################################################
 
+void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
+{
+    // create the RadioEvent
+    RadioEvent e;
+    e.ch5 = radio->getCh5();
+    e.ch6 = radio->getCh6();
+    e.txId = radio->getTxId();
+    e.copterId = radio->getId();
+    e.enabled = radio->isEnabled();
+    e.binding = radio->isBinding();
+    e.suspended = radio->isSuspended();
+
+    // fire the RadioEvent
+    this->onRadioChanged(e);
+}
+
 void IOServiceRadio::fireRadioCommand(IRadioCommand *command)
 {
     // invoke the fireRadioCommand inside the io_service to be thread safe
@@ -180,6 +198,8 @@ void IOServiceRadio::fireRadioCommand(IRadioCommand *command)
                                    AbstractRadio *radio = this->radios[copterId];
                                    // execute the command for the found radio
                                    this->commandExecutor.execute(command, radio);
+                                   // fire a radio event, because the state of the radio changed
+                                   this->fireRadioEvent(radio);
                                }
                            });
 }

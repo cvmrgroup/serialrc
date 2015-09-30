@@ -9,9 +9,8 @@
 #include <functional>
 #include <unordered_map>
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/format.hpp>
+#include <boost/signals2.hpp>
 #include <boost/log/trivial.hpp>
 
 #include <radio/i_radio.h>
@@ -20,6 +19,8 @@
 #include "transmitter/artp.h"
 #include "transmitter/artt.h"
 #include "transmitter/crazyradiotransmitter.h"
+
+#include "radio/radioevent.h"
 
 #include "radio/dsmxradio.h"
 #include "radio/crazyradio.h"
@@ -36,6 +37,8 @@ public:
     virtual ~IOServiceRadio();
 
 private:
+
+    void fireRadioEvent(AbstractRadio *radio);
 
     void createRadio(RadioConfiguration &conf);
 
@@ -66,6 +69,12 @@ public:
      * the method is thread safe, because the call gets invoke into the underlying io_service.
      */
     void stop();
+
+    /**
+     * boost signal which notifies when a radio changed his state
+     * @param RadioEvent the event which contains information about the radio state
+     */
+    boost::signals2::signal<void(RadioEvent)> onRadioChanged;
 
 private:
 
