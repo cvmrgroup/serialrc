@@ -73,8 +73,14 @@ void ArXX::open()
     this->serialPort->set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
     this->serialPort->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
 
-    // register the read data callback
-    this->readData();
+    // the delay to wait for the serial port, before start reading
+    boost::posix_time::milliseconds readDelay(100);
+    // create the async deadline_timer
+    boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->io_service));
+    // set the wait delay to the timer
+    timer->expires_from_now(readDelay);
+    // register the async timer to invoke the first reading
+    timer->async_wait(boost::bind(&ArXX::invokeReading, this, boost::asio::placeholders::error, timer));
 }
 
 // #################################################################################
@@ -114,6 +120,22 @@ std::string ArXX::findDeviceName(std::string &description)
 }
 
 // #################################################################################
+
+void ArXX::invokeReading(boost::system::error_code ec, boost::shared_ptr<boost::asio::deadline_timer> timer)
+{
+    // check if an error happens
+    if (ec)
+    {
+        // create the exception string
+        std::string ex =
+                str(boost::format("fail to start reading data on serial port with serial number [ %1% ], because [ %2% ]") %
+                    this->serialNumber % ec.message());
+        // throw an radio exception
+        throw RadioException(ex);
+    }
+    // register the first read callback
+    this->readData();
+}
 
 void ArXX::readData()
 {

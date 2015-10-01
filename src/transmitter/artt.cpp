@@ -37,22 +37,41 @@ void ArTT::addRadio(AbstractRadio *radio)
 
 void ArTT::onData(const char *frame, size_t length)
 {
-    // check if same data read
-    if (length > 0)
+    if (length <= 0)
     {
-        // check if an XON was received
-        if (frame[0] == XON)
-        {
-            // switch to nect token
-            this->token = (this->token + 1) % this->transmitterIds.size();
-            // get the next transmitter id
-            unsigned int txId = this->transmitterIds[this->token];
-            // write for the next transmitter
-            this->writeData(txId);
-        } else
-        {
-            BOOST_LOG_TRIVIAL(error) << "no XON received on serial port [ " << this->getSerialNumber() << " ]";
-        }
+        return;
+    }
+
+    // the index to find the xon in the frame
+    int xOnIndex = 0;
+
+    /* if the length bigger then one
+     * #########
+     * fix for the problem that when the arduino is first time connected,
+     * that a frame of size 2 is received with the array:
+     * [ -1, 17 ]
+     * #########
+     */
+    if (length > 1)
+    {
+        xOnIndex = 1;
+    }
+
+    // check if an XON was received
+    if (frame[xOnIndex] == XON)
+    {
+        // switch to nect token
+        this->token = (this->token + 1) % this->transmitterIds.size();
+        // get the next transmitter id
+        unsigned int txId = this->transmitterIds[this->token];
+        // write for the next transmitter
+        this->writeData(txId);
+    } else
+    {
+        // create the exception string
+        std::string ex = str(boost::format("no XON on serial port [ %1% ] received") % this->getSerialNumber());
+        // throw the radio exception
+        throw RadioException(ex);
     }
 }
 

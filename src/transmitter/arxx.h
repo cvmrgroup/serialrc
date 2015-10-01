@@ -60,6 +60,8 @@ private:
 
     std::string findDeviceName(std::string &description);
 
+    void invokeReading(boost::system::error_code ec, boost::shared_ptr<boost::asio::deadline_timer> timer);
+
     void readData();
 
     void onDataRead(boost::system::error_code ec, boost::shared_ptr<boost::asio::streambuf> buf, size_t bytes);
