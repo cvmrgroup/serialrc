@@ -14,6 +14,9 @@ class ITransmitter
 
 public:
 
+    virtual ~ITransmitter()
+    { };
+
     /**
      * open the transmitter
      */
