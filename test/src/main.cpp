@@ -2,7 +2,7 @@
 #include <boost/program_options.hpp>
 
 #include <ioserviceradio.h>
-#include <config/radioconfigloader.h>
+#include <config/configloader.h>
 
 #include "inputmanager.h"
 #include "programoptions.h"
@@ -44,15 +44,14 @@ int main(int argc, const char *argv[])
     // #############################################
 
     std::string radio_conf = (*args)["radio_conf"].as<std::string>();
-    std::vector<RadioConfiguration> confs = RadioConfigLoader::loadConfig(radio_conf);
+    std::vector<RadioConfiguration> confs = ConfigLoader::loadRadioConfigs(radio_conf);
 
     // #############################################
 
     // create the radio
-    IOServiceRadio radio(io_service);
+    IOServiceRadio radio(confs, io_service);
 
-    // initialize and start the Radio
-    radio.initialize(confs);
+    // start the Radio
     radio.start();
 
     // #############################################
