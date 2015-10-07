@@ -32,7 +32,7 @@
 class IOServiceRadio : public IRadio
 {
 public:
-    IOServiceRadio(boost::shared_ptr<boost::asio::io_service> io_service);
+    IOServiceRadio(std::vector<RadioConfiguration> configs, boost::shared_ptr<boost::asio::io_service> io_service);
 
     virtual ~IOServiceRadio();
 
@@ -46,15 +46,15 @@ private:
 
     // ############################################################################################
 
-public:
+    void doStart();
 
-    /**
-     * initialize the IOServiceRadio with the given RadioConfigurations
-     * the method is thread safe, because the call gets invoke into the underlying io_service.
-     * @param confs the vector with the RadioConfigurations to initialize the radios for
-     *
-     */
-    void initialize(std::vector<RadioConfiguration> confs);
+    void doStop();
+
+    // ############################################################################################
+
+    void executeCommand(IRadioCommand *command);
+
+public:
 
     void fireRadioCommand(IRadioCommand *command);
 
@@ -71,10 +71,9 @@ public:
     void stop();
 
     /**
-     * boost signal which notifies when a radio changed his state
-     * @param RadioEvent the event which contains information about the radio state
+     * waits for the IOServiceRadio to finish
      */
-    boost::signals2::signal<void(RadioEvent)> onRadioChanged;
+    void join();
 
 private:
 
@@ -83,6 +82,9 @@ private:
 
     /// the underlying and used io_service
     boost::shared_ptr<boost::asio::io_service> io_service;
+
+    /// the list with RadioConfiguration
+    std::vector<RadioConfiguration> configs;
 
     /// the map with all radios for the configured copters
     std::unordered_map<int, AbstractRadio *> radios;

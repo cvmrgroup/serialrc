@@ -4,8 +4,11 @@
 
 #include "ioserviceradio.h"
 
-IOServiceRadio::IOServiceRadio(boost::shared_ptr<boost::asio::io_service> io_service)
+IOServiceRadio::IOServiceRadio(std::vector<RadioConfiguration> configs,
+                               boost::shared_ptr<boost::asio::io_service> io_service)
 {
+    this->started = false;
+    this->configs = configs;
     this->io_service = io_service;
 }
 
@@ -34,17 +37,7 @@ IOServiceRadio::~IOServiceRadio()
     this->transmitters.clear();
 }
 
-void IOServiceRadio::initialize(std::vector<RadioConfiguration> confs)
-{
-    // invoke the initialize of the radio inside the io_service to be thread safe
-    this->io_service->post([this, confs]()
-                           {
-                               for (auto conf: confs)
-                               {
-                                   this->createRadio(conf);
-                               }
-                           });
-}
+// ##########################################################################################################
 
 ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 {
@@ -118,45 +111,67 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     this->fireRadioEvent(radio);
 }
 
+// ##########################################################################################################
+
 void IOServiceRadio::start()
 {
     // execute the start of the radio inside the io_service to be thread safe
-    this->io_service->post([this]()
-                           {
-                               // open all registered transmitters
-                               for (auto entry: this->transmitters)
-                               {
-                                   // get the transmitter
-                                   ITransmitter *transmitter = entry.second;
+    this->io_service->post(boost::bind(&IOServiceRadio::doStart, this));
+}
 
-                                   // check if he transmitter is open
-                                   if (!transmitter->isOpen())
-                                   {
-                                       // open the transmitter
-                                       transmitter->open();
-                                   }
-                               }
-                           });
+void IOServiceRadio::doStart()
+{
+    // create for each given configuration an radio
+    for (auto config : this->configs)
+    {
+        this->createRadio(config);
+    }
+
+    // start the transmitters
+    for (auto entry: this->transmitters)
+    {
+        // get the transmitter
+        ITransmitter *transmitter = entry.second;
+
+        // check if he transmitter is open
+        if (!transmitter->isOpen())
+        {
+            // open the transmitter
+            transmitter->open();
+        }
+    }
+    // the the radio started
+    this->started = true;
 }
 
 void IOServiceRadio::stop()
 {
     // execute the stop inside the io_service, to be thread safe
-    this->io_service->post([this]()
-                           {
-                               for (auto entry: this->transmitters)
-                               {
-                                   // get the transmitter
-                                   ITransmitter *transmitter = entry.second;
+    this->io_service->post(boost::bind(&IOServiceRadio::doStop, this));
+}
 
-                                   // checks if the transmitter is open
-                                   if (transmitter->isOpen())
-                                   {
-                                       // close the transmitter
-                                       transmitter->close();
-                                   }
-                               }
-                           });
+void IOServiceRadio::doStop()
+{
+    // stop each transmitter
+    for (auto entry: this->transmitters)
+    {
+        // get the transmitter
+        ITransmitter *transmitter = entry.second;
+
+        // checks if the transmitter is open
+        if (transmitter->isOpen())
+        {
+            // close the transmitter
+            transmitter->close();
+        }
+    }
+    // set the radio stopped
+    this->started = false;
+}
+
+void IOServiceRadio::join()
+{
+    // not used, because of the io_service
 }
 
 // ############################################################################################
@@ -180,26 +195,27 @@ void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
 void IOServiceRadio::fireRadioCommand(IRadioCommand *command)
 {
     // invoke the fireRadioCommand inside the io_service to be thread safe
-    this->io_service->post([this, command]()
-                           {
-                               // get the copter Id
-                               int copterId = command->getCopterId();
+    this->io_service->post(boost::bind(&IOServiceRadio::executeCommand, this, command));
+}
 
-                               // check if a radio for the given copter is registered
-                               if (this->radios.find(copterId) == this->radios.end())
-                               {
-                                   // remove the command
-                                   delete command;
+void IOServiceRadio::executeCommand(IRadioCommand *command)
+{
+    // get the copter Id
+    int copterId = command->getCopterId();
 
-                                   BOOST_LOG_TRIVIAL(error) << "no radio for copter [ " << copterId << " ]";
-                               } else
-                               {
-                                   // get th radio for the copter
-                                   AbstractRadio *radio = this->radios[copterId];
-                                   // execute the command for the found radio
-                                   this->commandExecutor.execute(command, radio);
-                                   // fire a radio event, because the state of the radio changed
-                                   this->fireRadioEvent(radio);
-                               }
-                           });
+    // check if a radio for the given copter is registered
+    if (this->radios.find(copterId) == this->radios.end())
+    {
+        BOOST_LOG_TRIVIAL(error) << "no radio for copter [ " << copterId << " ]";
+    } else
+    {
+        // get th radio for the copter
+        AbstractRadio *radio = this->radios[copterId];
+        // execute the command for the found radio
+        this->commandExecutor.execute(command, radio);
+        // fire a radio event, because the state of the radio changed
+        this->fireRadioEvent(radio);
+    }
+    // remove the command
+    delete command;
 }

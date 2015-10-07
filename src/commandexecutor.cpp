@@ -33,9 +33,6 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
     // check if a method is binded for the given command
     if (this->bindings.find(type) == this->bindings.end())
     {
-        // remove the command
-        delete command;
-
         // create the exception string
         std::string ex = str(boost::format("no method binding for radio-command-type [ %1% ]") % ((int) type));
         // display the exception with logger
@@ -46,10 +43,6 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
 
     // execute the binded method wfor the given command
     this->bindings[type](command, radio);
-
-    // remove the command
-    delete command;
-
 }
 
 // ################################################################
