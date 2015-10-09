@@ -106,7 +106,7 @@ std::string ArXX::findDeviceName(std::string &description)
 #ifdef _WIN32
             realPortName = deviceName;
 #elif __APPLE__
-            realPortName = "/dev/cu." + deviceName;
+            realPortName = "/dev/" + deviceName;
 #elif __linux
             realPortName = "/dev/" + deviceName;
 #endif
