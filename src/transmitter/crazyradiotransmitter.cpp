@@ -50,6 +50,11 @@ void CrazyRadioTransmitter::close()
 {
     // set running to false
     this->running = false;
+
+    // release the copter
+    this->copter.reset();
+    // release the radio
+    this->radio.reset();
 }
 
 // ###########################################
