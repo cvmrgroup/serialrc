@@ -13,7 +13,9 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
+#include <boost/thread.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/thread/latch.hpp>
 
 #include "i_transmitter.h"
 #include "radioexception.h"
@@ -26,9 +28,13 @@ public:
 
 private:
 
-    void update(const boost::system::error_code &ec);
+    void run();
 
-    void invokeTimer();
+    void initialize();
+
+    void update();
+
+    void cleanup();
 
 public:
 
@@ -65,11 +71,11 @@ private:
     /// the crazy radio
     boost::shared_ptr<CCrazyRadio> radio;
 
+    /// the boost thread for the update
+    boost::shared_ptr<boost::thread> thread;
+
     /// the underlying used io_service
     boost::shared_ptr<boost::asio::io_service> io_service;
-    /// the boost timer for updating the crazyflie copter
-    boost::shared_ptr<boost::asio::deadline_timer> timer;
-
 };
 
 

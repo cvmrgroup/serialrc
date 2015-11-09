@@ -11,7 +11,6 @@ set(CMAKE_AUTOMOC ON)
 
 find_library(USB_LIB usb-1.0)
 
-#find_package(libusb-1.0 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(CFlie REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system log thread regex date_time)
@@ -26,7 +25,6 @@ add_library(${TARGET}
 
 target_include_directories(${TARGET} PUBLIC
 	${OpenCV_INCLUDE_DIRS} # required by xcode
-	#${LIBUSB_1_INCLUDE_DIRS}
 	${CFlie_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
     ${Qt5SerialPort_INCLUDE_DIRS}
@@ -37,7 +35,6 @@ target_link_libraries(${TARGET}
     Qt5::SerialPort
 	${OpenCV_LIBS}
 	${CFlie_LIBRARY}
-	#${LIBUSB_1_LIBRARIES}
 	${USB_LIB}
 	${Boost_LIBRARIES}
     utils

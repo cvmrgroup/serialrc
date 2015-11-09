@@ -2,6 +2,7 @@
 // Created by lasse on 29.09.15.
 //
 
+#include <opencv2/core/matx.hpp>
 #include "crazyradiotransmitter.h"
 
 CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,
@@ -9,12 +10,74 @@ CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,
 {
     this->name = name;
     this->running = false;
-    this->currentRadio = 0;
+    this->currentRadio = -1;
     this->io_service = io_service;
-    this->timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(*io_service));
 }
 
 void CrazyRadioTransmitter::open()
+{
+    // check if the thread already created
+    if (this->thread)
+    {
+        return;
+    }
+
+    // set running to true
+    this->running = true;
+    // start the boost thread
+    this->thread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&CrazyRadioTransmitter::run, this)));
+}
+
+void CrazyRadioTransmitter::close()
+{
+
+    // set running to false
+    this->running = false;
+
+    // check if the thread is avalaibe
+    if (this->thread && this->thread->joinable())
+    {
+        // interrupt the thread
+        this->thread->interrupt();
+        // wait for the thread has been finished
+        this->thread->join();
+    }
+}
+
+// ###########################################
+
+void CrazyRadioTransmitter::run()
+{
+    // display info message
+    BOOST_LOG_TRIVIAL(info) << "starting crazyradio thread...";
+    // initialize the radio
+    this->initialize();
+
+    // run until running is false
+    while (this->running)
+    {
+        try
+        {
+            // update the crazy radio
+            this->update();
+
+            // sleep for 10 millis
+            boost::posix_time::milliseconds timeout(10);
+            boost::this_thread::sleep(timeout);
+        } catch (boost::thread_interrupted &)
+        {
+            BOOST_LOG_TRIVIAL(error) << "the crazy radio thread has been interrupred";
+        }
+    }
+
+    // clean up the crazy radio
+    this->cleanup();
+
+    // display info message
+    BOOST_LOG_TRIVIAL(info) << "crazyradio thread stopped";
+}
+
+void CrazyRadioTransmitter::initialize()
 {
     // the url to open the crazy radio
     std::string crazyRadioUrl = "radio://0/80/250K";
@@ -22,21 +85,19 @@ void CrazyRadioTransmitter::open()
     // create a new radio
     this->radio = boost::shared_ptr<CCrazyRadio>(new CCrazyRadio(crazyRadioUrl));
 
+    // start the radio
     if (this->radio->startRadio())
     {
         // create the copter
         this->copter = boost::shared_ptr<CCrazyflie>(new CCrazyflie(radio.get()));
         // configure the copter
         this->copter->setSendSetpoints(true);
+        // set thrust to zero
         this->copter->setThrust(0);
-
-        // set running to true
-        this->running = true;
-
-        // start the crazy radio update loop
-        this->invokeTimer();
     } else
     {
+        // set running to false
+        this->running = false;
         // create the exception string
         std::string ex = str(boost::format("fail to open crazy radio with url [ %1% ]") % crazyRadioUrl);
         // display the error
@@ -46,78 +107,69 @@ void CrazyRadioTransmitter::open()
     }
 }
 
-void CrazyRadioTransmitter::close()
+void CrazyRadioTransmitter::update()
 {
-    // set running to false
-    this->running = false;
-
-    // release the copter
-    this->copter.reset();
-    // release the radio
-    this->radio.reset();
-}
-
-// ###########################################
-
-
-void CrazyRadioTransmitter::invokeTimer()
-{
-    // get a delay from 10 ms
-    boost::posix_time::milliseconds timeout(10);
-    this->timer->expires_from_now(timeout);
-    // add the async callback for the timer
-    this->timer->async_wait(boost::bind(&CrazyRadioTransmitter::update, this, boost::asio::placeholders::error));
-}
-
-void CrazyRadioTransmitter::update(const boost::system::error_code &ec)
-{
-    // check if an error happens
-    if (ec)
-    {
-        std::string ex = str(boost::format("fail to update crazy radio transmitter, because [ %1% ]") % ec.message());
-        // display error
-        BOOST_LOG_TRIVIAL(error) << ex;
-        // throw the exception
-        throw RadioException(ex);
-    }
-
-    // check if the CrazyRadioTransmitter is running
-    if (!this->running)
-    {
-        return;
-    }
-
+    // update the copter radio
     if (this->copter->cycle())
     {
-        // check if the current radio avalable
-        if (this->radios.find(this->currentRadio) != this->radios.end())
+        // falg if request was successful
+        bool success = false;
+        // the control signals
+        cv::Vec4d u(0.0, 0.0, 0.0, 0.0);
+        // the latch to wait for the request
+        boost::latch latch(2);
+
+        // invoke the radio control request inside the io_service to be thread save
+        this->io_service->post([this, &latch, &success, &u]()
+                               {
+                                   // check if current radio exists
+                                   if (this->radios.find(this->currentRadio) != this->radios.end())
+                                   {
+                                       // get the current radio
+                                       AbstractRadio *radio = this->radios[this->currentRadio];
+                                       // check if the radio is suspended
+                                       if (!radio->isSuspended())
+                                       {
+                                           // create the Control Values
+                                           u = cv::Vec4d(radio->getThrottle(),
+                                                         radio->getRoll(),
+                                                         radio->getPitch(),
+                                                         radio->getYaw());
+                                       }
+                                       // set success to true
+                                       success = true;
+                                   }
+                                   // release the latch
+                                   latch.count_down();
+                               });
+        // countdown and wait for the latch release
+        latch.count_down_and_wait();
+        // check if the request was successful
+        if (success)
         {
-            // get the current radio
-            AbstractRadio *radio = this->radios[this->currentRadio];
-
-            int throttle = (int) radio->getThrottle();
-            float roll = (float) radio->getRoll();
-            float pitch = (float) radio->getPitch();
-            float yaw = (float) radio->getYaw();
-
-            // check if suspended given
-            if (radio->isSuspended())
-            {
-                throttle = 0;
-                roll = pitch = yaw = 0.0;
-            }
-
-            this->copter->setThrust(throttle);
-            this->copter->setRoll(roll);
-            this->copter->setPitch(pitch);
-            this->copter->setYaw(yaw);
+            // update the control signals
+            this->copter->setThrust((int) u[0]);
+            this->copter->setRoll((float) u[1]);
+            this->copter->setPitch((float) u[2]);
+            this->copter->setYaw((float) u[3]);
         }
     }
-
-    // restart the timer for next update
-    this->invokeTimer();
 }
 
+void CrazyRadioTransmitter::cleanup()
+{
+    if(this->copter){
+        // free the copter
+        this->copter.reset();
+        this->copter = NULL;
+    }
+
+    if(this->radio){
+        // free the radios
+        this->radio.reset();
+        this->radio = NULL;
+    }
+}
 
 // ###########################################
 
