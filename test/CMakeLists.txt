@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(CMAKE_AUTOMOC ON)
-
 set(TARGET multiradio_test)
 project(${TARGET})
 
@@ -15,13 +13,13 @@ add_executable(${TARGET}
         ${${TARGET}_HEADERS})
 
 target_include_directories(${TARGET} PUBLIC
-        multiradio
         inputdevices
         src
         ${Boost_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
+        PUBLIC
         multiradio
         inputdevices
         ${Boost_LIBRARIES}
