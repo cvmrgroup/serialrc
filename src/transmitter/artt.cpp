@@ -27,8 +27,10 @@ ArTT::ArTT(const std::string name, std::string serial, boost::shared_ptr<boost::
 
 void ArTT::addRadio(AbstractRadio *radio)
 {
-    // get the transmitter id
-    int txId = radio->getTxId();
+    // get the transmitter id as string
+    std::string txIdStr = radio->getTxId();
+    // cast the id to int
+    int txId = boost::lexical_cast<int>(txIdStr);
     // add the transmitter id to the ids
     this->transmitterIds.push_back(txId);
     // notify ArXX about add Radio

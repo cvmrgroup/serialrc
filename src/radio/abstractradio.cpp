@@ -19,7 +19,7 @@
 
 #include "abstractradio.h"
 
-AbstractRadio::AbstractRadio(unsigned int _id, unsigned int _txId)
+AbstractRadio::AbstractRadio(unsigned int _id, std::string _txId)
 {
     id = _id;
     txId = _txId;
@@ -38,7 +38,7 @@ unsigned int AbstractRadio::getId()
     return id;
 }
 
-unsigned int AbstractRadio::getTxId()
+std::string AbstractRadio::getTxId()
 {
     return txId;
 }

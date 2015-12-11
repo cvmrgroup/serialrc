@@ -20,12 +20,14 @@
 #ifndef ABSTRACTRADIO_H
 #define ABSTRACTRADIO_H
 
+#include <string>
+
 class AbstractRadio
 {
 
 public:
 
-    AbstractRadio(unsigned int id, unsigned int txId);
+    AbstractRadio(unsigned int id, std::string txId);
 
     virtual ~AbstractRadio();
 
@@ -102,7 +104,7 @@ public:
      *  get current transmitter id.
      *  @return the transmitter id
      */
-    unsigned int getTxId();
+    std::string getTxId();
 
     /**
      * Method to retrieve the currently active transmitters.
@@ -139,7 +141,7 @@ protected:
 
     int id;
 
-    int txId;
+    std::string txId;
 
     bool binding;
     bool enabled;

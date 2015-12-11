@@ -32,6 +32,7 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
 #include "serialhelper.h"

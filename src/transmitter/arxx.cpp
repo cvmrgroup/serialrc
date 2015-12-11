@@ -260,7 +260,11 @@ int ArXX::getNumberOfRadios()
 
 void ArXX::addRadio(AbstractRadio *radio)
 {
-    int txId = radio->getTxId();
+    // get the transmitter id as string
+    std::string txIdStr = radio->getTxId();
+    // cast the id to int
+    int txId = boost::lexical_cast<int>(txIdStr);
+
     // check if capacity is left
     if (this->hasCapacity())
     {

@@ -71,7 +71,10 @@ void ArTP::writeData()
     {
         AbstractRadio *radio = entry.second;
 
-        int id = radio->getTxId();
+        // get the transmitter id as string
+        std::string txIdStr = radio->getTxId();
+        // cast the id to int
+        int id = boost::lexical_cast<int>(txIdStr);
 
         int ch1 = center_value_offset + radio->getThrottle() * value_range_scale;
         int ch2 = center_value_offset + radio->getRoll() * value_range_scale;

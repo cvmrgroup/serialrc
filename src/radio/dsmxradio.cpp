@@ -19,7 +19,7 @@
 
 #include "dsmxradio.h"
 
-DSMXRadio::DSMXRadio(unsigned int id, unsigned int txId) :
+DSMXRadio::DSMXRadio(unsigned int id, std::string txId) :
         AbstractRadio(id, txId)
 {
     // default values

@@ -57,7 +57,7 @@ public:
 private:
 
     /// the id of the current radio
-    int currentRadio;
+    std::string currentRadio;
 
     /// flag if the CrazyRadioTransmitter is running
     std::atomic<bool> running;
@@ -66,7 +66,7 @@ private:
     std::string name;
 
     /// the map with radios
-    std::unordered_map<int, AbstractRadio *> radios;
+    std::unordered_map<std::string, AbstractRadio *> radios;
 
     /// the crazyflie copter
     boost::shared_ptr<CCrazyflie> copter;

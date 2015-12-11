@@ -79,8 +79,14 @@ void CrazyRadioTransmitter::run()
 
 void CrazyRadioTransmitter::initialize()
 {
+    // Fix Qt Issue with Localized String and sscanf
+    // see: http://www.solved.online/311063/why-does-qt-change-behaviour-of-sscanf
+    setlocale(LC_NUMERIC, "C");
+
     // the url to open the crazy radio
-    std::string crazyRadioUrl = "radio://0/80/250K";
+    std::string crazyRadioUrl = this->currentRadio;
+
+    BOOST_LOG_TRIVIAL(info) << "connecting crazyflie with radio url [ " << crazyRadioUrl  << " ]";
 
     // create a new radio
     this->radio = boost::shared_ptr<CCrazyRadio>(new CCrazyRadio(crazyRadioUrl));
@@ -243,14 +249,14 @@ bool CrazyRadioTransmitter::hasCapacity()
 void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
 {
     // get the transmitter id
-    int txId = radio->getTxId();
+    std::string radioURI = radio->getTxId();
 
     if (!this->hasCapacity())
     {
         // create the exception string
         std::string ex = str(
                 boost::format("can't add radio with trasmitter id [ %1% ] to vrazy radio transmitter, because no radio capacity available") %
-                txId);
+                        radioURI);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
@@ -258,8 +264,8 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
     }
 
     // insert the AbstractRadio
-    this->radios[txId] = radio;
+    this->radios[radioURI] = radio;
     // activaed the current radio
-    this->currentRadio = txId;
+    this->currentRadio = radioURI;
 
 }

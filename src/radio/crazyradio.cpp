@@ -19,7 +19,7 @@
 
 #include "crazyradio.h"
 
-CrazyRadio::CrazyRadio(unsigned int id, unsigned int txId) :
+CrazyRadio::CrazyRadio(unsigned int id, std::string txId) :
         AbstractRadio(id, txId)
 {
     throttle = 0;
