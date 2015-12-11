@@ -35,7 +35,7 @@ CrazyRadio::~CrazyRadio()
 void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw)
 {
     int throttle_center_value_offset = 30000;
-    int throttle_value_range_scale = 60000;
+    int throttle_value_range_scale = 30000;
 
     throttle = (int) (throttle_center_value_offset + _throttle * throttle_value_range_scale);
     roll = (float) (_roll * -45);
