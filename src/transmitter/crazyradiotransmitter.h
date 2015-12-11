@@ -36,6 +36,8 @@ private:
 
     void cleanup();
 
+    void publishCopterData();
+
 public:
 
     void open();

@@ -40,6 +40,8 @@ private:
 
     void fireRadioEvent(AbstractRadio *radio);
 
+    void fireCopterData(CopterData data);
+
     void createRadio(RadioConfiguration &conf);
 
     ITransmitter *createAndGetTransmitter(const std::string sender);

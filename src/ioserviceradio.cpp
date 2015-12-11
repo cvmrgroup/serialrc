@@ -68,7 +68,11 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     }
 
     // get the transmitter
-    return this->transmitters[sender];
+    ITransmitter *transmitter = this->transmitters[sender];
+    // connect the fireCopterData to the on copter data from transmitter
+    transmitter->onCopterData.connect(boost::bind(&IOServiceRadio::fireCopterData, this, _1));
+
+    return transmitter;
 }
 
 void IOServiceRadio::createRadio(RadioConfiguration &conf)
@@ -172,6 +176,14 @@ void IOServiceRadio::doStop()
 void IOServiceRadio::join()
 {
     // not used, because of the io_service
+}
+
+// ############################################################################################
+
+void IOServiceRadio::fireCopterData(CopterData data)
+{
+    // fire the copter data
+    this->onCopterData(data);
 }
 
 // ############################################################################################

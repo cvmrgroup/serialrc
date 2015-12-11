@@ -7,6 +7,10 @@
 
 #include <string>
 
+#include <boost/signals2.hpp>
+
+#include <radio/copterdata.h>
+
 #include "radio/abstractradio.h"
 
 class ITransmitter
@@ -52,6 +56,11 @@ public:
      * @param radio the radio to add to this ITransmitter
      */
     virtual void addRadio(AbstractRadio *radio) = 0;
+
+    // ###########################################
+
+    /// the boost signal to publish copter data
+    boost::signals2::signal<void(CopterData data)> onCopterData;
 };
 
 #endif //ICARUS_I_TRANSMITTER_H

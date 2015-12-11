@@ -112,7 +112,7 @@ void CrazyRadioTransmitter::update()
     // update the copter radio
     if (this->copter->cycle())
     {
-        // falg if request was successful
+        // flag if request was successful
         bool success = false;
         // the control signals
         cv::Vec4d u(0.0, 0.0, 0.0, 0.0);
@@ -153,22 +153,73 @@ void CrazyRadioTransmitter::update()
             this->copter->setPitch((float) u[2]);
             this->copter->setYaw((float) u[3]);
         }
+
+        // publish the copter data from the cflie radio
+        this->publishCopterData();
     }
 }
 
 void CrazyRadioTransmitter::cleanup()
 {
-    if(this->copter){
+    if (this->copter)
+    {
         // free the copter
         this->copter.reset();
         this->copter = NULL;
     }
 
-    if(this->radio){
+    if (this->radio)
+    {
         // free the radios
         this->radio.reset();
         this->radio = NULL;
     }
+}
+
+// ###########################################
+
+void CrazyRadioTransmitter::publishCopterData()
+{
+    // check if the current radio is available
+    if (this->radios.find(this->currentRadio) == this->radios.end())
+    {
+        return;
+    }
+
+    // get the current radio
+    AbstractRadio *radio = this->radios[this->currentRadio];
+
+    CopterData data;
+    // get the copter id
+    data.copterId = radio->getId();
+
+    data.batteryLevel = this->copter->batteryLevel();
+    data.batteryState = this->copter->batteryState();
+
+    data.asl = this->copter->asl();
+    data.aslLong = this->copter->aslLong();
+
+    data.pressure = this->copter->pressure();
+    data.temperature = this->copter->temperature();
+
+    data.accX = this->copter->accX();
+    data.accY = this->copter->accY();
+    data.accZ = this->copter->accZ();
+    data.accZW = this->copter->accZW();
+
+    data.gyroX = this->copter->gyroX();
+    data.gyroY = this->copter->gyroY();
+    data.gyroZ = this->copter->gyroZ();
+
+    data.magX = this->copter->magX();
+    data.magY = this->copter->magY();
+    data.magZ = this->copter->magZ();
+
+    // move into the given io_service to be thread safe
+    this->io_service->dispatch([this, data](){
+        // publish the copter data
+        this->onCopterData(data);
+    });
 }
 
 // ###########################################
