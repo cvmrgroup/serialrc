@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(TARGET multiradio_test)
+set(TARGET multiradio-test)
 project(${TARGET})
 
 find_package(Boost COMPONENTS program_options REQUIRED)

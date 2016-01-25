@@ -1,8 +1,18 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/")
+# ----------------------------------------------------
 
-#add_subdirectory(test)
+# check if WITH_TESTS is defined
+if(DEFINED WITH_TESTS)
+    # add the test subdirectory for multiradio
+    add_subdirectory(test)
+endif()
+# print the WITH_TESTS
+message(STATUS "WITH_TESTS: ${WITH_TESTS}")
+
+# ----------------------------------------------------
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/")
 
 set(TARGET multiradio)
 project(${TARGET})
