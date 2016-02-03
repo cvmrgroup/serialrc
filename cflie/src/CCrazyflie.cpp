@@ -25,8 +25,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <time.h>
+#include <sys/time.h>
 
-#include <cflie/CCrazyflie.h>
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+#include <CCrazyflie.h>
 
 
 CCrazyflie::CCrazyflie(CCrazyRadio *crRadio) {
@@ -222,10 +229,23 @@ float CCrazyflie::yaw() {
 }
 
 double CCrazyflie::currentTime() {
-  struct timespec tsTime;
-  clock_gettime(CLOCK_MONOTONIC, &tsTime);
+  struct timespec ts;
+
+  //clock_gettime(CLOCK_MONOTONIC, &tsTime);
+
+#ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  ts.tv_sec = mts.tv_sec;
+  ts.tv_nsec = mts.tv_nsec;
+#else
+  clock_gettime(CLOCK_REALTIME, &ts);
+#endif
   
-  return tsTime.tv_sec + double(tsTime.tv_nsec) / NSEC_PER_SEC;
+  return ts.tv_sec + double(ts.tv_nsec) / NSEC_PER_SEC;
 }
 
 bool CCrazyflie::isInitialized() {
@@ -293,11 +313,11 @@ float CCrazyflie::gyroX() {
 }
 
 float CCrazyflie::gyroY() {
-  return this->sensorDoubleValue("gyro.y");
+  return this->sensorDoubleValue("gyro.x");
 }
 
 float CCrazyflie::gyroZ() {
-  return this->sensorDoubleValue("gyro.z");
+  return this->sensorDoubleValue("gyro.x");
 }
 
 void CCrazyflie::enableAccelerometerLogging() {

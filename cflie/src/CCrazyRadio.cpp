@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <cflie/CCrazyRadio.h>
+#include <CCrazyRadio.h>
 
 
 CCrazyRadio::CCrazyRadio(std::string strRadioIdentifier) {

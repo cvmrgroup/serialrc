@@ -8,7 +8,7 @@
 #include <atomic>
 #include <unordered_map>
 
-#include <cflie/CCrazyflie.h>
+#include <CCrazyflie.h>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -16,6 +16,8 @@
 #include <boost/thread.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/thread/latch.hpp>
+
+#include <opencv2/core.hpp>
 
 #include "i_transmitter.h"
 #include "radioexception.h"

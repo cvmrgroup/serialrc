@@ -32,9 +32,9 @@
 #ifndef __C_CRAZYFLIE_H__
 #define __C_CRAZYFLIE_H__
 
-
+#ifndef __MACH__
 #define NSEC_PER_SEC 1000000000L
-
+#endif
 
 // System
 #include <cmath>

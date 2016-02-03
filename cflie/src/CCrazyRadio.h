@@ -38,7 +38,7 @@
 #include <string>
 #include <cstdio>
 #include <cstring>
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>

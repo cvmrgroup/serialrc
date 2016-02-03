@@ -2,7 +2,6 @@
 // Created by lasse on 29.09.15.
 //
 
-#include <opencv2/core/matx.hpp>
 #include "crazyradiotransmitter.h"
 
 CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,

@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <cflie/CTOC.h>
+#include <CTOC.h>
 
 
 CTOC::CTOC(CCrazyRadio *crRadio, int nPort) {
