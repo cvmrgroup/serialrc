@@ -40,7 +40,7 @@ private:
 
     void fireRadioEvent(AbstractRadio *radio);
 
-    void fireCopterData(CopterData data);
+    void fireTelemetryData(Telemetry data);
 
     void createRadio(RadioConfiguration &conf);
 

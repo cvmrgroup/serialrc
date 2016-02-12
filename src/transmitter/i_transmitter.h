@@ -9,7 +9,7 @@
 
 #include <boost/signals2.hpp>
 
-#include <radio/copterdata.h>
+#include <radio/telemetry.h>
 
 #include "radio/abstractradio.h"
 
@@ -59,8 +59,8 @@ public:
 
     // ###########################################
 
-    /// the boost signal to publish copter data
-    boost::signals2::signal<void(CopterData data)> onCopterData;
+    /// the boost signal to publish telemetry data
+    boost::signals2::signal<void(Telemetry data)> onTelemetry;
 };
 
 #endif //ICARUS_I_TRANSMITTER_H

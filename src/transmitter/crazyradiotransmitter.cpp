@@ -194,7 +194,7 @@ void CrazyRadioTransmitter::publishCopterData()
     // get the current radio
     AbstractRadio *radio = this->radios[this->currentRadio];
 
-    CopterData data;
+    Telemetry data;
     // get the copter id
     data.copterId = radio->getId();
 
@@ -222,8 +222,8 @@ void CrazyRadioTransmitter::publishCopterData()
 
     // move into the given io_service to be thread safe
     this->io_service->dispatch([this, data](){
-        // publish the copter data
-        this->onCopterData(data);
+        // publish the telementry data
+        this->onTelemetry(data);
     });
 }
 
