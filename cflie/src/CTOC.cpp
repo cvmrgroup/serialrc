@@ -262,10 +262,12 @@ bool CTOC::addElementToBlock(int nBlockID, int nElementID) {
 
 bool CTOC::stopLogging(std::string strName) {
   // TODO: Implement me.
+  return false;
 }
 
 bool CTOC::isLogging(std::string strName) {
   // TODO: Implement me.
+  return false;
 }
 
 double CTOC::doubleValue(std::string strName) {
