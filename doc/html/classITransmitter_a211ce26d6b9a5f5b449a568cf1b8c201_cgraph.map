@@ -1,0 +1,8 @@
+<map id="ITransmitter::~ITransmitter" name="ITransmitter::~ITransmitter">
+<area shape="rect" id="node2" href="$classITransmitter.html#a1ee7ab1ff2107b3715ce8b1769785076" title="open the transmitter " alt="" coords="253,5,382,31"/>
+<area shape="rect" id="node3" href="$classITransmitter.html#ae1147ecf5322106956dd5daf224bb205" title="close the transmitter " alt="" coords="252,55,383,80"/>
+<area shape="rect" id="node4" href="$classITransmitter.html#a9fb0a93cd3cf378fb5adc1a4e39d97e2" title="gets the name of the Transmitter " alt="" coords="241,104,394,129"/>
+<area shape="rect" id="node5" href="$classITransmitter.html#a9c812b387758de1c9cc562eb55d42c5f" title="checks if the ITransmitter is open " alt="" coords="247,153,388,179"/>
+<area shape="rect" id="node6" href="$classITransmitter.html#a43a59e85fb4c621f7b532d874d173171" title="checks if the radio has Radio capacity left " alt="" coords="231,203,404,228"/>
+<area shape="rect" id="node7" href="$classITransmitter.html#a1959f6adca735b895b861efe3d785fc2" title="add the given Radio to this ITransmitter " alt="" coords="239,252,396,277"/>
+</map>

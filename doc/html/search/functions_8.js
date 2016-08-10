@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['open',['open',['../classArXX.html#ab26673534f8cf1a903ca64b8d3a96c3c',1,'ArXX::open()'],['../classCrazyRadioThread.html#a475b1fb8084bfd35de579404a1627aa9',1,'CrazyRadioThread::open()']]]
+  ['join',['join',['../classIOServiceRadio.html#a4ade3b4290084c1a321080e763c1ebb8',1,'IOServiceRadio']]],
+  ['joinhilobytes',['joinHiLoBytes',['../classSerialHelper.html#a94eeda081084145ac9518bf499dc2bf7',1,'SerialHelper']]]
 ];

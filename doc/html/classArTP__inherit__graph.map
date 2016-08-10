@@ -1,3 +1,4 @@
 <map id="ArTP" name="ArTP">
-<area shape="rect" id="node2" href="$classArXX.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="5,127,194,387"/>
+<area shape="rect" id="node2" href="$classArXX.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="5,207,194,600"/>
+<area shape="rect" id="node3" href="$classITransmitter.html" title="{ITransmitter\n|+ onTelemetry\l|+ ~ITransmitter()\l+ open()\l+ close()\l+ getName()\l+ isOpen()\l+ hasCapacity()\l+ addRadio()\l}" alt="" coords="39,5,160,159"/>
 </map>

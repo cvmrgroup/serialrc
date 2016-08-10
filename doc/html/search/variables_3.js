@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['enabled',['enabled',['../classAbstractRadio.html#ad3151a38df2c3b64d2464d7afd65cd81',1,'AbstractRadio']]]
+  ['frame',['frame',['../classArTP.html#a6a3a087410d578b447cce78091866c26',1,'ArTP']]]
 ];

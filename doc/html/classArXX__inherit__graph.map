@@ -1,4 +1,5 @@
 <map id="ArXX" name="ArXX">
-<area shape="rect" id="node3" href="$classArTP.html" title="Software&#45;side class for communication with the software running on the tx3 built&#45;in arduino..." alt="" coords="5,441,137,701"/>
-<area shape="rect" id="node4" href="$classArTT.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="161,435,293,708"/>
+<area shape="rect" id="node3" href="$classArTP.html" title="Software&#45;side class for communication with the software running on the tx3 built&#45;in arduino..." alt="" coords="5,655,137,915"/>
+<area shape="rect" id="node4" href="$classArTT.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="161,648,293,921"/>
+<area shape="rect" id="node2" href="$classITransmitter.html" title="{ITransmitter\n|+ onTelemetry\l|+ ~ITransmitter()\l+ open()\l+ close()\l+ getName()\l+ isOpen()\l+ hasCapacity()\l+ addRadio()\l}" alt="" coords="88,5,209,159"/>
 </map>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['serialhelper',['SerialHelper',['../classSerialHelper.html',1,'']]]
+  ['ioserviceradio',['IOServiceRadio',['../classIOServiceRadio.html',1,'']]],
+  ['itransmitter',['ITransmitter',['../classITransmitter.html',1,'']]]
 ];

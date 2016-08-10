@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['yaw',['yaw',['../classAbstractRadio.html#a587b9603be8708f1e6bf6334b31edcf7',1,'AbstractRadio']]]
+  ['xon',['XON',['../arxx_8h.html#acdf721774c51e08c6609e6fa8cf82cc9',1,'arxx.h']]]
 ];

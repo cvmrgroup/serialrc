@@ -44,11 +44,18 @@ var searchData=
   ['channel_5f5_5flo',['channel_5_lo',['../classArTT.html#af1b9c51486d7acd4eea098df5fedec89',1,'ArTT']]],
   ['channel_5f6_5fhi',['channel_6_hi',['../classArTT.html#a064c720ef7517cec740ab5a677236391',1,'ArTT']]],
   ['channel_5f6_5flo',['channel_6_lo',['../classArTT.html#a0842f0a6027d0df7744e96c637e0828a',1,'ArTT']]],
-  ['close',['close',['../classArXX.html#acb9d756545f67dab123d3dafceb3e9e4',1,'ArXX']]],
+  ['cleanup',['cleanup',['../classCrazyRadioTransmitter.html#a5277667b49e8dd21f65e8a264f5e442f',1,'CrazyRadioTransmitter']]],
+  ['close',['close',['../classArXX.html#acb9d756545f67dab123d3dafceb3e9e4',1,'ArXX::close()'],['../classCrazyRadioTransmitter.html#a7552dbce886e9e066b5dfd0d62d1c384',1,'CrazyRadioTransmitter::close()'],['../classITransmitter.html#ae1147ecf5322106956dd5daf224bb205',1,'ITransmitter::close()']]],
   ['command_5flength',['command_length',['../classArTP.html#a73be8ff677604bb369d18116e0d2f17b',1,'ArTP::command_length()'],['../classArTT.html#af335a21e71ac9df54651e221758da83f',1,'ArTT::command_length()']]],
-  ['copter',['copter',['../classCrazyRadioThread.html#a31cea13109dfbf89b4e0da73900b8c6b',1,'CrazyRadioThread']]],
-  ['crazyradio',['CrazyRadio',['../classCrazyRadio.html',1,'CrazyRadio'],['../classCrazyRadio.html#a191fd956e4a49edb92313342d75b406b',1,'CrazyRadio::CrazyRadio()']]],
+  ['commandexecutor',['CommandExecutor',['../classCommandExecutor.html',1,'CommandExecutor'],['../classIOServiceRadio.html#a5ee4584daa959f82c8f3598b0a3a6719',1,'IOServiceRadio::commandExecutor()'],['../classCommandExecutor.html#a38b4a13dca8191b2c94f0de006d8c6d0',1,'CommandExecutor::CommandExecutor()']]],
+  ['commandexecutor_2eh',['commandexecutor.h',['../commandexecutor_8h.html',1,'']]],
+  ['configs',['configs',['../classIOServiceRadio.html#aceeeafb384dc5ccb82163f989ddf98b6',1,'IOServiceRadio']]],
+  ['copter',['copter',['../classCrazyRadioTransmitter.html#a2a64287d9a4c6ec841eacaadb26249aa',1,'CrazyRadioTransmitter']]],
+  ['crazyradio',['CrazyRadio',['../classCrazyRadio.html',1,'CrazyRadio'],['../classCrazyRadio.html#a7da2afebf72854ae7e9ff721625a4c14',1,'CrazyRadio::CrazyRadio()']]],
   ['crazyradio_2eh',['crazyradio.h',['../crazyradio_8h.html',1,'']]],
-  ['crazyradiothread',['CrazyRadioThread',['../classCrazyRadioThread.html',1,'CrazyRadioThread'],['../classCrazyRadioThread.html#af460bb08908b94dd26769bdbfe54e3d1',1,'CrazyRadioThread::CrazyRadioThread()']]],
-  ['crazyradiothread_2eh',['crazyradiothread.h',['../crazyradiothread_8h.html',1,'']]]
+  ['crazyradiotransmitter',['CrazyRadioTransmitter',['../classCrazyRadioTransmitter.html',1,'CrazyRadioTransmitter'],['../classCrazyRadioTransmitter.html#aba1c874c9c28e80097ab4e3fb0188f6d',1,'CrazyRadioTransmitter::CrazyRadioTransmitter()']]],
+  ['crazyradiotransmitter_2eh',['crazyradiotransmitter.h',['../crazyradiotransmitter_8h.html',1,'']]],
+  ['createandgettransmitter',['createAndGetTransmitter',['../classIOServiceRadio.html#abb81f5b9526da580864b4d3869c085ac',1,'IOServiceRadio']]],
+  ['createradio',['createRadio',['../classIOServiceRadio.html#a7425d9c71d0dc3841ec0aeca17edd4db',1,'IOServiceRadio']]],
+  ['currentradio',['currentRadio',['../classCrazyRadioTransmitter.html#a882b00ade37d433872a0896800bd97a9',1,'CrazyRadioTransmitter']]]
 ];

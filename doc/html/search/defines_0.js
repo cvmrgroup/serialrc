@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['baud_5frate',['BAUD_RATE',['../arxx_8h.html#ad4455691936f92fdd6c37566fc58ba1f',1,'arxx.h']]]
+  ['xon',['XON',['../arxx_8h.html#acdf721774c51e08c6609e6fa8cf82cc9',1,'arxx.h']]]
 ];

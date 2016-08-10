@@ -1,5 +1,3 @@
-<map id="dsmxradio.h" name="dsmxradio.h">
-<area shape="rect" id="node2" href="$arxx_8h.html" title="arxx.h" alt="" coords="43,79,101,104"/>
-<area shape="rect" id="node3" href="$artp_8h.html" title="artp.h" alt="" coords="5,152,61,177"/>
-<area shape="rect" id="node4" href="$artt_8h.html" title="artt.h" alt="" coords="85,152,136,177"/>
+<map id="src/radio/dsmxradio.h" name="src/radio/dsmxradio.h">
+<area shape="rect" id="node2" href="$ioserviceradio_8h.html" title="src/ioserviceradio.h" alt="" coords="12,79,148,104"/>
 </map>

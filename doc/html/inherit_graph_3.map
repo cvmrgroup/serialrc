@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSerialHelper.html" title="Serial helper class to calculate or join low and high bytes. " alt="" coords="5,5,100,31"/>
+<area shape="rect" id="node1" href="$classITransmitter.html" title="ITransmitter" alt="" coords="5,55,97,80"/>
+<area shape="rect" id="node2" href="$classArXX.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="198,29,250,55"/>
+<area shape="rect" id="node5" href="$classCrazyRadioTransmitter.html" title="CrazyRadioTransmitter" alt="" coords="145,79,303,104"/>
+<area shape="rect" id="node3" href="$classArTP.html" title="Software&#45;side class for communication with the software running on the tx3 built&#45;in arduino..." alt="" coords="351,5,403,31"/>
+<area shape="rect" id="node4" href="$classArTT.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="352,55,403,80"/>
 </map>
