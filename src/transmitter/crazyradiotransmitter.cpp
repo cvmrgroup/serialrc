@@ -29,7 +29,6 @@ void CrazyRadioTransmitter::open()
 
 void CrazyRadioTransmitter::close()
 {
-
     // set running to false
     this->running = false;
 
@@ -104,7 +103,7 @@ void CrazyRadioTransmitter::initialize()
         // set running to false
         this->running = false;
         // create the exception string
-        std::string ex = str(boost::format("fail to open crazy radio with url [ %1% ]") % crazyRadioUrl);
+        std::string ex = str(boost::format("Failed to open crazy radio with url [ %1% ]") % crazyRadioUrl);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
@@ -266,5 +265,4 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
     this->radios[radioURI] = radio;
     // activaed the current radio
     this->currentRadio = radioURI;
-
 }

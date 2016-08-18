@@ -82,5 +82,4 @@ private:
     boost::shared_ptr<boost::asio::io_service> io_service;
 };
 
-
 #endif //ICARUS_CRAZYRADIOTRANSMITTER_H

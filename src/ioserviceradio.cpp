@@ -47,20 +47,23 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
         return this->transmitters[sender];
     }
 
-    // create the corrent transmitter
+    // create the correct transmitter
     if (sender.compare("artt") == 0)
     {
         this->transmitters[sender] = new ArTT(sender, "75232303235351816182", this->io_service);
-    } else if (sender.compare("artp") == 0)
+    }
+    else if (sender.compare("artp") == 0)
     {
         this->transmitters[sender] = new ArTP(sender, "9523335323135180F092", this->io_service);
-    } else if (sender.compare("crazy") == 0)
+    }
+    else if (sender.compare("crazy") == 0)
     {
         this->transmitters[sender] = new CrazyRadioTransmitter(sender, this->io_service);
-    } else
+    }
+    else
     {
         // create the exception string
-        std::string ex = str(boost::format("can't create transmitter for unknown sender type [ %1% ]") % sender);
+        std::string ex = str(boost::format("Unable to create transmitter for unknown radio type [ %1% ]") % sender);
         // display the exception with logger
         //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
@@ -83,7 +86,7 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     if (this->radios.find(copterId) != this->radios.end())
     {
         // create the exception string
-        std::string ex = str(boost::format("copter [ %1% ] already configured") % copterId);
+        std::string ex = str(boost::format("Copter [ %1% ] already configured.") % copterId);
         // display the exception with logger
         //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
@@ -102,11 +105,13 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     {
         // create a new radio for the crazy radio
         radio = new CrazyRadio(copterId, conf.txId);
-    } else
+    }
+    else
     {
         // create a new radio for the given copter
         radio = new DSMXRadio(copterId, conf.txId);
     }
+
     // add the created radio
     transmitter->addRadio(radio);
     // add the radio to the copter
@@ -144,6 +149,7 @@ void IOServiceRadio::doStart()
             transmitter->open();
         }
     }
+
     // the the radio started
     this->started = true;
 }
@@ -219,7 +225,8 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     if (this->radios.find(copterId) == this->radios.end())
     {
         BOOST_LOG_TRIVIAL(error) << "no radio for copter [ " << copterId << " ]";
-    } else
+    }
+    else
     {
         // get th radio for the copter
         AbstractRadio *radio = this->radios[copterId];
@@ -228,6 +235,7 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
         // fire a radio event, because the state of the radio changed
         this->fireRadioEvent(radio);
     }
+
     // remove the command
     delete command;
 }
