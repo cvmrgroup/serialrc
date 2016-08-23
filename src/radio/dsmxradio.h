@@ -27,8 +27,7 @@
  *  nano   +roll / +yaw
  *  superx -roll / -yaw
  */
-class DSMXRadio : public AbstractRadio
-{
+class DSMXRadio : public AbstractRadio {
 
 public:
 
@@ -57,6 +56,8 @@ public:
     void setArmSignal();
 
     void setDisarmSignal();
+
+    void emergencyStop(bool _emergency = true);
 };
 
 #endif /* DSMXRADIO_H */

@@ -16,6 +16,7 @@ void CommandExecutor::initializeBindings()
     this->bindings[RadioCommandType::BIND_TRANSMITTER] = boost::bind(&CommandExecutor::onBindTransmitterCommand, this, _1, _2);
     this->bindings[RadioCommandType::CONTROL] = boost::bind(&CommandExecutor::onControlCommand, this, _1, _2);
     this->bindings[RadioCommandType::DISARM] = boost::bind(&CommandExecutor::onDisarmCommand, this, _1, _2);
+    this->bindings[RadioCommandType::EMERGENCY] = boost::bind(&CommandExecutor::onEmergencyCommand, this, _1, _2);
     this->bindings[RadioCommandType::RESUME_COPTER] = boost::bind(&CommandExecutor::onResumeCopterCommand, this, _1, _2);
     this->bindings[RadioCommandType::SUSPEND_COPTER] = boost::bind(&CommandExecutor::onSuspendCopterCommand, this, _1, _2);
     this->bindings[RadioCommandType::TAKE_OVER] = boost::bind(&CommandExecutor::onTakeOverCommand, this, _1, _2);
@@ -98,4 +99,9 @@ void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command, Abstract
 void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command, AbstractRadio *radio)
 {
     radio->toggleSender();
+}
+
+void CommandExecutor::onEmergencyCommand(IRadioCommand *command, AbstractRadio *radio)
+{
+    radio->emergencyStop();
 }

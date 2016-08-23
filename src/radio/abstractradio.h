@@ -22,8 +22,7 @@
 
 #include <string>
 
-class AbstractRadio
-{
+class AbstractRadio {
 
 public:
 
@@ -95,6 +94,11 @@ public:
     virtual void toggleCh6() = 0;
 
     /**
+     * Send Emergency command to copter
+     */
+    virtual void emergencyStop(bool _emergency = true) = 0;
+
+    /**
      *  get id
      *  @return the id
      */
@@ -137,6 +141,9 @@ public:
 
     double getCh6();
 
+    bool isEmergency();
+
+
 protected:
 
     int id;
@@ -146,6 +153,7 @@ protected:
     bool binding;
     bool enabled;
     bool suspended;
+    bool emergency;
 
     double throttle;
     double roll;

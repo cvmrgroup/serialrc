@@ -18,8 +18,7 @@
 #include "radio/abstractradio.h"
 #include "radioexception.h"
 
-class CommandExecutor
-{
+class CommandExecutor {
 
 public:
 
@@ -38,6 +37,8 @@ private:
     void onControlCommand(IRadioCommand *command, AbstractRadio *radio);
 
     void onDisarmCommand(IRadioCommand *command, AbstractRadio *radio);
+
+    void onEmergencyCommand(IRadioCommand *command, AbstractRadio *radio);
 
     void onResumeCopterCommand(IRadioCommand *command, AbstractRadio *radio);
 
@@ -61,7 +62,6 @@ public:
 private:
 
     std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *, AbstractRadio *)>> bindings;
-
 
 };
 

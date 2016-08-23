@@ -22,8 +22,7 @@
 
 #include "abstractradio.h"
 
-class CrazyRadio : public AbstractRadio
-{
+class CrazyRadio : public AbstractRadio {
 
 public:
 
@@ -52,6 +51,8 @@ public:
     void toggleCh5();
 
     void toggleCh6();
+
+    void emergencyStop(bool _emergency = true);
 };
 
 #endif /* CRAZYRADIO_H */

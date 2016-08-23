@@ -19,71 +19,63 @@
 
 #include "abstractradio.h"
 
-AbstractRadio::AbstractRadio(unsigned int _id, std::string _txId)
-{
+AbstractRadio::AbstractRadio(unsigned int _id, std::string _txId) {
     id = _id;
     txId = _txId;
 
     binding = false;
     enabled = false;
     suspended = true;
+    emergency = false;
 }
 
-AbstractRadio::~AbstractRadio()
-{
+AbstractRadio::~AbstractRadio() {
 }
 
-unsigned int AbstractRadio::getId()
-{
+unsigned int AbstractRadio::getId() {
     return id;
 }
 
-std::string AbstractRadio::getTxId()
-{
+std::string AbstractRadio::getTxId() {
     return txId;
 }
 
-bool AbstractRadio::isEnabled()
-{
+bool AbstractRadio::isEnabled() {
     return enabled;
 }
 
-bool AbstractRadio::isBinding()
-{
+bool AbstractRadio::isBinding() {
     return binding;
 }
 
-bool AbstractRadio::isSuspended()
-{
+bool AbstractRadio::isSuspended() {
     return suspended;
 }
 
-double AbstractRadio::getThrottle()
-{
+double AbstractRadio::getThrottle() {
     return throttle;
 }
 
-double AbstractRadio::getRoll()
-{
+double AbstractRadio::getRoll() {
     return roll;
 }
 
-double AbstractRadio::getPitch()
-{
+double AbstractRadio::getPitch() {
     return pitch;
 }
 
-double AbstractRadio::getYaw()
-{
+double AbstractRadio::getYaw() {
     return yaw;
 }
 
-double AbstractRadio::getCh5()
-{
+double AbstractRadio::getCh5() {
     return ch5;
 }
 
-double AbstractRadio::getCh6()
-{
+double AbstractRadio::getCh6() {
     return ch6;
+}
+
+bool AbstractRadio::isEmergency() {
+    return emergency;
 }

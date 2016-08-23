@@ -20,20 +20,17 @@
 #include "crazyradio.h"
 
 CrazyRadio::CrazyRadio(unsigned int id, std::string txId) :
-        AbstractRadio(id, txId)
-{
+        AbstractRadio(id, txId) {
     throttle = 0;
     roll = 0;
     pitch = 0;
     yaw = 0;
 }
 
-CrazyRadio::~CrazyRadio()
-{
+CrazyRadio::~CrazyRadio() {
 }
 
-void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw)
-{
+void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw) {
     int throttle_center_value_offset = 30000;
     int throttle_value_range_scale = 30000;
 
@@ -43,44 +40,38 @@ void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, doub
     yaw = (float) (_yaw * -180);
 }
 
-void CrazyRadio::toggleSender()
-{
+void CrazyRadio::toggleSender() {
 }
 
-void CrazyRadio::turnSenderOn()
-{
+void CrazyRadio::turnSenderOn() {
 }
 
-void CrazyRadio::turnSenderOff()
-{
+void CrazyRadio::turnSenderOff() {
 }
 
-void CrazyRadio::setBindSignal()
-{
+void CrazyRadio::setBindSignal() {
 }
 
-void CrazyRadio::suspend(bool _suspended)
-{
+void CrazyRadio::suspend(bool _suspended) {
     suspended = _suspended;
 }
 
-void CrazyRadio::toggleSuspension()
-{
+void CrazyRadio::toggleSuspension() {
     suspended = !suspended;
 }
 
-void CrazyRadio::setArmSignal()
-{
+void CrazyRadio::setArmSignal() {
 }
 
-void CrazyRadio::setDisarmSignal()
-{
+void CrazyRadio::setDisarmSignal() {
 }
 
-void CrazyRadio::toggleCh5()
-{
+void CrazyRadio::toggleCh5() {
 }
 
-void CrazyRadio::toggleCh6()
-{
+void CrazyRadio::toggleCh6() {
+}
+
+void CrazyRadio::emergencyStop(bool _emergency) {
+    suspend(true);
 }

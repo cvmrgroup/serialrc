@@ -20,8 +20,7 @@
 #include "dsmxradio.h"
 
 DSMXRadio::DSMXRadio(unsigned int id, std::string txId) :
-        AbstractRadio(id, txId)
-{
+        AbstractRadio(id, txId) {
     // default values
     throttle = -1.0;
     roll = 0.0;
@@ -31,43 +30,35 @@ DSMXRadio::DSMXRadio(unsigned int id, std::string txId) :
     ch6 = -1.0; // todo 1.0 for initial horizon mode when using superx
 }
 
-DSMXRadio::~DSMXRadio()
-{
+DSMXRadio::~DSMXRadio() {
 }
 
-void DSMXRadio::toggleSender()
-{
+void DSMXRadio::toggleSender() {
     enabled = !enabled;
 }
 
-void DSMXRadio::turnSenderOn()
-{
+void DSMXRadio::turnSenderOn() {
     enabled = true;
 }
 
-void DSMXRadio::turnSenderOff()
-{
+void DSMXRadio::turnSenderOff() {
     enabled = false;
 }
 
-void DSMXRadio::suspend(bool _suspended)
-{
+void DSMXRadio::suspend(bool _suspended) {
     suspended = _suspended;
 }
 
-void DSMXRadio::toggleSuspension()
-{
+void DSMXRadio::toggleSuspension() {
     suspended = !suspended;
 }
 
-void DSMXRadio::setBindSignal()
-{
+void DSMXRadio::setBindSignal() {
     binding = true;
     enabled = true;
 }
 
-void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw)
-{
+void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw) {
     binding = false;
 
     throttle = _throttle;
@@ -76,24 +67,24 @@ void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, doubl
     yaw = _yaw;
 }
 
-void DSMXRadio::toggleCh5()
-{
+void DSMXRadio::toggleCh5() {
     ch5 *= -1.0;
 }
 
-void DSMXRadio::toggleCh6()
-{
+void DSMXRadio::toggleCh6() {
     ch6 *= -1.0;
 }
 
-void DSMXRadio::setArmSignal()
-{
+void DSMXRadio::setArmSignal() {
     throttle = -1.0;
     yaw = 1.0;
 }
 
-void DSMXRadio::setDisarmSignal()
-{
+void DSMXRadio::setDisarmSignal() {
     throttle = -1.0;
     yaw = -1.0;
+}
+
+void DSMXRadio::emergencyStop(bool _emergency) {
+    suspend(true);
 }
