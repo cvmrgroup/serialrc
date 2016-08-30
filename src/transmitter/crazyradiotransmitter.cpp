@@ -4,6 +4,7 @@
 
 #include "crazyradiotransmitter.h"
 
+
 CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,
                                              boost::shared_ptr<boost::asio::io_service> io_service)
 {
@@ -194,6 +195,9 @@ void CrazyRadioTransmitter::publishCopterData()
     AbstractRadio *radio = this->radios[this->currentRadio];
 
     Telemetry data;
+
+    data.time = Clock::now();
+
     // get the copter id
     data.copterId = radio->getId();
 
@@ -218,6 +222,9 @@ void CrazyRadioTransmitter::publishCopterData()
     data.magX = this->copter->magX();
     data.magY = this->copter->magY();
     data.magZ = this->copter->magZ();
+    data.roll = this->copter->roll();
+    data.pitch = this->copter->pitch();
+    data.yaw = this->copter->yaw();
 
     // move into the given io_service to be thread safe
     this->io_service->dispatch([this, data](){

@@ -19,6 +19,8 @@
 
 #include <opencv2/core.hpp>
 
+#include <clock.h>
+
 #include "i_transmitter.h"
 #include "radioexception.h"
 
