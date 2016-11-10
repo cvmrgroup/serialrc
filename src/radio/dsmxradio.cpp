@@ -62,7 +62,7 @@ void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, doubl
     binding = false;
 
     throttle = _throttle;
-    roll = _roll;
+    roll = -_roll;
     pitch = _pitch;
     yaw = _yaw;
 }
