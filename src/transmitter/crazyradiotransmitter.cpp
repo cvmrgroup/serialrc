@@ -196,7 +196,7 @@ void CrazyRadioTransmitter::publishCopterData()
 
     Telemetry data;
 
-    data.time = Clock::now();
+    data.millis = Clock::nowMillis();
 
     // get the copter id
     data.copterId = radio->getId();
