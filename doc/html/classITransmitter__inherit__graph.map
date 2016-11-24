@@ -1,6 +1,0 @@
-<map id="ITransmitter" name="ITransmitter">
-<area shape="rect" id="node2" href="$classArXX.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="54,207,243,600"/>
-<area shape="rect" id="node5" href="$classCrazyRadioTransmitter.html" title="{CrazyRadioTransmitter\n|&#45; currentRadio\l&#45; running\l&#45; name\l&#45; radios\l&#45; copter\l&#45; radio\l&#45; thread\l&#45; io_service\l|+ CrazyRadioTransmitter()\l+ open()\l+ close()\l+ getName()\l+ isOpen()\l+ hasCapacity()\l+ addRadio()\l&#45; run()\l&#45; initialize()\l&#45; update()\l&#45; cleanup()\l&#45; publishCopterData()\l}" alt="" coords="267,247,446,560"/>
-<area shape="rect" id="node3" href="$classArTP.html" title="Software&#45;side class for communication with the software running on the tx3 built&#45;in arduino..." alt="" coords="5,655,137,915"/>
-<area shape="rect" id="node4" href="$classArTT.html" title="Software&#45;side class for communication with the software running on the arduino triple transmission bu..." alt="" coords="161,648,293,921"/>
-</map>
