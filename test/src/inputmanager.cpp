@@ -20,7 +20,7 @@ void InputManager::start()
     // open the gamepad
     if (!this->gamepad.open())
     {
-        BOOST_LOG_TRIVIAL(error) << "fail to open gamepad";
+        BOOST_LOG_TRIVIAL(error) << "Failed to open gamepad.";
         return;
     }
     // invoke the timer
