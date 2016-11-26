@@ -78,7 +78,7 @@ int main(int argc, const char *argv[])
 
     // #############################################
 
-    BOOST_LOG_TRIVIAL(info) << "goodbye";
+    BOOST_LOG_TRIVIAL(info) << "Goodbye.";
 
     return 0;
 }
