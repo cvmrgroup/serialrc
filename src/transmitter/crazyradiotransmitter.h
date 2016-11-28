@@ -8,7 +8,7 @@
 #include <atomic>
 #include <unordered_map>
 
-#include <CCrazyflie.h>
+#include <cflie/CCrazyflie.h>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -28,7 +28,7 @@ class CrazyRadioTransmitter : public ITransmitter
 {
 public:
 
-    CrazyRadioTransmitter(const std::string name, boost::shared_ptr<boost::asio::io_service> io_service);
+    CrazyRadioTransmitter(const std::string name, boost::shared_ptr<boost::asio::io_service> ioService);
 
 private:
 
@@ -81,7 +81,7 @@ private:
     boost::shared_ptr<boost::thread> thread;
 
     /// the underlying used io_service
-    boost::shared_ptr<boost::asio::io_service> io_service;
+    boost::shared_ptr<boost::asio::io_service> ioService;
 };
 
 #endif //ICARUS_CRAZYRADIOTRANSMITTER_H

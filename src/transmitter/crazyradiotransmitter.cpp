@@ -4,14 +4,13 @@
 
 #include "crazyradiotransmitter.h"
 
-
 CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,
-                                             boost::shared_ptr<boost::asio::io_service> io_service)
+                                             boost::shared_ptr<boost::asio::io_service> ioService)
 {
     this->name = name;
     this->running = false;
     this->currentRadio = -1;
-    this->io_service = io_service;
+    this->ioService = ioService;
 }
 
 void CrazyRadioTransmitter::open()
@@ -43,7 +42,7 @@ void CrazyRadioTransmitter::close()
     }
 }
 
-// ###########################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void CrazyRadioTransmitter::run()
 {
@@ -63,7 +62,8 @@ void CrazyRadioTransmitter::run()
             // sleep for 10 millis
             boost::posix_time::milliseconds timeout(10);
             boost::this_thread::sleep(timeout);
-        } catch (boost::thread_interrupted &)
+        }
+        catch (boost::thread_interrupted &)
         {
             BOOST_LOG_TRIVIAL(error) << "the crazy radio thread has been interrupred";
         }
@@ -85,7 +85,7 @@ void CrazyRadioTransmitter::initialize()
     // the url to open the crazy radio
     std::string crazyRadioUrl = this->currentRadio;
 
-    BOOST_LOG_TRIVIAL(info) << "connecting crazyflie with radio url [ " << crazyRadioUrl  << " ]";
+    BOOST_LOG_TRIVIAL(info) << "connecting crazyflie with radio url [ " << crazyRadioUrl << " ]";
 
     // create a new radio
     this->radio = boost::shared_ptr<CCrazyRadio>(new CCrazyRadio(crazyRadioUrl));
@@ -99,7 +99,8 @@ void CrazyRadioTransmitter::initialize()
         this->copter->setSendSetpoints(true);
         // set thrust to zero
         this->copter->setThrust(0);
-    } else
+    }
+    else
     {
         // set running to false
         this->running = false;
@@ -125,30 +126,31 @@ void CrazyRadioTransmitter::update()
         boost::latch latch(2);
 
         // invoke the radio control request inside the io_service to be thread save
-        this->io_service->post([this, &latch, &success, &u]()
-                               {
-                                   // check if current radio exists
-                                   if (this->radios.find(this->currentRadio) != this->radios.end())
-                                   {
-                                       // get the current radio
-                                       AbstractRadio *radio = this->radios[this->currentRadio];
-                                       // check if the radio is suspended
-                                       if (!radio->isSuspended())
-                                       {
-                                           // create the Control Values
-                                           u = cv::Vec4d(radio->getThrottle(),
-                                                         radio->getRoll(),
-                                                         radio->getPitch(),
-                                                         radio->getYaw());
-                                       }
-                                       // set success to true
-                                       success = true;
-                                   }
-                                   // release the latch
-                                   latch.count_down();
-                               });
+        this->ioService->post([this, &latch, &success, &u]()
+                              {
+                                  // check if current radio exists
+                                  if (this->radios.find(this->currentRadio) != this->radios.end())
+                                  {
+                                      // get the current radio
+                                      AbstractRadio *radio = this->radios[this->currentRadio];
+                                      // check if the radio is suspended
+                                      if (!radio->isSuspended())
+                                      {
+                                          // create the Control Values
+                                          u = cv::Vec4d(radio->getThrottle(),
+                                                        radio->getRoll(),
+                                                        radio->getPitch(),
+                                                        radio->getYaw());
+                                      }
+                                      // set success to true
+                                      success = true;
+                                  }
+                                  // release the latch
+                                  latch.count_down();
+                              });
         // countdown and wait for the latch release
         latch.count_down_and_wait();
+
         // check if the request was successful
         if (success)
         {
@@ -181,7 +183,7 @@ void CrazyRadioTransmitter::cleanup()
     }
 }
 
-// ###########################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void CrazyRadioTransmitter::publishCopterData()
 {
@@ -227,13 +229,14 @@ void CrazyRadioTransmitter::publishCopterData()
     data.yaw = this->copter->yaw();
 
     // move into the given io_service to be thread safe
-    this->io_service->dispatch([this, data](){
-        // publish the telementry data
-        this->onTelemetry(data);
-    });
+    this->ioService->dispatch([this, data]()
+                              {
+                                  // publish the telementry data
+                                  this->onTelemetry(data);
+                              });
 }
 
-// ###########################################
+// /////////////////////////////////////////////////////////////////////////////
 
 std::string CrazyRadioTransmitter::getName()
 {
@@ -248,7 +251,6 @@ bool CrazyRadioTransmitter::isOpen()
 bool CrazyRadioTransmitter::hasCapacity()
 {
     return this->radios.size() < 1;
-
 }
 
 void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
@@ -259,9 +261,7 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
     if (!this->hasCapacity())
     {
         // create the exception string
-        std::string ex = str(
-                boost::format("can't add radio with trasmitter id [ %1% ] to vrazy radio transmitter, because no radio capacity available") %
-                        radioURI);
+        std::string ex = str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio, because there is no capacity left.") % radioURI);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
@@ -270,6 +270,7 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
 
     // insert the AbstractRadio
     this->radios[radioURI] = radio;
-    // activaed the current radio
+
+    // activate the current radio
     this->currentRadio = radioURI;
 }

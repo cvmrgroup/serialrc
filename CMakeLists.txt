@@ -17,7 +17,7 @@ message(STATUS "WITH_TESTS: ${WITH_TESTS}")
 # ----------------------------------------------------
 
 # add the cflie library
-add_subdirectory(cflie)
+add_subdirectory(ext/libcflie)
 
 # ----------------------------------------------------
 
@@ -38,9 +38,10 @@ add_library(${PROJECT_NAME} STATIC
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         src
+        cflie
         ${OpenCV_INCLUDE_DIRS} # required by xcode
         ${Boost_INCLUDE_DIRS}
-        ${Qt5SerialPort_INCLUDE_DIRS}        
+        ${Qt5SerialPort_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
