@@ -4,7 +4,6 @@
 
 #include "commandexecutor.h"
 
-
 CommandExecutor::CommandExecutor()
 {
     this->initializeBindings();
@@ -24,7 +23,7 @@ void CommandExecutor::initializeBindings()
     this->bindings[RadioCommandType::TOGGLE_TRANSMITTER] = boost::bind(&CommandExecutor::onToggleTransmitterCommand, this, _1, _2);
 }
 
-// ################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
 {
@@ -46,7 +45,7 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
     this->bindings[type](command, radio);
 }
 
-// ################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void CommandExecutor::onArmCommand(IRadioCommand *command, AbstractRadio *radio)
 {
@@ -54,13 +53,15 @@ void CommandExecutor::onArmCommand(IRadioCommand *command, AbstractRadio *radio)
     radio->setArmSignal();
 }
 
-void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command,
+                                               AbstractRadio *radio)
 {
     // set the bind signal
     radio->setBindSignal();
 }
 
-void CommandExecutor::onControlCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onControlCommand(IRadioCommand *command,
+                                       AbstractRadio *radio)
 {
     // cast the command to ControlCommand
     if (ControlCommand *crtl = dynamic_cast<ControlCommand *>(command))
@@ -72,36 +73,44 @@ void CommandExecutor::onControlCommand(IRadioCommand *command, AbstractRadio *ra
     }
 }
 
-void CommandExecutor::onDisarmCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onDisarmCommand(IRadioCommand *command,
+                                      AbstractRadio *radio)
 {
     // set the disarm signal
     radio->setDisarmSignal();
 }
 
-void CommandExecutor::onResumeCopterCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onResumeCopterCommand(IRadioCommand *command,
+                                            AbstractRadio *radio)
 {
     radio->suspend(false);
 }
 
-void CommandExecutor::onSuspendCopterCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onSuspendCopterCommand(IRadioCommand *command,
+                                             AbstractRadio *radio)
 {
     radio->suspend(true);
 }
 
-void CommandExecutor::onTakeOverCommand(IRadioCommand *command, AbstractRadio *radio)
-{ }
+void CommandExecutor::onTakeOverCommand(IRadioCommand *command,
+                                        AbstractRadio *radio)
+{
+}
 
-void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command,
+                                                AbstractRadio *radio)
 {
     radio->toggleSuspension();
 }
 
-void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command,
+                                                 AbstractRadio *radio)
 {
     radio->toggleSender();
 }
 
-void CommandExecutor::onEmergencyCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onEmergencyCommand(IRadioCommand *command,
+                                         AbstractRadio *radio)
 {
     radio->emergencyStop();
 }

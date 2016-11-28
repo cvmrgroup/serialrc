@@ -28,7 +28,8 @@ class CrazyRadioTransmitter : public ITransmitter
 {
 public:
 
-    CrazyRadioTransmitter(const std::string name, boost::shared_ptr<boost::asio::io_service> ioService);
+    CrazyRadioTransmitter(const std::string name,
+                          boost::shared_ptr<boost::asio::io_service> ioService);
 
 private:
 
@@ -47,8 +48,6 @@ public:
     void open();
 
     void close();
-
-    // ###########################################
 
     std::string getName();
 

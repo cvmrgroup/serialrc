@@ -4,7 +4,8 @@
 
 #include "inputmanager.h"
 
-InputManager::InputManager(int source, std::vector<RadioConfiguration> confs, IRadio *radio,
+InputManager::InputManager(int source, std::vector<RadioConfiguration> confs,
+                           IRadio *radio,
                            boost::shared_ptr<boost::asio::io_service> io_service)
 {
     this->confId = 0;
@@ -39,7 +40,7 @@ void InputManager::stop()
     this->gamepad.close();
 }
 
-// ########################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void InputManager::invokeTimer()
 {
@@ -48,7 +49,6 @@ void InputManager::invokeTimer()
     this->timer->expires_from_now(timeout);
     // add the async callback for the timer
     this->timer->async_wait(boost::bind(&InputManager::update, this, boost::asio::placeholders::error));
-
 }
 
 void InputManager::update(const boost::system::error_code &ec)
@@ -56,7 +56,7 @@ void InputManager::update(const boost::system::error_code &ec)
     // check if an error happens
     if (ec)
     {
-        std::string ex = str(boost::format("fail to update input manager, because [ %1% ]") % ec.message());
+        std::string ex = str(boost::format("Updating input manager failed with error code [ %1% ].") % ec.message());
         // display error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw the exception
@@ -93,9 +93,7 @@ void InputManager::updateGamepad()
         this->confId = (this->confId + 1) % this->confs.size();
         conf = this->confs[this->confId];
 
-        BOOST_LOG_TRIVIAL(info) << "switch copter to [ id: " << conf.copterId << ", sender: "
-                                << conf.sender << ", txId: " << conf.txId << " ]";
-
+        BOOST_LOG_TRIVIAL(info) << "switch copter to [ id: " << conf.copterId << ", sender: " << conf.sender << ", txId: " << conf.txId << " ]";
     }
 
     if (this->gamepad.buttonToggled(BUTTON_SELECT))

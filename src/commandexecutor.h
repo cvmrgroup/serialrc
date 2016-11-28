@@ -18,7 +18,8 @@
 #include "radio/abstractradio.h"
 #include "radioexception.h"
 
-class CommandExecutor {
+class CommandExecutor
+{
 
 public:
 
@@ -28,7 +29,7 @@ private:
 
     void initializeBindings();
 
-    // ################################################################
+    // /////////////////////////////////////////////////////////////////////////
 
     void onArmCommand(IRadioCommand *command, AbstractRadio *radio);
 
@@ -46,9 +47,11 @@ private:
 
     void onTakeOverCommand(IRadioCommand *command, AbstractRadio *radio);
 
-    void onToggleSuspensionCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onToggleSuspensionCommand(IRadioCommand *command,
+                                   AbstractRadio *radio);
 
-    void onToggleTransmitterCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onToggleTransmitterCommand(IRadioCommand *command,
+                                    AbstractRadio *radio);
 
 public:
 
@@ -61,9 +64,8 @@ public:
 
 private:
 
-    std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *, AbstractRadio *)>> bindings;
-
+    std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *,
+                                                              AbstractRadio *)>> bindings;
 };
-
 
 #endif //ICARUS_COMMANDEXECUTOR_H

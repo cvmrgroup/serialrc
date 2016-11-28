@@ -19,7 +19,8 @@ class ITransmitter
 public:
 
     virtual ~ITransmitter()
-    { };
+    {
+    };
 
     /**
      * open the transmitter
@@ -31,7 +32,7 @@ public:
      */
     virtual void close() = 0;
 
-    // ###########################################
+    // /////////////////////////////////////////////////////////////////////////
 
     /**
      * gets the name of the Transmitter
@@ -57,7 +58,7 @@ public:
      */
     virtual void addRadio(AbstractRadio *radio) = 0;
 
-    // ###########################################
+    // /////////////////////////////////////////////////////////////////////////
 
     /// the boost signal to publish telemetry data
     boost::signals2::signal<void(Telemetry data)> onTelemetry;

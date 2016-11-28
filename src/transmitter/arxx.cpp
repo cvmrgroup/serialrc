@@ -19,7 +19,8 @@
 
 #include "arxx.h"
 
-ArXX::ArXX(const std::string name, int maxNumberOfRadios, std::string serialNumber,
+ArXX::ArXX(const std::string name, int maxNumberOfRadios,
+           std::string serialNumber,
            boost::shared_ptr<boost::asio::io_service> io_service)
 {
     this->name = name;
@@ -83,7 +84,7 @@ void ArXX::open()
     timer->async_wait(boost::bind(&ArXX::invokeReading, this, boost::asio::placeholders::error, timer));
 }
 
-// #################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 std::string ArXX::findDeviceName(std::string &description)
 {
@@ -119,9 +120,10 @@ std::string ArXX::findDeviceName(std::string &description)
     return std::string();
 }
 
-// #################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
-void ArXX::invokeReading(boost::system::error_code ec, boost::shared_ptr<boost::asio::deadline_timer> timer)
+void ArXX::invokeReading(boost::system::error_code ec,
+                         boost::shared_ptr<boost::asio::deadline_timer> timer)
 {
     // check if an error happens
     if (ec)
@@ -156,7 +158,9 @@ void ArXX::readData()
                                               boost::asio::placeholders::bytes_transferred));
 }
 
-void ArXX::onDataRead(boost::system::error_code ec, boost::shared_ptr<boost::asio::streambuf> buf, size_t bytes)
+void ArXX::onDataRead(boost::system::error_code ec,
+                      boost::shared_ptr<boost::asio::streambuf> buf,
+                      size_t bytes)
 {
     // check if an error happens
     if (ec)
@@ -212,18 +216,17 @@ void ArXX::writeFrame(const char *frame, size_t length)
                                          boost::asio::placeholders::error,
                                          buf,
                                          boost::asio::placeholders::bytes_transferred));
-
 }
 
-void ArXX::onDataWritten(boost::system::error_code ec, boost::shared_ptr<boost::asio::streambuf> buf, size_t bytes)
+void ArXX::onDataWritten(boost::system::error_code ec,
+                         boost::shared_ptr<boost::asio::streambuf> buf,
+                         size_t bytes)
 {
     // check if an error happens
     if (ec)
     {
         // create the exception string
-        std::string ex =
-                str(boost::format("fail to write through the serial port with serial number [ %1% ], because [ %2% ]") %
-                    this->serialNumber % ec.message());
+        std::string ex = str(boost::format("Writing to serial [ %1% ] failed with error code [ %2% ].") % this->serialNumber % ec.message());
         // display the error
         //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
@@ -246,7 +249,7 @@ void ArXX::close()
     }
 }
 
-// #################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 int ArXX::getMaxNumberOfRadios()
 {
@@ -269,11 +272,12 @@ void ArXX::addRadio(AbstractRadio *radio)
     if (this->hasCapacity())
     {
         this->radios[txId] = radio;
-    } else
+    }
+    else
     {
         // create the exception string
         std::string ex = str(
-                boost::format("can't add radio with trasmitter id [ %1% ] to serial [ %2% ], because no radio capacity available") %
+                boost::format("Cannot add radio with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") %
                 txId % this->serialNumber);
         // display the error
         //BOOST_LOG_TRIVIAL(error) << ex;

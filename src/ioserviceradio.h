@@ -32,7 +32,8 @@
 class IOServiceRadio : public IRadio
 {
 public:
-    IOServiceRadio(std::vector<RadioConfiguration> configs, boost::shared_ptr<boost::asio::io_service> io_service);
+    IOServiceRadio(std::vector<RadioConfiguration> configs,
+                   boost::shared_ptr<boost::asio::io_service> io_service);
 
     virtual ~IOServiceRadio();
 
@@ -46,13 +47,13 @@ private:
 
     ITransmitter *createAndGetTransmitter(const std::string sender);
 
-    // ############################################################################################
+    // /////////////////////////////////////////////////////////////////////////
 
     void doStart();
 
     void doStop();
 
-    // ############################################################################################
+    // /////////////////////////////////////////////////////////////////////////
 
     void executeCommand(IRadioCommand *command);
 
@@ -94,6 +95,5 @@ private:
     /// the map with all used ITransmitters
     std::unordered_map<std::string, ITransmitter *> transmitters;
 };
-
 
 #endif //ICARUS_RADIOMANAGER_H

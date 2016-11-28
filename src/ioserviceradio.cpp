@@ -37,7 +37,7 @@ IOServiceRadio::~IOServiceRadio()
     this->transmitters.clear();
 }
 
-// ##########################################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 {
@@ -120,7 +120,7 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     this->fireRadioEvent(radio);
 }
 
-// ##########################################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void IOServiceRadio::start()
 {
@@ -184,7 +184,7 @@ void IOServiceRadio::join()
     // not used, because of the io_service
 }
 
-// ############################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void IOServiceRadio::fireTelemetryData(Telemetry data)
 {
@@ -192,7 +192,7 @@ void IOServiceRadio::fireTelemetryData(Telemetry data)
     this->onTelemetry(data);
 }
 
-// ############################################################################################
+// /////////////////////////////////////////////////////////////////////////////
 
 void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
 {

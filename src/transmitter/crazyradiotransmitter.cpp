@@ -261,7 +261,7 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
     if (!this->hasCapacity())
     {
         // create the exception string
-        std::string ex = str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio, because there is no capacity left.") % radioURI);
+        std::string ex = str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio. No capacity free.") % radioURI);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
