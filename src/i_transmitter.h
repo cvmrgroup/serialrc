@@ -11,7 +11,7 @@
 
 #include <radio/telemetry.h>
 
-#include "radio/abstractradio.h"
+#include "abstractradio.h"
 
 class ITransmitter
 {

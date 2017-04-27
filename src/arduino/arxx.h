@@ -129,7 +129,6 @@ private:
     boost::shared_ptr<boost::asio::io_service> io_service;
     // the serial port
     boost::shared_ptr<boost::asio::serial_port> serialPort;
-
 };
 
 #endif /* ARXX_H */

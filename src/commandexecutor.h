@@ -15,7 +15,7 @@
 #include <radio/i_radiocommand.h>
 #include <radio/commands/controlcommand.h>
 
-#include "radio/abstractradio.h"
+#include "abstractradio.h"
 #include "radioexception.h"
 
 class CommandExecutor

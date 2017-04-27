@@ -9,6 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
+#include <boost/asio.hpp>
 #include <boost/format.hpp>
 #include <boost/signals2.hpp>
 #include <boost/log/trivial.hpp>
@@ -16,14 +17,26 @@
 #include <radio/i_radio.h>
 #include <radio/commands/controlcommand.h>
 
-#include "transmitter/artp.h"
-#include "transmitter/artt.h"
-#include "transmitter/crazyradiotransmitter.h"
+#include "i_transmitter.h"
+
+// dsmx tx based radios (arduino and pi)
+#include "dsmxradio.h"
+
+#ifdef WITH_ARDUINO
+#include "arduino/artp.h"
+#include "arduino/artt.h"
+#endif
+
+#ifdef WITH_CRAZYRADIO
+#include "crazyradio/crazyradiotransmitter.h"
+#include "crazyradio/crazyradio.h"
+#endif
+
+#ifdef WITH_RASPBERRYPI
+#include "raspberrypi/rpitx.h"
+#endif
 
 #include "radio/radioevent.h"
-
-#include "radio/dsmxradio.h"
-#include "radio/crazyradio.h"
 
 #include "radioexception.h"
 #include "commandexecutor.h"
