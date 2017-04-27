@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-project(radio)
+project(multiradio)
 
 message("\n\n   " ${PROJECT_NAME} "\n##########################################")
 
