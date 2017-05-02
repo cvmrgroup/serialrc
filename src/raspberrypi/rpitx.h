@@ -20,7 +20,7 @@
 #ifndef RPITX_H
 #define RPITX_H
 
-//#include <wiringPi.h>
+#include <wiringPi.h>
 
 #include <atomic>
 

@@ -74,49 +74,33 @@ void RpiTX::run()
 
     this->running = true;
 
-    /*wiringPiSetup();
+    wiringPiSetup();
     pinMode(0, OUTPUT);
-    
-    while(this->running)
-    {
-	digitalWrite(0, HIGH);
-	delay(500);
-	digitalWrite(0, LOW);
-	delay(500);*/
 
     while (this->running)
     {
-
+        digitalWrite(0, HIGH);
+        delay(500);
+        digitalWrite(0, LOW);
+        delay(500);
     }
-
-    /*
-    try
-    {
-        this->io_service->run();
-    }
-    catch (std::exception &e)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();
-    }
-    */
 
     BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
-}
 
-void RpiTX::stop()
-{
-    this->running = false;
-}
-
-void RpiTX::join()
-{
-    if (this->thread && this->thread->joinable())
+    void RpiTX::stop()
     {
-        this->thread->join();
+        this->running = false;
     }
-}
 
-bool RpiTX::isRunning()
-{
-    return this->running;
-}
+    void RpiTX::join()
+    {
+        if (this->thread && this->thread->joinable())
+        {
+            this->thread->join();
+        }
+    }
+
+    bool RpiTX::isRunning()
+    {
+        return this->running;
+    }
