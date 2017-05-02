@@ -86,21 +86,22 @@ void RpiTX::run()
     }
 
     BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
+}
 
-    void RpiTX::stop()
-    {
-        this->running = false;
-    }
+void RpiTX::stop()
+{
+    this->running = false;
+}
 
-    void RpiTX::join()
+void RpiTX::join()
+{
+    if (this->thread && this->thread->joinable())
     {
-        if (this->thread && this->thread->joinable())
-        {
-            this->thread->join();
-        }
+	this->thread->join();
     }
+}
 
-    bool RpiTX::isRunning()
-    {
-        return this->running;
-    }
+bool RpiTX::isRunning()
+{
+    return this->running;
+}
