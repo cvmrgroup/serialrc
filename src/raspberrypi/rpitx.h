@@ -20,19 +20,23 @@
 #ifndef RPITX_H
 #define RPITX_H
 
-#include <wiringPi.h>
+//#include <wiringPi.h>
 
 #include <atomic>
 
 #include <boost/thread.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/log/trivial.hpp>
+
+#include "i_transmitter.h"
 
 class RpiTX : public ITransmitter
 {
 
 public:
 
-    RpiTX(const std::string name, int maxNumberOfRadios, boost::shared_ptr<boost::asio::io_service> io_service);
+    RpiTX(const std::string name, boost::shared_ptr<boost::asio::io_service> io_service);
 
     void open();
 
@@ -54,17 +58,19 @@ public:
 
     void join();
 
-    void isRunning();
+    bool isRunning();
     
 private:
 
     /// the name of the transmitter
     std::string name;
 
+    bool initialized;
+
     std::atomic<bool> running;
     boost::shared_ptr<boost::asio::io_service> io_service;
     boost::shared_ptr<boost::thread> thread;
-    boost::shared_ptr<boost::asio::io_service::work> work;
+    //boost::shared_ptr<boost::asio::io_service::work> work;
 };
 
 #endif /* RPITX_H */

@@ -19,12 +19,13 @@
 
 #include "rpitx.h"
 
-RpiTX::RpiTX(const std::string name, boost::shared_ptr<boost::asio::io_service> io_service)
+RpiTX::RpiTX(const std::string name,
+             boost::shared_ptr<boost::asio::io_service> io_service)
 {
+    this->initialized = false;
     this->running = false;
     this->name = name;
     this->io_service = io_service;
-    this->work = boost::shared_ptr<boost::asio::io_service::work>(new boost::asio::io_service::work(*this->io_service));
 }
 
 void RpiTX::open()
@@ -44,12 +45,12 @@ std::string RpiTX::getName()
 
 bool RpiTX::isOpen()
 {
-    return false;
+    return this->initialized;
 }
 
 bool RpiTX::hasCapacity()
 {
-    return false;
+    return true;
 }
 
 void RpiTX::addRadio(AbstractRadio *radio)
@@ -60,19 +61,20 @@ void RpiTX::start()
 {
     if (this->thread)
     {
-	return;
+        return;
     }
-    
+
     this->thread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&RpiTX::run, this)));
+    this->initialized = true;
 }
 
 void RpiTX::run()
 {
-    BOOST_LOG_TRIVIAL(info) << "Starting gpio thread...";
-    
+    BOOST_LOG_TRIVIAL(info) << "Starting GPIO thread...";
+
     this->running = true;
 
-    wiringPiSetup();
+    /*wiringPiSetup();
     pinMode(0, OUTPUT);
     
     while(this->running)
@@ -80,43 +82,41 @@ void RpiTX::run()
 	digitalWrite(0, HIGH);
 	delay(500);
 	digitalWrite(0, LOW);
-	delay(500);
-	
-	/*
-	try
-	{
-	    this->io_service->run();
-	}
-	catch (std::exception &e)
-	{
-	    BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();
-	}
-	*/
+	delay(500);*/
+
+    while (this->running)
+    {
+
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Gpio thread stopped.";
+    /*
+    try
+    {
+        this->io_service->run();
+    }
+    catch (std::exception &e)
+    {
+        BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();
+    }
+    */
+
+    BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
 }
 
 void RpiTX::stop()
 {
     this->running = false;
-
-    if (this->work)
-    {
-	this->work.reset();
-	this->work = nullptr;
-    }
 }
 
 void RpiTX::join()
 {
     if (this->thread && this->thread->joinable())
     {
-	this->thread->join();
+        this->thread->join();
     }
 }
 
-void RpiTX::isRunning()
+bool RpiTX::isRunning()
 {
-    return this->isRunning;
+    return this->running;
 }

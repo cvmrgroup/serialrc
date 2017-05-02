@@ -6,25 +6,36 @@ message("\n\n   " ${PROJECT_NAME} "\n##########################################"
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/")
 
-# ----------------------------------------------------
+# Build Tests ##################################################################
 
-# check if WITH_TESTS is defined
 if(DEFINED WITH_TESTS)
-    # add the test subdirectory for multiradio
     add_subdirectory(test)
 endif()
-# print the WITH_TESTS
+
 message(STATUS "WITH_TESTS: ${WITH_TESTS}")
 
 set(${PROJECT_NAME}_INCLUDE_DIRS "")
 set(${PROJECT_NAME}_LINK_LIBS "")
 set(${PROJECT_NAME}_FLAGS "")
 
-# optional radios ####################################
+# Default Packages #############################################################
+
+find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system log thread regex date_time)
+
+# Default Source Directory #####################################################
+
+file(GLOB ${PROJECT_NAME}_HEADERS src/*.h)
+file(GLOB ${PROJECT_NAME}_SOURCES src/*.cpp)
+
+# Select Radio(s) ##############################################################
 
 if (${WITH_ARDUINO})
-    file(GLOB ${PROJECT_NAME}_HEADERS src/radios/arduino/*.h)
-    file(GLOB ${PROJECT_NAME}_SOURCES src/radios/arduino/*.cpp)
+    find_package(Qt5SerialPort REQUIRED)
+    file(GLOB ARDUINO_HEADERS src/arduino/*.h)
+    file(GLOB ARDUINO_SOURCES src/arduino/*.cpp)
+    list(APPEND ${PROJECT_NAME}_HEADERS ${ARDUINO_HEADERS})
+    list(APPEND ${PROJECT_NAME}_SOURCES ${ARDUINO_SOURCES})
     list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${Qt5SerialPort_INCLUDE_DIRS})
     list(APPEND ${PROJECT_NAME}_LINK_LIBS Qt5::SerialPort)
     list(APPEND ${PROJECT_NAME}_FLAGS WITH_ARDUINO)
@@ -32,8 +43,10 @@ endif ()
 
 if (${WITH_RASPBERRYPI})
     find_package(WiringPi REQUIRED)
-    file(GLOB ${PROJECT_NAME}_HEADERS src/radios/raspberrypi/*.h)
-    file(GLOB ${PROJECT_NAME}_SOURCES src/radios/raspberrypi/*.cpp)
+    file(GLOB RASPBERRYPI_HEADERS src/raspberrypi/*.h)
+    file(GLOB RASPBERRYPI_SOURCES src/raspberrypi/*.cpp)
+    list(APPEND ${PROJECT_NAME}_HEADERS ${RASPBERRYPI_HEADERS})
+    list(APPEND ${PROJECT_NAME}_SOURCES ${RASPBERRYPI_SOURCES})
     list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${WIRINGPI_INCLUDE_DIRS})
     list(APPEND ${PROJECT_NAME}_LINK_LIBS ${WIRINGPI_LIBRARIES})
     list(APPEND ${PROJECT_NAME}_FLAGS WITH_RASPBERRYPI)
@@ -41,29 +54,20 @@ endif ()
 
 if (${WITH_CRAZYRADIO})
     add_subdirectory(ext/libcflie)
-    find_package(Qt5SerialPort REQUIRED)
-    file(GLOB ${PROJECT_NAME}_HEADERS src/*.h)
-    file(GLOB ${PROJECT_NAME}_SOURCES src/*.cpp)
+    file(GLOB CRAZYRADIO_HEADERS src/crazyradio/*.h)
+    file(GLOB CRAZYRADIO_SOURCES src/crazyradio/*.cpp)
+    list(APPEND ${PROJECT_NAME}_HEADERS ${CRAZYRADIO_HEADERS})
+    list(APPEND ${PROJECT_NAME}_SOURCES ${CRAZYRADIO_SOURCES})
     list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS cflie)
     list(APPEND ${PROJECT_NAME}_LINK_LIBS cflie)
     list(APPEND ${PROJECT_NAME}_FLAGS WITH_CRAZYRADIO)
 endif ()
 
-message(STATUS "Arduino: ${WITH_ARDUINO}")
-message(STATUS "RaspberryPi: ${WITH_RASPBERRYPI}")
-message(STATUS "Crazyradio: ${WITH_CRAZYRADIO}")
+message(STATUS "WITH_ARDUINO: ${WITH_ARDUINO}")
+message(STATUS "WITH_RASPBERRYPI: ${WITH_RASPBERRYPI}")
+message(STATUS "WITH_CRAZYRADIO: ${WITH_CRAZYRADIO}")
 
-# ----------------------------------------------------
-
-find_package(OpenCV REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system log thread regex date_time)
-
-# ----------------------------------------------------
-
-file(GLOB ${PROJECT_NAME}_HEADERS src/*.h)
-file(GLOB ${PROJECT_NAME}_SOURCES src/*.cpp)
-
-# ----------------------------------------------------
+# ##############################################################################
 
 add_library(${PROJECT_NAME} STATIC
     ${${PROJECT_NAME}_SOURCES}
@@ -84,7 +88,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     )
 
 # set the compile definition for the BOOST Log
-target_compile_definitions(${PROJECT_NAME} PUBLIC "-DBOOST_LOG_DYN_LINK" ${PROJECT_NAME}_FLAGS)
+target_compile_definitions(${PROJECT_NAME} PUBLIC "-DBOOST_LOG_DYN_LINK" ${${PROJECT_NAME}_FLAGS})
 
-# add C++11 as compile option
-target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)

@@ -49,8 +49,8 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     }
 
     // create the correct transmitter
-    ITransmitter* tx = NULL;
-    
+    ITransmitter *tx = NULL;
+
 #ifdef WITH_ARDUINO
     if (sender.compare("artt") == 0)
     {
@@ -72,12 +72,11 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 #ifdef WITH_RASPBERRYPI
     if (sender.compare("raspberrypi") == 0)
     {
-	BOOST_LOG_TRIVIAL(info) << "rpitx added";
-	tx = new RpiTX(sender, this->io_service);
+        tx = new RpiTX(sender, this->io_service);
     }
 #endif
-    
-    if(!tx)
+
+    if (!tx)
     {
         // create the exception string
         std::string ex = str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
@@ -112,8 +111,6 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
         throw RadioException(ex);
     }
 
-    BOOST_LOG_TRIVIAL(info) << conf.sender;
-    
     // get the name of the sender
     std::string sender = conf.sender;
     // create or get the transmitter for the configured sender
@@ -122,9 +119,9 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     // radio which is used for the given copter
     AbstractRadio *radio = NULL;
 
-    if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi"))
+    if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi") == 0)
     {
-	BOOST_LOG_TRIVIAL(info) << "dsmx radio added " << sender;
+        BOOST_LOG_TRIVIAL(info) << "dsmx radio added " << sender;
         radio = new DSMXRadio(copterId, conf.txId);
     }
 
@@ -135,7 +132,7 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
     }
 #endif
 
-    if(!radio)
+    if (!radio)
     {
         // create the exception string
         std::string ex = str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
@@ -157,14 +154,12 @@ void IOServiceRadio::createRadio(RadioConfiguration &conf)
 
 void IOServiceRadio::start()
 {
-    BOOST_LOG_TRIVIAL(info) << "execute the start of the radio inside the io_service to be thread safe";
     // execute the start of the radio inside the io_service to be thread safe
     this->io_service->post(boost::bind(&IOServiceRadio::doStart, this));
 }
 
 void IOServiceRadio::doStart()
 {
-    BOOST_LOG_TRIVIAL(info) << "dostart";
     // create for each given configuration an radio
     for (auto config : this->configs)
     {
