@@ -74,17 +74,50 @@ void RpiTX::run()
 
     this->running = true;
 
-    wiringPiSetup();
-    pinMode(0, OUTPUT);
+    int powersignal = 0;
+    int radiosignal = 2;
 
-    while (this->running)
+    int fd;
+    if ((fd = serialOpen("/dev/ttyAMA0", 115200)) < 0)
     {
-        digitalWrite(0, HIGH);
-        delay(500);
-        digitalWrite(0, LOW);
-        delay(500);
+	BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << strerror(errno) << " ]." ;
+	return;
     }
 
+    if (wiringPiSetup () == -1)
+    {
+	BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << strerror(errno) << " ].";
+	return;
+    }
+
+    pinMode(powersignal, OUTPUT);
+    pinMode(radiosignal, OUTPUT);
+
+    unsigned int nextTime = millis() + 22;
+
+    int count = 0;
+    
+    while (this->running)
+    {
+	if (millis() > nextTime)
+	{
+	    BOOST_LOG_TRIVIAL(info) << count;
+	    serialPutchar(fd, count);
+	    nextTime += 22;
+	    count = (count + 1) % 255;
+	}
+    }
+    
+    /*
+    while (this->running)
+    {
+        digitalWrite(powersignal, HIGH);
+        delay(500);
+        digitalWrite(powersignal, LOW);
+        delay(500);
+    }
+    */
+    
     BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
 }
 

@@ -21,6 +21,7 @@
 #define RPITX_H
 
 #include <wiringPi.h>
+#include <wiringSerial.h>
 
 #include <atomic>
 
