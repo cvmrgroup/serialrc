@@ -30,7 +30,10 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/log/trivial.hpp>
 
+#include "dsmxconstants.h"
+#include "abstractradio.h"
 #include "i_transmitter.h"
+#include "serialhelper.h"
 
 class RpiTX : public ITransmitter
 {
@@ -68,10 +71,34 @@ private:
 
     bool initialized;
 
+    AbstractRadio *radio;
+
     std::atomic<bool> running;
     boost::shared_ptr<boost::asio::io_service> io_service;
     boost::shared_ptr<boost::thread> thread;
-    //boost::shared_ptr<boost::asio::io_service::work> work;
+
+    static const int DSM_FRAME_LENGTH = 14;
+    static const int DSM_SEND_RATE = 22;
+    static const int DSM_BAUD_RATE = 125000;
+
+    static const int DARLINGTON_PIN = 0;
+    static const int DSM_SIGNAL_PIN = 2;
+
+    /// channel ids
+    static const int header_1 = 0;
+    static const int header_2 = 1;
+    static const int channel_1_hi = 2;
+    static const int channel_1_lo = 3;
+    static const int channel_2_hi = 4;
+    static const int channel_2_lo = 5;
+    static const int channel_3_hi = 6;
+    static const int channel_3_lo = 7;
+    static const int channel_4_hi = 8;
+    static const int channel_4_lo = 9;
+    static const int channel_5_hi = 10;
+    static const int channel_5_lo = 11;
+    static const int channel_6_hi = 12;
+    static const int channel_6_lo = 13;
 };
 
 #endif /* RPITX_H */

@@ -22,6 +22,7 @@
 RpiTX::RpiTX(const std::string name,
              boost::shared_ptr<boost::asio::io_service> io_service)
 {
+    this->radio = NULL;
     this->initialized = false;
     this->running = false;
     this->name = name;
@@ -55,6 +56,7 @@ bool RpiTX::hasCapacity()
 
 void RpiTX::addRadio(AbstractRadio *radio)
 {
+    this->radio = radio;
 }
 
 void RpiTX::start()
@@ -72,52 +74,85 @@ void RpiTX::run()
 {
     BOOST_LOG_TRIVIAL(info) << "Starting GPIO thread...";
 
-    this->running = true;
+    if (!this->radio)
+    {
+        BOOST_LOG_TRIVIAL(error) << "No radio set.";
+        return;
+    }
 
-    int powersignal = 0;
-    int radiosignal = 2;
+    unsigned char dsmx[DSM_FRAME_LENGTH] = {0};
 
     int fd;
-    if ((fd = serialOpen("/dev/ttyAMA0", 115200)) < 0)
+
+    if ((fd = serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
     {
-	BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << strerror(errno) << " ]." ;
-	return;
+        BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << strerror(errno) << " ].";
+        return;
     }
 
-    if (wiringPiSetup () == -1)
+    if (wiringPiSetup() == -1)
     {
-	BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << strerror(errno) << " ].";
-	return;
+        BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << strerror(errno) << " ].";
+        return;
     }
 
-    pinMode(powersignal, OUTPUT);
-    pinMode(radiosignal, OUTPUT);
+    this->running = true;
 
-    unsigned int nextTime = millis() + 22;
+    pinMode(DARLINGTON_PIN, OUTPUT);
+    pinMode(DSM_SIGNAL_PIN, OUTPUT);
 
-    int count = 0;
-    
+    unsigned int nextTime = millis() + DSM_SEND_RATE;
+
     while (this->running)
     {
-	if (millis() > nextTime)
-	{
-	    BOOST_LOG_TRIVIAL(info) << count;
-	    serialPutchar(fd, count);
-	    nextTime += 22;
-	    count = (count + 1) % 255;
-	}
+        bool enabled = this->radio->isEnabled();
+        digitalWrite(DARLINGTON_PIN, enabled ? HIGH : LOW);
+
+        if (millis() > nextTime)
+        {
+            // prepare array and send signal
+            dsmx[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
+            dsmx[header_2] = header_2_default;
+
+            int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
+            int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
+            int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
+            int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
+            int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
+            int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
+
+            // overwrite throttle signal if copter is supended
+            if (radio->isSuspended())
+            {
+                ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
+            }
+
+            // convert to byte frame
+            dsmx[channel_1_hi] = SerialHelper::hiByte(ch1);
+            dsmx[channel_1_lo] = SerialHelper::loByte(ch1);
+
+            dsmx[channel_2_hi] = SerialHelper::hiByte(ch2);
+            dsmx[channel_2_lo] = SerialHelper::loByte(ch2);
+
+            dsmx[channel_3_hi] = SerialHelper::hiByte(ch3);
+            dsmx[channel_3_lo] = SerialHelper::loByte(ch3);
+
+            dsmx[channel_4_hi] = SerialHelper::hiByte(ch4);
+            dsmx[channel_4_lo] = SerialHelper::loByte(ch4);
+
+            dsmx[channel_5_hi] = SerialHelper::hiByte(ch5);
+            dsmx[channel_5_lo] = SerialHelper::loByte(ch5);
+
+            dsmx[channel_6_hi] = SerialHelper::hiByte(ch6);
+            dsmx[channel_6_lo] = SerialHelper::loByte(ch6);
+
+            write(fd, dsmx, DSM_FRAME_LENGTH);
+
+            // set next send time
+            nextTime += DSM_SEND_RATE;
+        }
     }
-    
-    /*
-    while (this->running)
-    {
-        digitalWrite(powersignal, HIGH);
-        delay(500);
-        digitalWrite(powersignal, LOW);
-        delay(500);
-    }
-    */
-    
+
     BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
 }
 
@@ -130,7 +165,7 @@ void RpiTX::join()
 {
     if (this->thread && this->thread->joinable())
     {
-	this->thread->join();
+        this->thread->join();
     }
 }
 

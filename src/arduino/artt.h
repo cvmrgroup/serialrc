@@ -22,6 +22,7 @@
 
 #include <vector>
 
+#include "dsmxconstants.h"
 #include "arxx.h"
 
 /**
@@ -84,26 +85,6 @@ private:
     static const int ch4 = 3;
     static const int ch5 = 4;
     static const int ch6 = 5;
-
-    /// default header value
-    static const int header_1_default = 0x0058;
-    /// header value when in bind mode
-    static const int header_1_bind_mode = 0x00D8;
-    /// second header byte always zero
-    static const int header_2_default = 0x0000;
-
-    /// channel offsets
-    static const int ch1_offset = 0x0000;
-    static const int ch2_offset = 0x0400;
-    static const int ch3_offset = 0x0800;
-    static const int ch4_offset = 0x0C00;
-    static const int ch5_offset = 0x1000;
-    static const int ch6_offset = 0x1400;
-
-    /// offset from channel offset to center value
-    static const int center_value_offset = 0x01FF;
-    /// scale from normalized values -1...1 to serial dsm values 170...852
-    static const int value_range_scale = 0x0155;
 
     // multiwii trimming for super-x
     //#define CENTER_VALUE_OFFSET 0x1e2
