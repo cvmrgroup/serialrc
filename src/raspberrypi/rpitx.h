@@ -34,6 +34,7 @@
 #include "abstractradio.h"
 #include "i_transmitter.h"
 #include "serialhelper.h"
+#include "serial.h"
 
 class RpiTX : public ITransmitter
 {
@@ -82,7 +83,6 @@ private:
     static const int DSM_BAUD_RATE = 125000;
 
     static const int DARLINGTON_PIN = 0;
-    static const int DSM_SIGNAL_PIN = 2;
 
     /// channel ids
     static const int header_1 = 0;

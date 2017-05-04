@@ -80,53 +80,88 @@ void RpiTX::run()
         return;
     }
 
-    unsigned char dsmx[DSM_FRAME_LENGTH] = {0};
-
     int fd;
 
-    if ((fd = serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
+    if ((fd = Serial::serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
     {
-        BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << strerror(errno) << " ].";
+        BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << errno << " ].";
         return;
     }
 
     if (wiringPiSetup() == -1)
     {
-        BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << strerror(errno) << " ].";
+        BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << errno << " ].";
         return;
     }
 
     this->running = true;
-
+    
     pinMode(DARLINGTON_PIN, OUTPUT);
-    pinMode(DSM_SIGNAL_PIN, OUTPUT);
+    digitalWrite(DARLINGTON_PIN, LOW);
+    
+    int ch1, ch2, ch3, ch4, ch5, ch6;
+    unsigned char dsmx[DSM_FRAME_LENGTH] = {};
+    
+    bool binding = false;
 
-    unsigned int nextTime = millis() + DSM_SEND_RATE;
+    unsigned int offTime = 0;
+    unsigned int bindTime = 0;
+
+    unsigned int nextTime =  millis() + DSM_SEND_RATE;
 
     while (this->running)
     {
-        bool enabled = this->radio->isEnabled();
-        digitalWrite(DARLINGTON_PIN, enabled ? HIGH : LOW);
+	if (radio->isBinding() && !binding)
+	{
+	    binding = true;
+	    offTime = millis() + 1000;
+	    bindTime = millis() + 5000;
+	    
+	    digitalWrite(DARLINGTON_PIN, LOW);
+	    dsmx[header_1] = header_1_bind_mode;
 
-        if (millis() > nextTime)
-        {
-            // prepare array and send signal
-            dsmx[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
-            dsmx[header_2] = header_2_default;
+	    BOOST_LOG_TRIVIAL(info) << "start binding";
+	}
 
-            int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
-            int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
-            int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
-            int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-            int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
-            int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
+	if (binding)
+	{
+	    if (millis() > bindTime)
+	    {
+		dsmx[header_1] = header_1_default;
+		BOOST_LOG_TRIVIAL(info) << "bind time over";
 
-            // overwrite throttle signal if copter is supended
-            if (radio->isSuspended())
-            {
-                ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
-            }
+		binding = false;
+	    }
+	    else if (millis() > offTime)
+	    {
+		digitalWrite(DARLINGTON_PIN, HIGH);
+		BOOST_LOG_TRIVIAL(info) << "turn on";
+	    }
+	}
+	
+	// make sure to switch on tx with bind signal applied
+	//bool enabled = this->radio->isEnabled();
+	//digitalWrite(DARLINGTON_PIN, enabled ? HIGH : LOW);
+	
+	// prepare array and send signal
+	//dsmx[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
+	//dsmx[header_2] = header_2_default;
+	
+	ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
+	ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
+	ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
+	ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
+	ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
+	ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
+	
+	// overwrite throttle signal if copter is supended
+	if (radio->isSuspended())
+	{
+	    ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
+	}
 
+	if (millis() > nextTime)
+	{
             // convert to byte frame
             dsmx[channel_1_hi] = SerialHelper::hiByte(ch1);
             dsmx[channel_1_lo] = SerialHelper::loByte(ch1);
