@@ -43,25 +43,22 @@ class RpiTX : public ITransmitter
 
 public:
 
-    RpiTX(const std::string name, boost::shared_ptr<boost::asio::io_service> io_service);
+    RpiTX(const std::string name,
+          boost::shared_ptr<boost::asio::io_service> io_service);
 
     void open();
 
     void close();
 
     std::string getName();
-	
+
     bool isOpen();
 
     bool hasCapacity();
 
     void addRadio(AbstractRadio *radio);
 
-    void start();
-
     void update(const boost::system::error_code &ec);
-    
-    void stop();
 
 private:
 
