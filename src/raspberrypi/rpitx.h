@@ -20,17 +20,19 @@
 #ifndef RPITX_H
 #define RPITX_H
 
-#include <wiringPi.h>
-#include <wiringSerial.h>
-
 #include <atomic>
 
-#include <boost/thread.hpp>
+#include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <wiringPi.h>
+
+#include <timing/deadlinetimer.h>
+
 #include "dsmxconstants.h"
+#include "radioexception.h"
 #include "abstractradio.h"
 #include "i_transmitter.h"
 #include "serialhelper.h"
@@ -56,27 +58,22 @@ public:
     void addRadio(AbstractRadio *radio);
 
     void start();
-    
-    void run();
 
+    void update(const boost::system::error_code &ec);
+    
     void stop();
 
-    void join();
-
-    bool isRunning();
-    
 private:
 
     /// the name of the transmitter
     std::string name;
-
+    int serial;
     bool initialized;
 
     AbstractRadio *radio;
 
-    std::atomic<bool> running;
     boost::shared_ptr<boost::asio::io_service> io_service;
-    boost::shared_ptr<boost::thread> thread;
+    DeadlineTimer *timer;
 
     static const int DSM_FRAME_LENGTH = 14;
     static const int DSM_SEND_RATE = 22;

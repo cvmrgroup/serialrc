@@ -23,14 +23,37 @@ RpiTX::RpiTX(const std::string name,
              boost::shared_ptr<boost::asio::io_service> io_service)
 {
     this->radio = NULL;
-    this->initialized = false;
-    this->running = false;
     this->name = name;
+    this->serial = -1;
+    this->initialized = false;
     this->io_service = io_service;
+    this->timer = new DeadlineTimer(45.45454545454546, this->io_service);
 }
 
 void RpiTX::open()
 {
+    if ((this->serial = Serial::serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
+    {
+	std::string ex = "Unable to open serial device";
+	BOOST_LOG_TRIVIAL(error) << ex;
+	throw RadioException(ex);
+	return;
+    }
+    
+    if (wiringPiSetup() == -1)
+    {
+	std::string ex = "Unable to start wiringPi.";
+	BOOST_LOG_TRIVIAL(error) << ex;
+	throw RadioException(ex);
+	return;
+    }
+
+    pinMode(DARLINGTON_PIN, OUTPUT);
+    digitalWrite(DARLINGTON_PIN, LOW);
+    
+    BOOST_LOG_TRIVIAL(info) << "GPIO serial port initialized.";
+    this->initialized = true;
+
     this->start();
 }
 
@@ -61,18 +84,28 @@ void RpiTX::addRadio(AbstractRadio *radio)
 
 void RpiTX::start()
 {
-    if (this->thread)
+    if (!this->initialized)
     {
-        return;
+	std::string ex = "Raspi Radio not initialized.";
+	BOOST_LOG_TRIVIAL(error) << ex;
+	throw RadioException(ex);
+	return;
     }
 
-    this->thread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&RpiTX::run, this)));
-    this->initialized = true;
+    BOOST_LOG_TRIVIAL(info) << "Transmission started.";
+	
+    this->timer->start();
+    this->timer->invokeTimer(boost::bind(&RpiTX::update, this, boost::asio::placeholders::error));
 }
 
-void RpiTX::run()
+void RpiTX::update(const boost::system::error_code &ec)
 {
-    BOOST_LOG_TRIVIAL(info) << "Starting GPIO thread...";
+    if (ec)
+    {
+	std::string ex = str(boost::format("Raspi Radio timer update failed with exception [ %1% ].") % ec.message());
+	BOOST_LOG_TRIVIAL(error) << ex;
+	throw RadioException(ex);
+    }
 
     if (!this->radio)
     {
@@ -80,131 +113,64 @@ void RpiTX::run()
         return;
     }
 
-    int fd;
-
-    if ((fd = Serial::serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Unable to open serial device [ " << errno << " ].";
-        return;
-    }
-
-    if (wiringPiSetup() == -1)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Unable to start wiringPi [ " << errno << " ].";
-        return;
-    }
-
-    this->running = true;
-    
-    pinMode(DARLINGTON_PIN, OUTPUT);
-    digitalWrite(DARLINGTON_PIN, LOW);
-    
-    int ch1, ch2, ch3, ch4, ch5, ch6;
     unsigned char dsmx[DSM_FRAME_LENGTH] = {};
+
+    // prepare array and send signal
+    dsmx[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
+    dsmx[header_2] = header_2_default;
+
+    int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
+    int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
+    int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
+    int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
+    int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
+    int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
     
-    bool binding = false;
-
-    unsigned int offTime = 0;
-    unsigned int bindTime = 0;
-
-    unsigned int nextTime =  millis() + DSM_SEND_RATE;
-
-    while (this->running)
+    // overwrite throttle signal if copter is supended
+    if (radio->isSuspended())
     {
-	if (radio->isBinding() && !binding)
-	{
-	    binding = true;
-	    offTime = millis() + 1000;
-	    bindTime = millis() + 5000;
-	    
-	    digitalWrite(DARLINGTON_PIN, LOW);
-	    dsmx[header_1] = header_1_bind_mode;
-
-	    BOOST_LOG_TRIVIAL(info) << "start binding";
-	}
-
-	if (binding)
-	{
-	    if (millis() > bindTime)
-	    {
-		dsmx[header_1] = header_1_default;
-		BOOST_LOG_TRIVIAL(info) << "bind time over";
-
-		binding = false;
-	    }
-	    else if (millis() > offTime)
-	    {
-		digitalWrite(DARLINGTON_PIN, HIGH);
-		BOOST_LOG_TRIVIAL(info) << "turn on";
-	    }
-	}
-	
-	// make sure to switch on tx with bind signal applied
-	//bool enabled = this->radio->isEnabled();
-	//digitalWrite(DARLINGTON_PIN, enabled ? HIGH : LOW);
-	
-	// prepare array and send signal
-	//dsmx[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
-	//dsmx[header_2] = header_2_default;
-	
-	ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
-	ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
-	ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
-	ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-	ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
-	ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
-	
-	// overwrite throttle signal if copter is supended
-	if (radio->isSuspended())
-	{
-	    ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
-	}
-
-	if (millis() > nextTime)
-	{
-            // convert to byte frame
-            dsmx[channel_1_hi] = SerialHelper::hiByte(ch1);
-            dsmx[channel_1_lo] = SerialHelper::loByte(ch1);
-
-            dsmx[channel_2_hi] = SerialHelper::hiByte(ch2);
-            dsmx[channel_2_lo] = SerialHelper::loByte(ch2);
-
-            dsmx[channel_3_hi] = SerialHelper::hiByte(ch3);
-            dsmx[channel_3_lo] = SerialHelper::loByte(ch3);
-
-            dsmx[channel_4_hi] = SerialHelper::hiByte(ch4);
-            dsmx[channel_4_lo] = SerialHelper::loByte(ch4);
-
-            dsmx[channel_5_hi] = SerialHelper::hiByte(ch5);
-            dsmx[channel_5_lo] = SerialHelper::loByte(ch5);
-
-            dsmx[channel_6_hi] = SerialHelper::hiByte(ch6);
-            dsmx[channel_6_lo] = SerialHelper::loByte(ch6);
-
-            write(fd, dsmx, DSM_FRAME_LENGTH);
-
-            // set next send time
-            nextTime += DSM_SEND_RATE;
-        }
+	ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
     }
+    
+    // convert to byte frame
+    dsmx[channel_1_hi] = SerialHelper::hiByte(ch1);
+    dsmx[channel_1_lo] = SerialHelper::loByte(ch1);
+    
+    dsmx[channel_2_hi] = SerialHelper::hiByte(ch2);
+    dsmx[channel_2_lo] = SerialHelper::loByte(ch2);
+    
+    dsmx[channel_3_hi] = SerialHelper::hiByte(ch3);
+    dsmx[channel_3_lo] = SerialHelper::loByte(ch3);
+    
+    dsmx[channel_4_hi] = SerialHelper::hiByte(ch4);
+    dsmx[channel_4_lo] = SerialHelper::loByte(ch4);
+    
+    dsmx[channel_5_hi] = SerialHelper::hiByte(ch5);
+    dsmx[channel_5_lo] = SerialHelper::loByte(ch5);
+    
+    dsmx[channel_6_hi] = SerialHelper::hiByte(ch6);
+    dsmx[channel_6_lo] = SerialHelper::loByte(ch6);
 
-    BOOST_LOG_TRIVIAL(info) << "GPIO thread stopped.";
+    // power
+    digitalWrite(DARLINGTON_PIN, this->radio->isEnabled() ? HIGH : LOW);
+	
+    // signal
+    write(this->serial, dsmx, DSM_FRAME_LENGTH);
+
+    // reinvoke timer
+    this->timer->invokeTimer(boost::bind(&RpiTX::update, this, boost::asio::placeholders::error));
 }
 
 void RpiTX::stop()
 {
-    this->running = false;
-}
-
-void RpiTX::join()
-{
-    if (this->thread && this->thread->joinable())
+    if (!this->initialized)
     {
-        this->thread->join();
+	return;
     }
-}
 
-bool RpiTX::isRunning()
-{
-    return this->running;
+    digitalWrite(DARLINGTON_PIN, LOW);
+    Serial::serialClose(this->serial);
+    this->timer->cancel();
+    BOOST_LOG_TRIVIAL(info) << "GPIO stopped.";
+    this->initialized = false;
 }

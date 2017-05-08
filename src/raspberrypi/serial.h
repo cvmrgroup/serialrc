@@ -17,9 +17,9 @@
 class Serial
 {
 public:
-    static int setBaudRate();
-    static int serialOpen(const char *device, int rate);
     static int rate2constant(int baudrate);
+    static int serialOpen(const char *device, int rate);
+    static int serialClose(int fd);
 };
 
 #endif//PI_SERIAL_H
