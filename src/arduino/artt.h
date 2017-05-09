@@ -22,12 +22,12 @@
 
 #include <vector>
 
-#include "dsmxconstants.h"
 #include "arxx.h"
+#include "dsmxconstants.h"
 
 /**
  * @brief Software-side class for communication with the software running on the
- * arduino triple transmission built-in arduino board.
+ * arduino triple transmission built-in Arduino board.
  */
 class ArTT : public ArXX
 {
@@ -37,10 +37,11 @@ public:
     /**
      * @brief Constructor.
      */
-    ArTT(const std::string name, std::string serial, boost::shared_ptr<boost::asio::io_service> io_service);
+    ArTT(const std::string name, std::string serial,
+         boost::shared_ptr<boost::asio::io_service> io_service);
 
     /**
-     * overwrite the addRadio for getting the transmitter ids
+     * Overwrite addRadio function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter
      */
     void addRadio(AbstractRadio *radio);
@@ -58,7 +59,8 @@ private:
 
     /// length of a single transmitter command
     static const int command_length = 16;
-    // number of channels
+
+    /// number of radio channels
     static const int n_channels = 6;
 
     /// channel ids

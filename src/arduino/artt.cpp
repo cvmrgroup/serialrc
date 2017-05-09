@@ -19,7 +19,8 @@
 
 #include "artt.h"
 
-ArTT::ArTT(const std::string name, std::string serial, boost::shared_ptr<boost::asio::io_service> io_service) :
+ArTT::ArTT(const std::string name, std::string serial,
+           boost::shared_ptr<boost::asio::io_service> io_service) :
         ArXX(name, maxRadios, serial, io_service)
 {
     this->token = 0;
@@ -47,7 +48,7 @@ void ArTT::onData(const char *frame, size_t length)
     // the index to find the xon in the frame
     int xOnIndex = 0;
 
-    /* if the length bigger then one
+    /*
      * #########
      * fix for the problem that when the arduino is first time connected,
      * that a frame of size 2 is received with the array:
@@ -59,16 +60,17 @@ void ArTT::onData(const char *frame, size_t length)
         xOnIndex = 1;
     }
 
-    // check if an XON was received
+    // check if XON was received
     if (frame[xOnIndex] == XON)
     {
         // switch to nect token
-        this->token = (this->token + 1) % this->transmitterIds.size();
+        this->token = (this->token + 1) % (unsigned int) this->transmitterIds.size();
         // get the next transmitter id
         unsigned int txId = this->transmitterIds[this->token];
         // write for the next transmitter
         this->writeData(txId);
-    } else
+    }
+    else
     {
         // create the exception string
         std::string ex = str(boost::format("no XON on serial port [ %1% ] received") % this->getSerialNumber());
@@ -96,22 +98,22 @@ void ArTT::writeData(unsigned int id)
 
     unsigned char frame[command_length];
 
-    frame[header_1] = radio->isBinding() ? header_1_bind_mode : header_1_default;
+    frame[header_1] = (unsigned char) (radio->isBinding() ? header_1_bind_mode : header_1_default);
     frame[header_2] = header_2_default;
     frame[relay_state] = radio->isEnabled() ? relay_state_on : relay_state_off;
     frame[tx_id] = (unsigned char) id;
 
-    int ch1 = ch1_offset + center_value_offset + radio->getThrottle() * value_range_scale;
-    int ch2 = ch2_offset + center_value_offset + radio->getRoll() * value_range_scale;
-    int ch3 = ch3_offset + center_value_offset + radio->getPitch() * value_range_scale;
-    int ch4 = ch4_offset + center_value_offset + radio->getYaw() * value_range_scale;
-    int ch5 = ch5_offset + center_value_offset + radio->getCh5() * value_range_scale;
-    int ch6 = ch6_offset + center_value_offset + radio->getCh6() * value_range_scale;
+    int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
+    int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
+    int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
+    int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
+    int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
+    int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
 
     // overwrite throttle signal if copter is supended
     if (radio->isSuspended())
     {
-        ch1 = ch1_offset + center_value_offset + -1.0 * value_range_scale;
+        ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
     }
 
     // write to byte frame
@@ -135,5 +137,5 @@ void ArTT::writeData(unsigned int id)
     frame[channel_6_lo] = SerialHelper::loByte(ch6);
 
     // write to serial port
-    this->writeFrame(reinterpret_cast<const char *>(frame), this->command_length);
+    this->writeFrame(reinterpret_cast<const char *>(frame), (size_t) this->command_length);
 }
