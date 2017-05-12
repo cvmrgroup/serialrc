@@ -4,7 +4,7 @@
 
 #include "ioserviceradio.h"
 
-IOServiceRadio::IOServiceRadio(std::vector<RadioConfiguration> configs,
+IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
                                boost::shared_ptr<boost::asio::io_service> io_service)
 {
     this->started = false;
@@ -96,7 +96,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     return transmitter;
 }
 
-void IOServiceRadio::createRadio(RadioConfiguration &conf)
+void IOServiceRadio::createRadio(RadioConfig &conf)
 {
     int copterId = conf.copterId;
 

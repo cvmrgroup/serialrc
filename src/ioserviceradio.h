@@ -40,12 +40,12 @@
 
 #include "radioexception.h"
 #include "commandexecutor.h"
-#include "config/radioconfiguration.h"
+#include "config/radioconfig.h"
 
 class IOServiceRadio : public IRadio
 {
 public:
-    IOServiceRadio(std::vector<RadioConfiguration> configs,
+    IOServiceRadio(std::vector<RadioConfig> configs,
                    boost::shared_ptr<boost::asio::io_service> io_service);
 
     virtual ~IOServiceRadio();
@@ -56,7 +56,7 @@ private:
 
     void fireTelemetryData(Telemetry data);
 
-    void createRadio(RadioConfiguration &conf);
+    void createRadio(RadioConfig &conf);
 
     ITransmitter *createAndGetTransmitter(const std::string sender);
 
@@ -100,7 +100,7 @@ private:
     boost::shared_ptr<boost::asio::io_service> io_service;
 
     /// the list with RadioConfiguration
-    std::vector<RadioConfiguration> configs;
+    std::vector<RadioConfig> configs;
 
     /// the map with all radios for the configured copters
     std::unordered_map<int, AbstractRadio *> radios;
