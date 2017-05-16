@@ -24,13 +24,8 @@ DSMXRadio::DSMXRadio(int id, RadioConfig config) :
 {
     this->config = config;
 
-    // default values
-    this->throttle = config.channels[RadioConfig::Channel::Throttle].travelMin;
-    this->roll = 0.0;
-    this->pitch = 0.0;
-    this->yaw = 0.0;
-    this->ch5 = 0.0;
-    this->ch6 = 0.0;
+    // default values neutral (already set in AbstractRadio), throttle low
+    this->signal[Throttle] = -config.channels[Throttle].travel;
 }
 
 DSMXRadio::~DSMXRadio()
@@ -78,32 +73,30 @@ void DSMXRadio::setControls(double throttle, double roll, double pitch,
 {
     this->binding = false;
 
-    this->throttle = throttle;
-    this->roll = -roll;
-    this->pitch = pitch;
-    this->yaw = yaw;
+    this->signal[Throttle] = this->config.channels[Throttle].getServoTravel(throttle);
+    this->signal[Aileron] = this->config.channels[Aileron].getServoTravel(-roll);
+    this->signal[Elevation] = this->config.channels[Elevation].getServoTravel(pitch);
+    this->signal[Rudder] = this->config.channels[Rudder].getServoTravel(yaw);
 }
 
-void DSMXRadio::toggleCh5()
+void DSMXRadio::toggleGear()
 {
-    this->ch5 *= -1.0;
+    this->signal[Gear] = this->config.channels[Gear].nextPosition();
 }
 
-void DSMXRadio::toggleCh6()
+void DSMXRadio::toggleAux1()
 {
-    this->ch6 *= -1.0;
+    this->signal[Aux1] = this->config.channels[Aux1].nextPosition();
 }
 
 void DSMXRadio::setArmSignal()
 {
-    this->throttle = -1.0;
-    this->yaw = 1.0;
+    memcpy(this->signal, this->config.armSignal, N_CHANNELS * sizeof(double));
 }
 
 void DSMXRadio::setDisarmSignal()
 {
-    this->throttle = -1.0;
-    this->yaw = -1.0;
+    memcpy(this->signal, this->config.disarmSignal, N_CHANNELS * sizeof(double));
 }
 
 void DSMXRadio::emergencyStop(bool emergency)

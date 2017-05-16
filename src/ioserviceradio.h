@@ -23,10 +23,8 @@
 #include "dsmxradio.h"
 
 #ifdef WITH_ARDUINO
-
 #include "arduino/artp.h"
 #include "arduino/artt.h"
-
 #endif
 
 #ifdef WITH_CRAZYRADIO

@@ -30,10 +30,6 @@
 // frame sizes
 #define N_TX 3
 
-// transmission code sent to host when
-// arduino is ready to process next command
-#define XON 0x11
-
 // transmitter
 MLP4DSM tx[N_TX];
 
@@ -68,11 +64,12 @@ void setup()
 
     delay(1000);
 
-    byte b[2];
-    b[0] = (byte) 3;
-    b[1] = (byte) ';';
+    byte hi[3];
+    hi[0] = (byte) 'h';
+    hi[1] = (byte) 'i';
+    hi[2] = ATT_DELIMITER;
 
-    Serial.write(b, 2);
+    Serial.write(hi, 3);
 }
 
 // arduino loop function

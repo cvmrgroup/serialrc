@@ -72,7 +72,7 @@ void ArXX::open()
     this->serialPort->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
 
     // the delay to wait for the serial port, before start reading
-    boost::posix_time::milliseconds readDelay(500);
+    boost::posix_time::milliseconds readDelay(600);
     // create the async deadline_timer
     boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->io_service));
     // set the wait delay to the timer

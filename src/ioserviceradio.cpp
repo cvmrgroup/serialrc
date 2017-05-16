@@ -80,7 +80,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
         // create the exception string
         std::string ex = boost::str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
         // display the exception with logger
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
         throw RadioException(ex);
     }
@@ -127,7 +127,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
 #ifdef WITH_CRAZYRADIO
     if (sender.compare("crazy") == 0)
     {
-        radio = new CrazyRadio(copterId, conf.txId);
+        radio = new CrazyRadio(copterId, config.txId);
     }
 #endif
 
@@ -136,7 +136,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
         // create the exception string
         std::string ex = boost::str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
         // display the exception with logger
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
         throw RadioException(ex);
     }
@@ -227,8 +227,8 @@ void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
 {
     // create the RadioEvent
     RadioEvent e;
-    e.ch5 = radio->getCh5();
-    e.ch6 = radio->getCh6();
+    e.gear = radio->getGear();
+    e.aux1 = radio->getAux1();
     e.txId = radio->getTxId();
     e.copterId = radio->getId();
     e.enabled = radio->isEnabled();
@@ -253,7 +253,7 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     // check if a radio for the given copter is registered
     if (this->radios.find(copterId) == this->radios.end())
     {
-        BOOST_LOG_TRIVIAL(error) << "no radio for copter [ " << copterId << " ]";
+        BOOST_LOG_TRIVIAL(error) << "No radio set for copter [ " << copterId << " ].";
     }
     else
     {

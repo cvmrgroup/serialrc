@@ -22,15 +22,24 @@
 
 #include "abstractradio.h"
 
-class CrazyRadio : public AbstractRadio {
+class CrazyRadio : public AbstractRadio
+{
 
 public:
 
-    CrazyRadio(unsigned int id, std::string txId);
+    CrazyRadio(int id, std::string txId);
 
     virtual ~CrazyRadio();
 
     void setControls(double throttle, double roll, double pitch, double yaw);
+
+    void toggleSuspension();
+
+    void suspend(bool suspend);
+
+    void emergencyStop(bool _emergency = true);
+
+    // not implemented /////////////////////////////////////////////////////////
 
     void toggleSender();
 
@@ -40,19 +49,13 @@ public:
 
     void setBindSignal();
 
-    void toggleSuspension();
-
-    void suspend(bool suspend);
-
     void setArmSignal();
 
     void setDisarmSignal();
 
-    void toggleCh5();
+    void toggleGear();
 
-    void toggleCh6();
-
-    void emergencyStop(bool _emergency = true);
+    void toggleAux1();
 };
 
 #endif /* CRAZYRADIO_H */

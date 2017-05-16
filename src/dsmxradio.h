@@ -53,9 +53,9 @@ public:
 
     void setControls(double throttle, double roll, double pitch, double yaw);
 
-    void toggleCh5();
+    void toggleGear();
 
-    void toggleCh6();
+    void toggleAux1();
 
     void setArmSignal();
 

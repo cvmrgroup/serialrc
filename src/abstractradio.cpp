@@ -19,15 +19,18 @@
 
 #include "abstractradio.h"
 
-AbstractRadio::AbstractRadio(int _id, std::string _txId)
+AbstractRadio::AbstractRadio(int id, std::string txId) :
+        id(id), txId(txId)
 {
-    id = _id;
-    txId = _txId;
-
     binding = false;
     enabled = false;
     suspended = true;
     emergency = false;
+
+    for (int i = 0; i < N_CHANNELS; i++)
+    {
+        this->signal[i] = 0;
+    }
 }
 
 AbstractRadio::~AbstractRadio()
@@ -61,32 +64,32 @@ bool AbstractRadio::isSuspended()
 
 double AbstractRadio::getThrottle()
 {
-    return throttle;
+    return this->signal[Throttle];
 }
 
 double AbstractRadio::getRoll()
 {
-    return roll;
+    return this->signal[Aileron];
 }
 
 double AbstractRadio::getPitch()
 {
-    return pitch;
+    return this->signal[Elevation];
 }
 
 double AbstractRadio::getYaw()
 {
-    return yaw;
+    return this->signal[Rudder];
 }
 
-double AbstractRadio::getCh5()
+double AbstractRadio::getGear()
 {
-    return ch5;
+    return this->signal[Gear];
 }
 
-double AbstractRadio::getCh6()
+double AbstractRadio::getAux1()
 {
-    return ch6;
+    return this->signal[Aux1];
 }
 
 bool AbstractRadio::isEmergency()

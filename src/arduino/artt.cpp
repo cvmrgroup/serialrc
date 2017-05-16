@@ -18,7 +18,6 @@
  *****************************************************/
 
 #include "artt.h"
-#include <iostream>
 
 ArTT::ArTT(std::string name, std::string serial,
            boost::shared_ptr<boost::asio::io_service> io_service) :
@@ -58,7 +57,7 @@ void ArTT::onData(const char *frame, size_t length)
     // just ignore the first message (kind of flush serial buffer)
     if (this->first)
     {
-        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully.";
+        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << std::string(frame) << " ].";
 
         this->first = false;
     }
@@ -75,7 +74,7 @@ void ArTT::onData(const char *frame, size_t length)
     }
     else
     {
-        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ].") % this->getSerialNumber());
+        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ], message [ %2% ].") % this->getSerialNumber() % std::string(frame));
         BOOST_LOG_TRIVIAL(info) << ex;
         throw RadioException(ex);
     }
@@ -116,8 +115,8 @@ void ArTT::writeData(int id)
         int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
         int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
         int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-        int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
-        int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
+        int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
+        int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
 
         // overwrite throttle signal if copter is supended
         if (radio->isSuspended())

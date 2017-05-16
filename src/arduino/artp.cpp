@@ -80,8 +80,8 @@ void ArTP::writeData()
         int ch2 = center_value_offset + radio->getRoll() * value_range_scale;
         int ch3 = center_value_offset + radio->getPitch() * value_range_scale;
         int ch4 = center_value_offset + radio->getYaw() * value_range_scale;
-        int ch5 = center_value_offset + radio->getCh5() * value_range_scale;
-        int ch6 = center_value_offset + radio->getCh6() * value_range_scale;
+        int ch5 = center_value_offset + radio->getGear() * value_range_scale;
+        int ch6 = center_value_offset + radio->getAux1() * value_range_scale;
 
         // overwrite throttle signal if copter is supended
         if (radio->isSuspended())

@@ -21,11 +21,22 @@
 #define ABSTRACTRADIO_H
 
 #include <string>
-#include <config/radioconfig.h>
 
 class AbstractRadio
 {
 public:
+
+    static const int N_CHANNELS = 6;
+
+    enum Channel
+    {
+        Throttle = 0,
+        Aileron = 1,
+        Elevation = 2,
+        Rudder = 3,
+        Gear = 4,
+        Aux1 = 5
+    };
 
     AbstractRadio(int id, std::string txId);
 
@@ -91,9 +102,9 @@ public:
     virtual void setControls(double throttle, double roll, double pitch,
                              double yaw) = 0;
 
-    virtual void toggleCh5() = 0;
+    virtual void toggleGear() = 0;
 
-    virtual void toggleCh6() = 0;
+    virtual void toggleAux1() = 0;
 
     /**
      * Send Emergency command to copter
@@ -139,9 +150,9 @@ public:
 
     double getYaw();
 
-    double getCh5();
+    double getGear();
 
-    double getCh6();
+    double getAux1();
 
     bool isEmergency();
 
@@ -151,19 +162,12 @@ protected:
 
     std::string txId;
 
+    double signal[N_CHANNELS];
+
     bool binding;
     bool enabled;
     bool suspended;
     bool emergency;
-
-    double throttle;
-    double roll;
-    double pitch;
-    double yaw;
-    double ch5;
-    double ch6;
-
-    RadioConfig config;
 };
 
 #endif /* ABSTRACTRADIO_H */

@@ -19,59 +19,72 @@
 
 #include "crazyradio.h"
 
-CrazyRadio::CrazyRadio(unsigned int id, std::string txId) :
-        AbstractRadio(id, txId) {
-    throttle = 0;
-    roll = 0;
-    pitch = 0;
-    yaw = 0;
+CrazyRadio::CrazyRadio(int id, std::string txId) :
+        AbstractRadio(id, txId)
+{
 }
 
-CrazyRadio::~CrazyRadio() {
+CrazyRadio::~CrazyRadio()
+{
 }
 
-void CrazyRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw) {
+void CrazyRadio::setControls(double throttle, double roll, double pitch,
+                             double yaw)
+{
     int throttle_center_value_offset = 30000;
     int throttle_value_range_scale = 30000;
 
-    throttle = (int) (throttle_center_value_offset + _throttle * throttle_value_range_scale);
-    roll = (float) (_roll * 45);
-    pitch = (float) (_pitch * 45);
-    yaw = (float) (_yaw * -180);
+    this->signal[Throttle] = (throttle_center_value_offset + throttle * throttle_value_range_scale);
+    this->signal[Aileron] = (roll * 45);
+    this->signal[Elevation] = (pitch * 45);
+    this->signal[Rudder] = (yaw * -180);
 }
 
-void CrazyRadio::toggleSender() {
+void CrazyRadio::suspend(bool suspended)
+{
+    this->suspended = suspended;
 }
 
-void CrazyRadio::turnSenderOn() {
+void CrazyRadio::toggleSuspension()
+{
+    this->suspended = !this->suspended;
 }
 
-void CrazyRadio::turnSenderOff() {
-}
-
-void CrazyRadio::setBindSignal() {
-}
-
-void CrazyRadio::suspend(bool _suspended) {
-    suspended = _suspended;
-}
-
-void CrazyRadio::toggleSuspension() {
-    suspended = !suspended;
-}
-
-void CrazyRadio::setArmSignal() {
-}
-
-void CrazyRadio::setDisarmSignal() {
-}
-
-void CrazyRadio::toggleCh5() {
-}
-
-void CrazyRadio::toggleCh6() {
-}
-
-void CrazyRadio::emergencyStop(bool _emergency) {
+void CrazyRadio::emergencyStop(bool emergency)
+{
     suspend(true);
+}
+
+// not implemented /////////////////////////////////////////////////////////////
+
+void CrazyRadio::toggleSender()
+{
+}
+
+void CrazyRadio::turnSenderOn()
+{
+}
+
+void CrazyRadio::turnSenderOff()
+{
+}
+
+void CrazyRadio::setBindSignal()
+{
+}
+
+void CrazyRadio::setArmSignal()
+{
+}
+
+void CrazyRadio::setDisarmSignal()
+{
+}
+
+void CrazyRadio::toggleGear()
+{
+}
+
+void CrazyRadio::toggleAux1()
+{
 }
