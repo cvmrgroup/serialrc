@@ -9,7 +9,6 @@ IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
 {
     this->started = false;
     this->configs = configs;
-    BOOST_LOG_TRIVIAL(info) << configs.size();
     this->io_service = io_service;
 }
 
@@ -79,7 +78,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     if (!tx)
     {
         // create the exception string
-        std::string ex = str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
+        std::string ex = boost::str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
         // display the exception with logger
         //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
@@ -96,23 +95,24 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     return transmitter;
 }
 
-void IOServiceRadio::createRadio(RadioConfig &conf)
+void IOServiceRadio::createRadio(RadioConfig &config)
 {
-    int copterId = conf.copterId;
+    int copterId = config.copterId;
 
     // check if the copter has already created an radio
     if (this->radios.find(copterId) != this->radios.end())
     {
         // create the exception string
-        std::string ex = str(boost::format("Copter [ %1% ] already configured.") % copterId);
+        std::string ex = boost::str(boost::format("Copter [ %1% ] already configured.") % copterId);
         // display the exception with logger
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
         throw RadioException(ex);
     }
 
     // get the name of the sender
-    std::string sender = conf.sender;
+    std::string sender = config.sender;
+
     // create or get the transmitter for the configured sender
     ITransmitter *transmitter = this->createAndGetTransmitter(sender);
 
@@ -121,8 +121,7 @@ void IOServiceRadio::createRadio(RadioConfig &conf)
 
     if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi") == 0)
     {
-        BOOST_LOG_TRIVIAL(info) << "dsmx radio added " << sender;
-        radio = new DSMXRadio(copterId, conf.txId);
+        radio = new DSMXRadio(copterId, config);
     }
 
 #ifdef WITH_CRAZYRADIO
@@ -135,7 +134,7 @@ void IOServiceRadio::createRadio(RadioConfig &conf)
     if (!radio)
     {
         // create the exception string
-        std::string ex = str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
+        std::string ex = boost::str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
         // display the exception with logger
         //BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception

@@ -39,8 +39,7 @@
 #include "i_transmitter.h"
 #include "radioexception.h"
 
-/// signal to wait for before sending a new command
-#define XON 0x11
+#include "attdefinitions.h"
 
 /**
  * @brief Software-side class for communication with the software running on the
@@ -54,20 +53,26 @@ public:
     /**
      * @brief Constructor.
      */
-    ArXX(const std::string name, int maxNumberOfRadios, std::string serialNumber,
+    ArXX(const std::string name, int maxNumberOfRadios,
+         std::string serialNumber,
          boost::shared_ptr<boost::asio::io_service> io_service);
 
 private:
 
     std::string findDeviceName(std::string &description);
 
-    void invokeReading(boost::system::error_code ec, boost::shared_ptr<boost::asio::deadline_timer> timer);
+    void invokeReading(boost::system::error_code ec,
+                       boost::shared_ptr<boost::asio::deadline_timer> timer);
 
     void readData();
 
-    void onDataRead(boost::system::error_code ec, boost::shared_ptr<boost::asio::streambuf> buf, size_t bytes);
+    void onDataRead(boost::system::error_code ec,
+                    boost::shared_ptr<boost::asio::streambuf> buf,
+                    size_t bytes);
 
-    void onDataWritten(boost::system::error_code ec, boost::shared_ptr<boost::asio::streambuf> buf, size_t bytes);
+    void onDataWritten(boost::system::error_code ec,
+                       boost::shared_ptr<boost::asio::streambuf> buf,
+                       size_t bytes);
 
 public:
 
@@ -127,7 +132,8 @@ private:
 
     /// the io service to handle the incoming and outgoing serial data
     boost::shared_ptr<boost::asio::io_service> io_service;
-    // the serial port
+
+    /// the serial port
     boost::shared_ptr<boost::asio::serial_port> serialPort;
 };
 

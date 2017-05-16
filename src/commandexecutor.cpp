@@ -34,7 +34,7 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
     if (this->bindings.find(type) == this->bindings.end())
     {
         // create the exception string
-        std::string ex = str(boost::format("no method binding for radio-command-type [ %1% ]") % ((int) type));
+        std::string ex = boost::str(boost::format("no method binding for radio-command-type [ %1% ]") % ((int) type));
         // display the exception with logger
         BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception

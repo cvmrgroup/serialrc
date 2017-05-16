@@ -19,15 +19,15 @@
 
 #include "rpitx.h"
 
-RpiTX::RpiTX(const std::string name,
-             boost::shared_ptr<boost::asio::io_service> io_service)
+RpiTX::RpiTX(const std::string name, int frameRate,
+             boost::shared_ptr<boost::asio::io_service> io_service) :
+        name(name),
+        serial(-1),
+        initialized(false),
+        radio(NULL)
 {
-    this->radio = NULL;
-    this->name = name;
-    this->serial = -1;
-    this->initialized = false;
     this->io_service = io_service;
-    this->timer = new DeadlineTimer(45.45454545454546, this->io_service);
+    this->timer = new DeadlineTimer((1. / (double) frameRate) * 1000., this->io_service);
 }
 
 void RpiTX::open()
@@ -37,7 +37,6 @@ void RpiTX::open()
         std::string ex = "Unable to open serial device";
         BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
-        return;
     }
 
     if (wiringPiSetup() == -1)
@@ -45,7 +44,6 @@ void RpiTX::open()
         std::string ex = "Unable to start wiringPi.";
         BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
-        return;
     }
 
     BOOST_LOG_TRIVIAL(info) << "GPIO serial port initialized.";
@@ -100,15 +98,16 @@ void RpiTX::update(const boost::system::error_code &ec)
 {
     if (ec)
     {
-        std::string ex = str(boost::format("Raspi Radio timer update failed with exception [ %1% ].") % ec.message());
+        std::string ex = boost::str(boost::format("Raspi Radio timer update failed with exception [ %1% ].") % ec.message());
         BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
     }
 
     if (!this->radio)
     {
-        BOOST_LOG_TRIVIAL(error) << "No radio set.";
-        return;
+        std::string ex = "No radio set.";
+        BOOST_LOG_TRIVIAL(error) << ex;
+        throw RadioException(ex);
     }
 
     unsigned char dsmx[DSM_FRAME_LENGTH] = {};

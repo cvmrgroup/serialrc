@@ -19,72 +19,94 @@
 
 #include "dsmxradio.h"
 
-DSMXRadio::DSMXRadio(unsigned int id, std::string txId) :
-        AbstractRadio(id, txId) {
+DSMXRadio::DSMXRadio(int id, RadioConfig config) :
+        AbstractRadio(id, config.txId)
+{
+    this->config = config;
+
     // default values
-    throttle = -1.0;
-    roll = 0.0;
-    pitch = 0.0;
-    yaw = 0.0;
-    ch5 = 1.0; // -1.0 for copters other than nano 3d
-    ch6 = -1.0; // todo 1.0 for initial horizon mode when using superx
+    this->throttle = config.channels[RadioConfig::Channel::Throttle].travelMin;
+    this->roll = 0.0;
+    this->pitch = 0.0;
+    this->yaw = 0.0;
+    this->ch5 = 0.0;
+    this->ch6 = 0.0;
 }
 
-DSMXRadio::~DSMXRadio() {
+DSMXRadio::~DSMXRadio()
+{
 }
 
-void DSMXRadio::toggleSender() {
-    enabled = !enabled;
+RadioConfig DSMXRadio::getRadioConfig()
+{
+    return this->config;
 }
 
-void DSMXRadio::turnSenderOn() {
-    enabled = true;
+void DSMXRadio::toggleSender()
+{
+    this->enabled = !this->enabled;
 }
 
-void DSMXRadio::turnSenderOff() {
-    enabled = false;
+void DSMXRadio::turnSenderOn()
+{
+    this->enabled = true;
 }
 
-void DSMXRadio::suspend(bool _suspended) {
-    suspended = _suspended;
+void DSMXRadio::turnSenderOff()
+{
+    this->enabled = false;
 }
 
-void DSMXRadio::toggleSuspension() {
-    suspended = !suspended;
+void DSMXRadio::suspend(bool suspended)
+{
+    this->suspended = suspended;
 }
 
-void DSMXRadio::setBindSignal() {
-    binding = true;
-    enabled = true;
+void DSMXRadio::toggleSuspension()
+{
+    this->suspended = !this->suspended;
 }
 
-void DSMXRadio::setControls(double _throttle, double _roll, double _pitch, double _yaw) {
-    binding = false;
-
-    throttle = _throttle;
-    roll = -_roll;
-    pitch = _pitch;
-    yaw = _yaw;
+void DSMXRadio::setBindSignal()
+{
+    this->enabled = true;
+    this->binding = true;
 }
 
-void DSMXRadio::toggleCh5() {
-    ch5 *= -1.0;
+void DSMXRadio::setControls(double throttle, double roll, double pitch,
+                            double yaw)
+{
+    this->binding = false;
+
+    this->throttle = throttle;
+    this->roll = -roll;
+    this->pitch = pitch;
+    this->yaw = yaw;
 }
 
-void DSMXRadio::toggleCh6() {
-    ch6 *= -1.0;
+void DSMXRadio::toggleCh5()
+{
+    this->ch5 *= -1.0;
 }
 
-void DSMXRadio::setArmSignal() {
-    throttle = -1.0;
-    yaw = 1.0;
+void DSMXRadio::toggleCh6()
+{
+    this->ch6 *= -1.0;
 }
 
-void DSMXRadio::setDisarmSignal() {
-    throttle = -1.0;
-    yaw = -1.0;
+void DSMXRadio::setArmSignal()
+{
+    this->throttle = -1.0;
+    this->yaw = 1.0;
 }
 
-void DSMXRadio::emergencyStop(bool _emergency) {
+void DSMXRadio::setDisarmSignal()
+{
+    this->throttle = -1.0;
+    this->yaw = -1.0;
+}
+
+void DSMXRadio::emergencyStop(bool emergency)
+{
     suspend(true);
 }

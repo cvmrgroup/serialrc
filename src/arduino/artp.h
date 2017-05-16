@@ -22,6 +22,8 @@
 
 #include "arxx.h"
 
+#define XON 0x11
+
 /**
  * Software-side class for communication with the software running on the
  * tx3 built-in arduino.

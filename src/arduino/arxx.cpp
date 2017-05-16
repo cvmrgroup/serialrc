@@ -33,36 +33,33 @@ void ArXX::open()
 {
     std::string deviceDescription;
     // find the deviceName for the given serial number
-    std::string deviceName = this->findDeviceName(deviceDescription);
+    std::string portName = this->findDeviceName(deviceDescription);
 
-    // check if a device name given
-    if (deviceName.empty())
+    // check if a device name is given
+    if (portName.empty())
     {
-        // create the exception string
-        std::string ex = str(boost::format("can't find device with serial number [ %1% ]") % this->serialNumber);
-        // display the error
-        //BOOST_LOG_TRIVIAL(error) << ex;
-        // throw an radio exception
+        std::string ex = boost::str(boost::format("Cannot open device with S/N [ %1% ]") % this->serialNumber);
+        BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
     }
+
     // display found device
-    BOOST_LOG_TRIVIAL(info) << "found device [ " << deviceDescription << " ] on [ " << deviceName << " ]";
+    BOOST_LOG_TRIVIAL(info) << "Found device [ " << deviceDescription << " ] on [ " << portName << " ]";
 
     // create the serial port
     this->serialPort = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(*this->io_service));
 
     // open the device name
     boost::system::error_code ec;
-    this->serialPort->open(deviceName, ec);
+    this->serialPort->open(portName, ec);
 
     // check if an exception happens
     if (ec)
     {
         // create the exception string
-        std::string ex =
-                str(boost::format("can't open serial device [ %1% ], because [ %2% ]") % deviceName % ec.message());
+        std::string ex = boost::str(boost::format("Cannot open serial port [ %1% ]: [ %2% ].") % portName % ec.message());
         // display the error
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -75,7 +72,7 @@ void ArXX::open()
     this->serialPort->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
 
     // the delay to wait for the serial port, before start reading
-    boost::posix_time::milliseconds readDelay(100);
+    boost::posix_time::milliseconds readDelay(500);
     // create the async deadline_timer
     boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->io_service));
     // set the wait delay to the timer
@@ -129,12 +126,11 @@ void ArXX::invokeReading(boost::system::error_code ec,
     if (ec)
     {
         // create the exception string
-        std::string ex =
-                str(boost::format("fail to start reading data on serial port with serial number [ %1% ], because [ %2% ]") %
-                    this->serialNumber % ec.message());
+        std::string ex = boost::str(boost::format("Failed reading data from serial port with S/N [ %1% ]: [ %2% ].") % this->serialNumber % ec.message());
         // throw an radio exception
         throw RadioException(ex);
     }
+
     // register the first read callback
     this->readData();
 }
@@ -149,8 +145,8 @@ void ArXX::readData()
 
     // create the new streambuf
     boost::shared_ptr<boost::asio::streambuf> buf(new boost::asio::streambuf());
-    // read until XON
-    boost::asio::async_read_until(*this->serialPort, *buf, XON,
+    // read until semicolon
+    boost::asio::async_read_until(*this->serialPort, *buf, ATT_DELIMITER,
                                   boost::bind(&ArXX::onDataRead,
                                               this,
                                               boost::asio::placeholders::error,
@@ -166,11 +162,9 @@ void ArXX::onDataRead(boost::system::error_code ec,
     if (ec)
     {
         // create the exception string
-        std::string ex =
-                str(boost::format("fail to read data on serial port with serial number [ %1% ], because [ %2% ]") %
-                    this->serialNumber % ec.message());
+        std::string ex = boost::str(boost::format("Failed reading data from serial port with S/N [ %1% ]: [ %2% ].") % this->serialNumber % ec.message());
         // display the error
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
@@ -226,12 +220,13 @@ void ArXX::onDataWritten(boost::system::error_code ec,
     if (ec)
     {
         // create the exception string
-        std::string ex = str(boost::format("Writing to serial [ %1% ] failed with error code [ %2% ].") % this->serialNumber % ec.message());
+        std::string ex = boost::str(boost::format("Writing to serial with S/N [ %1% ] failed with error code [ %2% ].") % this->serialNumber % ec.message());
         // display the error
-        //BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
         throw RadioException(ex);
     }
+
     // free the buffer
     buf->consume(bytes);
     buf.reset();
@@ -239,8 +234,6 @@ void ArXX::onDataWritten(boost::system::error_code ec,
 
 void ArXX::close()
 {
-    // todo turn off relays somehow
-
     // check if the serial port is inilized and open
     if (this->serialPort && this->serialPort->is_open())
     {
@@ -276,9 +269,7 @@ void ArXX::addRadio(AbstractRadio *radio)
     else
     {
         // create the exception string
-        std::string ex = str(
-                boost::format("Cannot add radio with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") %
-                txId % this->serialNumber);
+        std::string ex = boost::str(boost::format("Cannot add radio with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % txId % this->serialNumber);
         // display the error
         //BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception

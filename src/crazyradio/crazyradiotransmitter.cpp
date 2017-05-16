@@ -105,7 +105,7 @@ void CrazyRadioTransmitter::initialize()
         // set running to false
         this->running = false;
         // create the exception string
-        std::string ex = str(boost::format("Failed to open crazy radio with url [ %1% ]") % crazyRadioUrl);
+        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ]") % crazyRadioUrl);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
@@ -261,7 +261,7 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
     if (!this->hasCapacity())
     {
         // create the exception string
-        std::string ex = str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio. No capacity free.") % radioURI);
+        std::string ex = boost::str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio. No capacity free.") % radioURI);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception

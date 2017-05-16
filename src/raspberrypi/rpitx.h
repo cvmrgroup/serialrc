@@ -43,7 +43,7 @@ class RpiTX : public ITransmitter
 
 public:
 
-    RpiTX(const std::string name,
+    RpiTX(const std::string name, int frameRate,
           boost::shared_ptr<boost::asio::io_service> io_service);
 
     void open();
@@ -73,7 +73,6 @@ private:
     DeadlineTimer *timer;
 
     static const int DSM_FRAME_LENGTH = 14;
-    static const int DSM_SEND_RATE = 22;
     static const int DSM_BAUD_RATE = 125000;
 
     static const int DARLINGTON_PIN = 0;

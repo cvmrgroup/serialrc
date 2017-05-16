@@ -56,7 +56,7 @@ void InputManager::update(const boost::system::error_code &ec)
     // check if an error happens
     if (ec)
     {
-        std::string ex = str(boost::format("Updating input manager failed with error code [ %1% ].") % ec.message());
+        std::string ex = boost::str(boost::format("Updating input manager failed with error code [ %1% ].") % ec.message());
         // display error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw the exception

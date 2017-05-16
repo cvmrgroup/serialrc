@@ -23,8 +23,10 @@
 #include "dsmxradio.h"
 
 #ifdef WITH_ARDUINO
+
 #include "arduino/artp.h"
 #include "arduino/artt.h"
+
 #endif
 
 #ifdef WITH_CRAZYRADIO
@@ -56,7 +58,7 @@ private:
 
     void fireTelemetryData(Telemetry data);
 
-    void createRadio(RadioConfig &conf);
+    void createRadio(RadioConfig &config);
 
     ITransmitter *createAndGetTransmitter(const std::string sender);
 

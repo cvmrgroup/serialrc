@@ -20,20 +20,24 @@
 #ifndef DSMXRADIO_H
 #define DSMXRADIO_H
 
+#include <config/radioconfig.h>
+
 #include "abstractradio.h"
 
-/**
- *  @todo invert flag for roll and pitch of super x copter
- *  nano   +roll / +yaw
- *  superx -roll / -yaw
- */
-class DSMXRadio : public AbstractRadio {
+class DSMXRadio : public AbstractRadio
+{
 
 public:
 
-    DSMXRadio(unsigned int id, std::string txId);
+    DSMXRadio(int id, RadioConfig config);
 
     virtual ~DSMXRadio();
+
+    /**
+     * Get the radio configuration.
+     * @return The radio configuration.
+     */
+    RadioConfig getRadioConfig();
 
     void toggleSender();
 
@@ -57,7 +61,11 @@ public:
 
     void setDisarmSignal();
 
-    void emergencyStop(bool _emergency = true);
+    void emergencyStop(bool emergency = true);
+
+private:
+
+    RadioConfig config;
 };
 
 #endif /* DSMXRADIO_H */

@@ -21,12 +21,13 @@
 #define ABSTRACTRADIO_H
 
 #include <string>
+#include <config/radioconfig.h>
 
-class AbstractRadio {
-
+class AbstractRadio
+{
 public:
 
-    AbstractRadio(unsigned int id, std::string txId);
+    AbstractRadio(int id, std::string txId);
 
     virtual ~AbstractRadio();
 
@@ -87,7 +88,8 @@ public:
      * @param ch3 Normalized pitch value.
      * @param ch4 Normalized yaw value.
      */
-    virtual void setControls(double throttle, double roll, double pitch, double yaw) = 0;
+    virtual void setControls(double throttle, double roll, double pitch,
+                             double yaw) = 0;
 
     virtual void toggleCh5() = 0;
 
@@ -102,7 +104,7 @@ public:
      *  get id
      *  @return the id
      */
-    unsigned int getId();
+    int getId();
 
     /**
      *  get current transmitter id.
@@ -143,7 +145,6 @@ public:
 
     bool isEmergency();
 
-
 protected:
 
     int id;
@@ -161,6 +162,8 @@ protected:
     double yaw;
     double ch5;
     double ch6;
+
+    RadioConfig config;
 };
 
 #endif /* ABSTRACTRADIO_H */
