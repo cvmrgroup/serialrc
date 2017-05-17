@@ -133,15 +133,11 @@ void CrazyRadioTransmitter::update()
                                   {
                                       // get the current radio
                                       AbstractRadio *radio = this->radios[this->currentRadio];
-                                      // check if the radio is suspended
-                                      if (!radio->isSuspended())
-                                      {
-                                          // create the Control Values
-                                          u = cv::Vec4d(radio->getThrottle(),
-                                                        radio->getRoll(),
-                                                        radio->getPitch(),
-                                                        radio->getYaw());
-                                      }
+                                      // create the Control Values
+                                      u = cv::Vec4d(radio->getThrottle(),
+                                                    radio->getRoll(),
+                                                    radio->getPitch(),
+                                                    radio->getYaw());
                                       // set success to true
                                       success = true;
                                   }

@@ -118,12 +118,6 @@ void ArTT::writeData(int id)
         int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
         int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
 
-        // overwrite throttle signal if copter is supended
-        if (radio->isSuspended())
-        {
-            ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
-        }
-
         // write to byte frame
         frame[ATT_CH1_HI] = SerialHelper::hiByte(ch1);
         frame[ATT_CH1_LO] = SerialHelper::loByte(ch1);

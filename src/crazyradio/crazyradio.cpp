@@ -31,6 +31,11 @@ CrazyRadio::~CrazyRadio()
 void CrazyRadio::setControls(double throttle, double roll, double pitch,
                              double yaw)
 {
+    if (this->suspended)
+    {
+        return;
+    }
+
     int throttle_center_value_offset = 30000;
     int throttle_value_range_scale = 30000;
 
@@ -43,16 +48,34 @@ void CrazyRadio::setControls(double throttle, double roll, double pitch,
 void CrazyRadio::suspend(bool suspended)
 {
     this->suspended = suspended;
+
+    if (this->suspended)
+    {
+        this->setSuspensionSignal();
+    }
 }
 
 void CrazyRadio::toggleSuspension()
 {
     this->suspended = !this->suspended;
+
+    if (this->suspended)
+    {
+        this->setSuspensionSignal();
+    }
 }
 
 void CrazyRadio::emergencyStop(bool emergency)
 {
     suspend(true);
+}
+
+void CrazyRadio::setSuspensionSignal()
+{
+    for (int i = 0; i < N_CHANNELS; i++)
+    {
+        this->signal[i] = 0;
+    }
 }
 
 // not implemented /////////////////////////////////////////////////////////////

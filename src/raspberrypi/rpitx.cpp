@@ -135,14 +135,8 @@ void RpiTX::update(const boost::system::error_code &ec)
     int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
     int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
     int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-    int ch5 = ch5_offset + center_value_offset + int(radio->getCh5() * value_range_scale);
-    int ch6 = ch6_offset + center_value_offset + int(radio->getCh6() * value_range_scale);
-
-    // overwrite throttle signal if copter is supended
-    if (radio->isSuspended())
-    {
-        ch1 = ch1_offset + center_value_offset + int(-1.0 * value_range_scale);
-    }
+    int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
+    int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
 
     // convert to byte frame
     dsmx[channel_1_hi] = SerialHelper::hiByte(ch1);

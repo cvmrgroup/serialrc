@@ -23,9 +23,7 @@ DSMXRadio::DSMXRadio(int id, RadioConfig config) :
         AbstractRadio(id, config.txId)
 {
     this->config = config;
-
-    // default values neutral (already set in AbstractRadio), throttle low
-    this->signal[Throttle] = -config.channels[Throttle].travel;
+    this->setSuspensionSignal();
 }
 
 DSMXRadio::~DSMXRadio()
@@ -55,11 +53,21 @@ void DSMXRadio::turnSenderOff()
 void DSMXRadio::suspend(bool suspended)
 {
     this->suspended = suspended;
+
+    if (this->suspended)
+    {
+        this->setSuspensionSignal();
+    }
 }
 
 void DSMXRadio::toggleSuspension()
 {
     this->suspended = !this->suspended;
+
+    if (this->suspended)
+    {
+        this->setSuspensionSignal();
+    }
 }
 
 void DSMXRadio::setBindSignal()
@@ -71,6 +79,12 @@ void DSMXRadio::setBindSignal()
 void DSMXRadio::setControls(double throttle, double roll, double pitch,
                             double yaw)
 {
+    if (this->suspended)
+    {
+        // do not accept new control inputs if copter is suspended
+        return;
+    }
+
     this->binding = false;
 
     this->signal[Throttle] = this->config.channels[Throttle].getServoTravel(throttle);
@@ -87,6 +101,16 @@ void DSMXRadio::toggleGear()
 void DSMXRadio::toggleAux1()
 {
     this->signal[Aux1] = this->config.channels[Aux1].nextPosition();
+}
+
+void DSMXRadio::setSuspensionSignal()
+{
+    for (int i = 0; i < N_CHANNELS; i++)
+    {
+        this->signal[i] = 0.0;
+    }
+
+    this->signal[Throttle] = -config.channels[Throttle].travel;
 }
 
 void DSMXRadio::setArmSignal()
