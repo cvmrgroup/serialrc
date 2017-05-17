@@ -109,7 +109,7 @@ void ArTT::writeData(int id)
         frame[ATT_RELAY_STATE] = radio->isEnabled() ? (unsigned char) ATT_RELAY_STATE_ON : (unsigned char) ATT_RELAY_STATE_OFF;
 
         frame[ATT_HEADER_1] = (unsigned char) (radio->isBinding() ? header_1_bind_mode : header_1_default);
-        frame[ATT_HEADER_2] = header_2_default;
+        frame[ATT_HEADER_2] = (unsigned char) header_2_default;
 
         int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
         int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
