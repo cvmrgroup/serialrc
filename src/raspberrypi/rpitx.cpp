@@ -34,7 +34,7 @@ void RpiTX::open()
 {
     if ((this->serial = Serial::serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
     {
-        std::string ex = "Unable to open serial device";
+        std::string ex = "Unable to open serial device.";
         BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
     }
