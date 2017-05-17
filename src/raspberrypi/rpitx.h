@@ -43,7 +43,7 @@ class RpiTX : public ITransmitter
 
 public:
 
-    RpiTX(const std::string name, int frameRate,
+    RpiTX(const std::string name,
           boost::shared_ptr<boost::asio::io_service> io_service);
 
     void open();
@@ -75,7 +75,7 @@ private:
     static const int DSM_FRAME_LENGTH = 14;
     static const int DSM_BAUD_RATE = 125000;
 
-    static const int DARLINGTON_PIN = 0;
+    static const int POWER_PIN = 0;
 
     /// channel ids
     static const int header_1 = 0;

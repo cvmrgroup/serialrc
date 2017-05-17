@@ -19,7 +19,7 @@
 
 #include "rpitx.h"
 
-RpiTX::RpiTX(const std::string name, int frameRate,
+RpiTX::RpiTX(const std::string name,
              boost::shared_ptr<boost::asio::io_service> io_service) :
         name(name),
         serial(-1),
@@ -48,8 +48,8 @@ void RpiTX::open()
 
     BOOST_LOG_TRIVIAL(info) << "GPIO serial port initialized.";
 
-    pinMode(DARLINGTON_PIN, OUTPUT);
-    digitalWrite(DARLINGTON_PIN, LOW);
+    pinMode(POWER_PIN, OUTPUT);
+    digitalWrite(POWER_PIN, LOW);
 
     this->initialized = true;
 
@@ -66,7 +66,7 @@ void RpiTX::close()
         return;
     }
 
-    digitalWrite(DARLINGTON_PIN, LOW);
+    digitalWrite(POWER_PIN, LOW);
     Serial::serialClose(this->serial);
     this->timer->cancel();
     this->initialized = false;
@@ -91,7 +91,22 @@ bool RpiTX::hasCapacity()
 
 void RpiTX::addRadio(AbstractRadio *radio)
 {
-    this->radio = radio;
+    if (radio)
+    {
+        std::string ex = "Raspi Radio already added.";
+        BOOST_LOG_TRIVIAL(error) << ex;
+        throw RadioException(ex);
+    }
+
+    // this is a dsmx radio
+    DSMXRadio *dsmx = static_cast<DSMXRadio *>(radio);
+
+    // add the radio config to our map of configs
+    RadioConfig config = dsmx->getRadioConfig();
+    int frameRate = config.frameRate;
+
+    // update the timer
+    this->timer->updatePeriod(frameRate);
 }
 
 void RpiTX::update(const boost::system::error_code &ec)
@@ -149,7 +164,7 @@ void RpiTX::update(const boost::system::error_code &ec)
     dsmx[channel_6_lo] = SerialHelper::loByte(ch6);
 
     // power
-    digitalWrite(DARLINGTON_PIN, this->radio->isEnabled() ? HIGH : LOW);
+    digitalWrite(POWER_PIN, this->radio->isEnabled() ? HIGH : LOW);
 
     // signal
     write(this->serial, dsmx, DSM_FRAME_LENGTH);

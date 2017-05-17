@@ -91,12 +91,14 @@ void DSMXRadio::toggleAux1()
 
 void DSMXRadio::setArmSignal()
 {
-    memcpy(this->signal, this->config.armSignal, N_CHANNELS * sizeof(double));
+    //memcpy(this->signal, this->config.armSignal, N_CHANNELS * sizeof(double));
+    std::copy(std::begin(this->config.armSignal), std::end(this->config.armSignal), std::begin(this->signal));
 }
 
 void DSMXRadio::setDisarmSignal()
 {
-    memcpy(this->signal, this->config.disarmSignal, N_CHANNELS * sizeof(double));
+    //memcpy(this->signal, this->config.disarmSignal, N_CHANNELS * sizeof(double));
+    std::copy(std::begin(this->config.disarmSignal), std::end(this->config.disarmSignal), std::begin(this->signal));
 }
 
 void DSMXRadio::emergencyStop(bool emergency)

@@ -20,6 +20,8 @@
 #ifndef DSMXRADIO_H
 #define DSMXRADIO_H
 
+#include <algorithm>
+
 #include <config/radioconfig.h>
 
 #include "abstractradio.h"
