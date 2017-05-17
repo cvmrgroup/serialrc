@@ -31,6 +31,7 @@
 
 #include <timing/deadlinetimer.h>
 
+#include "dsmxradio.h"
 #include "dsmxconstants.h"
 #include "radioexception.h"
 #include "abstractradio.h"
@@ -67,7 +68,7 @@ private:
     int serial;
     bool initialized;
 
-    AbstractRadio *radio;
+    DSMXRadio *radio;
 
     boost::shared_ptr<boost::asio::io_service> io_service;
     DeadlineTimer *timer;

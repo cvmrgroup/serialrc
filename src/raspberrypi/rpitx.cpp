@@ -27,7 +27,7 @@ RpiTX::RpiTX(const std::string name,
         radio(NULL)
 {
     this->io_service = io_service;
-    this->timer = new DeadlineTimer((1. / (double) frameRate) * 1000., this->io_service);
+    this->timer = new DeadlineTimer((1. / 22.) * 1000., this->io_service);
 }
 
 void RpiTX::open()
@@ -91,7 +91,7 @@ bool RpiTX::hasCapacity()
 
 void RpiTX::addRadio(AbstractRadio *radio)
 {
-    if (radio)
+    if (this->radio)
     {
         std::string ex = "Raspi Radio already added.";
         BOOST_LOG_TRIVIAL(error) << ex;
@@ -99,11 +99,13 @@ void RpiTX::addRadio(AbstractRadio *radio)
     }
 
     // this is a dsmx radio
-    DSMXRadio *dsmx = static_cast<DSMXRadio *>(radio);
+    this->radio = static_cast<DSMXRadio *>(radio);
 
     // add the radio config to our map of configs
-    RadioConfig config = dsmx->getRadioConfig();
+    RadioConfig config = this->radio->getRadioConfig();
     int frameRate = config.frameRate;
+
+    BOOST_LOG_TRIVIAL(info) << "DSMX frame rate set to " << frameRate << "ms.";
 
     // update the timer
     this->timer->updatePeriod(frameRate);

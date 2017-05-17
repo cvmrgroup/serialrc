@@ -22,9 +22,8 @@
 
 #include <vector>
 
-#include <dsmxradio.h>
-
 #include "arxx.h"
+#include "dsmxradio.h"
 #include "dsmxconstants.h"
 #include "attdefinitions.h"
 
