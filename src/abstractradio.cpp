@@ -19,8 +19,8 @@
 
 #include "abstractradio.h"
 
-AbstractRadio::AbstractRadio(int id, std::string txId) :
-        id(id), txId(txId)
+AbstractRadio::AbstractRadio(int id, std::string sender, std::string txId) :
+        id(id), sender(sender), txId(txId)
 {
     binding = false;
     enabled = false;
@@ -40,6 +40,11 @@ AbstractRadio::~AbstractRadio()
 int AbstractRadio::getId()
 {
     return id;
+}
+
+std::string AbstractRadio::getSender()
+{
+    return sender;
 }
 
 std::string AbstractRadio::getTxId()

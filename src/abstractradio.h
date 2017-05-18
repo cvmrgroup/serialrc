@@ -38,7 +38,7 @@ public:
         Aux1 = 5
     };
 
-    AbstractRadio(int id, std::string txId);
+    AbstractRadio(int id, std::string sender, std::string txId);
 
     virtual ~AbstractRadio();
 
@@ -123,6 +123,12 @@ public:
     int getId();
 
     /**
+     * Get the sender name (as defined in config)
+     * @return The sender name
+     */
+    std::string getSender();
+
+    /**
      *  get current transmitter id.
      *  @return the transmitter id
      */
@@ -164,6 +170,8 @@ public:
 protected:
 
     int id;
+
+    std::string sender;
 
     std::string txId;
 

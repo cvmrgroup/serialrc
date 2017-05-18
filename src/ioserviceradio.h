@@ -20,6 +20,7 @@
 #include "i_transmitter.h"
 
 // dsmx tx based radios (arduino and pi)
+#include "abstractradio.h"
 #include "dsmxradio.h"
 
 #ifdef WITH_ARDUINO

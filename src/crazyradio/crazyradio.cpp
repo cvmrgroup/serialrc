@@ -19,8 +19,8 @@
 
 #include "crazyradio.h"
 
-CrazyRadio::CrazyRadio(int id, std::string txId) :
-        AbstractRadio(id, txId)
+CrazyRadio::CrazyRadio(int id, std::string sender, std::string txId) :
+        AbstractRadio(id, sender, txId)
 {
 }
 

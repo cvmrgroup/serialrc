@@ -18,13 +18,14 @@
  *****************************************************/
 
 #include "dsmxradio.h"
-#include <iostream>
 
 DSMXRadio::DSMXRadio(int id, RadioConfig &config) :
-        AbstractRadio(id, config.txId)
+        AbstractRadio(id, config.sender, config.txId)
 {
     this->config = config;
     this->setSuspensionSignal();
+    this->signal[Gear] = this->config.channels[Gear].getSwitchValue();
+    this->signal[Aux1] = this->config.channels[Aux1].getSwitchValue();
 }
 
 DSMXRadio::~DSMXRadio()
@@ -106,7 +107,7 @@ void DSMXRadio::toggleAux1()
 
 void DSMXRadio::setSuspensionSignal()
 {
-    for (int i = 0; i < N_CHANNELS; i++)
+    for (int i = 1; i < 4; i++)
     {
         this->signal[i] = 0.0;
     }

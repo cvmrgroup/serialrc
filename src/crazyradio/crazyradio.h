@@ -27,7 +27,7 @@ class CrazyRadio : public AbstractRadio
 
 public:
 
-    CrazyRadio(int id, std::string txId);
+    CrazyRadio(int id, std::string sender, std::string txId);
 
     virtual ~CrazyRadio();
 

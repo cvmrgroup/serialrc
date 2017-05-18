@@ -127,7 +127,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
 #ifdef WITH_CRAZYRADIO
     if (sender.compare("crazy") == 0)
     {
-        radio = new CrazyRadio(copterId, config.txId);
+        radio = new CrazyRadio(copterId, config.sender, config.txId);
     }
 #endif
 
@@ -227,13 +227,20 @@ void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
 {
     // create the RadioEvent
     RadioEvent e;
-    e.gear = radio->getGear();
-    e.aux1 = radio->getAux1();
+    e.sender = radio->getSender();
     e.txId = radio->getTxId();
     e.copterId = radio->getId();
     e.enabled = radio->isEnabled();
     e.binding = radio->isBinding();
     e.suspended = radio->isSuspended();
+
+    // todo copy signal
+    e.signal[AbstractRadio::Channel::Throttle] = radio->getThrottle();
+    e.signal[AbstractRadio::Channel::Aileron] = radio->getRoll();
+    e.signal[AbstractRadio::Channel::Elevation] = radio->getPitch();
+    e.signal[AbstractRadio::Channel::Rudder] = radio->getYaw();
+    e.signal[AbstractRadio::Channel::Gear] = radio->getGear();
+    e.signal[AbstractRadio::Channel::Aux1] = radio->getAux1();
 
     // fire the RadioEvent
     this->onRadioChanged(e);
