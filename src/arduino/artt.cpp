@@ -84,7 +84,7 @@ void ArTT::onData(const char *frame, size_t length)
 
 void ArTT::writeData(int id)
 {
-    // check if an radio for the given id exists
+    // check if a radio exists for the given id
     if (this->radios.find(id) == this->radios.end())
     {
         std::string ex = boost::str(boost::format("Failed to write data to transmitter with id [ %1% ] on serial port [ %2% ]: No radio set for transmitter.") % id % this->getSerialNumber());
