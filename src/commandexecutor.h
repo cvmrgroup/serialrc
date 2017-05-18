@@ -53,6 +53,10 @@ private:
     void onToggleTransmitterCommand(IRadioCommand *command,
                                     AbstractRadio *radio);
 
+    void onSwitchGearCommand(IRadioCommand *command, AbstractRadio *radio);
+
+    void onSwitchAux1Command(IRadioCommand *command, AbstractRadio *radio);
+
 public:
 
     /**

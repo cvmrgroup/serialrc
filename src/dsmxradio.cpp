@@ -18,8 +18,9 @@
  *****************************************************/
 
 #include "dsmxradio.h"
+#include <iostream>
 
-DSMXRadio::DSMXRadio(int id, RadioConfig config) :
+DSMXRadio::DSMXRadio(int id, RadioConfig &config) :
         AbstractRadio(id, config.txId)
 {
     this->config = config;
@@ -115,13 +116,11 @@ void DSMXRadio::setSuspensionSignal()
 
 void DSMXRadio::setArmSignal()
 {
-    //memcpy(this->signal, this->config.armSignal, N_CHANNELS * sizeof(double));
     std::copy(std::begin(this->config.armSignal), std::end(this->config.armSignal), std::begin(this->signal));
 }
 
 void DSMXRadio::setDisarmSignal()
 {
-    //memcpy(this->signal, this->config.disarmSignal, N_CHANNELS * sizeof(double));
     std::copy(std::begin(this->config.disarmSignal), std::end(this->config.disarmSignal), std::begin(this->signal));
 }
 

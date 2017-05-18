@@ -31,7 +31,7 @@ class DSMXRadio : public AbstractRadio
 
 public:
 
-    DSMXRadio(int id, RadioConfig config);
+    DSMXRadio(int id, RadioConfig &config);
 
     virtual ~DSMXRadio();
 

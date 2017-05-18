@@ -21,6 +21,8 @@ void CommandExecutor::initializeBindings()
     this->bindings[RadioCommandType::TAKE_OVER] = boost::bind(&CommandExecutor::onTakeOverCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_SUSPEND_COPTER] = boost::bind(&CommandExecutor::onToggleSuspensionCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_TRANSMITTER] = boost::bind(&CommandExecutor::onToggleTransmitterCommand, this, _1, _2);
+    this->bindings[RadioCommandType::TOGGLE_GEAR] = boost::bind(&CommandExecutor::onSwitchGearCommand, this, _1, _2);
+    this->bindings[RadioCommandType::TOGGLE_AUX1] = boost::bind(&CommandExecutor::onSwitchAux1Command, this, _1, _2);
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -107,6 +109,18 @@ void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command,
                                                  AbstractRadio *radio)
 {
     radio->toggleSender();
+}
+
+void CommandExecutor::onSwitchGearCommand(IRadioCommand *command,
+                                                 AbstractRadio *radio)
+{
+    radio->toggleGear();
+}
+
+void CommandExecutor::onSwitchAux1Command(IRadioCommand *command,
+                                                 AbstractRadio *radio)
+{
+    radio->toggleAux1();
 }
 
 void CommandExecutor::onEmergencyCommand(IRadioCommand *command,
