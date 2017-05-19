@@ -17,30 +17,29 @@
  *       @date:   03.06.2014
  *****************************************************/
 
+#include <iostream>
 #include "artp.h"
 
-ArTP::ArTP(const std::string name, std::string serial, boost::shared_ptr<boost::asio::io_service> io_service) :
-        ArXX(name, maxRadios, serial, io_service)
+ArTP::ArTP(const std::string name, std::string serial,
+           boost::shared_ptr<boost::asio::io_service> io_service) :
+        ArXX(name, ATP_N_RADIOS, serial, io_service)
 {
-    for (int id = 0; id < n_tx; id++)
+    this->first = true;
+
+    for (int i = 0; i < ATP_N_RADIOS; i++)
     {
-        frame[id * command_length + ch1_hi] = SerialHelper::hiByte(ch1_init_value);
-        frame[id * command_length + ch1_lo] = SerialHelper::loByte(ch1_init_value);
-
-        frame[id * command_length + ch2_hi] = SerialHelper::hiByte(ch2_init_value);
-        frame[id * command_length + ch2_lo] = SerialHelper::loByte(ch2_init_value);
-
-        frame[id * command_length + ch3_hi] = SerialHelper::hiByte(ch3_init_value);
-        frame[id * command_length + ch3_lo] = SerialHelper::loByte(ch3_init_value);
-
-        frame[id * command_length + ch4_hi] = SerialHelper::hiByte(ch4_init_value);
-        frame[id * command_length + ch4_lo] = SerialHelper::loByte(ch4_init_value);
-
-        frame[id * command_length + ch5_hi] = SerialHelper::hiByte(ch5_init_value);
-        frame[id * command_length + ch5_lo] = SerialHelper::loByte(ch5_init_value);
-
-        frame[id * command_length + ch6_hi] = SerialHelper::hiByte(ch6_init_value);
-        frame[id * command_length + ch6_lo] = SerialHelper::loByte(ch6_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6_init_value);
     }
 }
 
@@ -50,66 +49,59 @@ ArTP::~ArTP()
 
 void ArTP::onData(const char *frame, size_t length)
 {
-    // check if same data read
-    if (length > 0)
+    if (this->first)
     {
-        // check if an XON was received
-        if (frame[0] == XON)
-        {
-            // write data to andoinu
-            this->writeData();
-        } else
-        {
-            BOOST_LOG_TRIVIAL(error) << "no XON received on serial port [ " << this->getSerialNumber() << " ]";
-        }
+        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << std::string(frame) << " ].";
+        this->first = false;
     }
+    else if (length == 1 && frame[0] == AXX_DELIMITER)
+    {
+        // cool
+    }
+    else
+    {
+        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ], message [ %2% ].") % this->getSerialNumber() % std::string(frame));
+        BOOST_LOG_TRIVIAL(info) << ex;
+        throw RadioException(ex);
+    }
+
+    this->writeData();
 }
 
 void ArTP::writeData()
 {
     for (auto entry: this->modules)
     {
-        AbstractTxModule *radio = entry.second;
+        AbstractTxModule *module = entry.second;
 
-        // get the transmitter id as string
-        std::string txIdStr = radio->getModuleId();
-        // cast the id to int
+        // get the transmitter id as string and cast to int
+        std::string txIdStr = module->getModuleId();
         int id = boost::lexical_cast<int>(txIdStr);
 
-        int ch1 = center_value_offset + radio->getThrottle() * value_range_scale;
-        int ch2 = center_value_offset + radio->getRoll() * value_range_scale;
-        int ch3 = center_value_offset + radio->getPitch() * value_range_scale;
-        int ch4 = center_value_offset + radio->getYaw() * value_range_scale;
-        int ch5 = center_value_offset + radio->getGear() * value_range_scale;
-        int ch6 = center_value_offset + radio->getAux1() * value_range_scale;
+        int ch1 = this->center_value_offset + int(module->getThrottle() * this->value_range_scale);
+        int ch2 = this->center_value_offset + int(module->getRoll() * this->value_range_scale);
+        int ch3 = this->center_value_offset + int(module->getPitch() * this->value_range_scale);
+        int ch4 = this->center_value_offset + int(module->getYaw() * this->value_range_scale);
+        int ch5 = this->center_value_offset + int(module->getGear() * this->value_range_scale);
+        int ch6 = this->center_value_offset + int(module->getAux1() * this->value_range_scale);
 
-        // overwrite throttle signal if copter is supended
-        if (radio->isSuspended())
-        {
-            ch1 = center_value_offset + -1.0 * value_range_scale;
-        }
+        std::cout << id << ": " << ch1 << " " << ch2 << " " << ch3 << " " << ch4 << " " << ch5 << " " << ch6 << std::endl;
 
         // write to byte frame
-
-        frame[id * command_length + ch1_hi] = SerialHelper::hiByte(ch1);
-        frame[id * command_length + ch1_lo] = SerialHelper::loByte(ch1);
-
-        frame[id * command_length + ch2_hi] = SerialHelper::hiByte(ch2);
-        frame[id * command_length + ch2_lo] = SerialHelper::loByte(ch2);
-
-        frame[id * command_length + ch3_hi] = SerialHelper::hiByte(ch3);
-        frame[id * command_length + ch3_lo] = SerialHelper::loByte(ch3);
-
-        frame[id * command_length + ch4_hi] = SerialHelper::hiByte(ch4);
-        frame[id * command_length + ch4_lo] = SerialHelper::loByte(ch4);
-
-        frame[id * command_length + ch5_hi] = SerialHelper::hiByte(ch5);
-        frame[id * command_length + ch5_lo] = SerialHelper::loByte(ch5);
-
-        frame[id * command_length + ch6_hi] = SerialHelper::hiByte(ch6);
-        frame[id * command_length + ch6_lo] = SerialHelper::loByte(ch6);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
+        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
     }
 
     // write to serial port
-    this->writeFrame(reinterpret_cast<const char *>(this->frame), this->n_tx * this->command_length);
+    this->writeFrame(reinterpret_cast<const char *>(this->frame), (size_t) (ATP_FRAME_LENGTH));
 }

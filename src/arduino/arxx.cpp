@@ -146,7 +146,7 @@ void ArXX::readData()
     // create the new streambuf
     boost::shared_ptr<boost::asio::streambuf> buf(new boost::asio::streambuf());
     // read until semicolon
-    boost::asio::async_read_until(*this->serialPort, *buf, ATT_DELIMITER,
+    boost::asio::async_read_until(*this->serialPort, *buf, AXX_DELIMITER,
                                   boost::bind(&ArXX::onDataRead,
                                               this,
                                               boost::asio::placeholders::error,

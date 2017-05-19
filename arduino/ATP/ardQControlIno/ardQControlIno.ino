@@ -1,12 +1,12 @@
-/*****************************************************/
-/**		  Master Project	            **/
-/**						    **/
-/**	  Created by Robert Brylka                  **/
-/**	  during the summer session of 2014         **/
-/**						    **/
-/**		version 1.01 // 26.08.15  	    **/
-/**						    **/
-/*****************************************************/
+/******************************************/
+/**         Master Project               **/
+/**                                      **/
+/**   Created by Robert Brylka           **/
+/**   during the summer session of 2014  **/
+/**                                      **/
+/**     version 1.01 // 26.08.15         **/
+/**                                      **/
+/******************************************/
 
 /**
 
@@ -18,24 +18,21 @@
    +--+  +--+     +--+     +--+     +--+  +--+  +--+     	 +
     P     P        P        P        P     P     P
 
- A...F	PULSE			700 - 1530 us
- P	PAUSE			400 us
+ A...F  PULSE      700-1530 us
+ P	    PAUSE           400 us
 
- Channel:                       Description
-
- A - throttle			0%	- left stick
- B - roll			50%	- left stick
- C - pitch			50%	- right stick
- D - yaw			50%	- right stick
- E -				50%
- F - Fly Modus			- switch 0% / 50% / 100%
-
- SYNC				22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
+ SYNC   22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
  
- 
+ PINS 3...7
+
 **/
 
 #include <DueTimer.h>
+
+#include "atpdefinitions.h"
+
+// error LED
+#define ERROR_LED 53
 
 /**
   For 7 Pause and 6 channel with full extent we need at least
@@ -45,17 +42,10 @@
 **/
 #define MASK_LENGTH 375
 
-// frame size -> 5 devices times 6 chanels (channel = two bytes)
-#define BYTE_FRAME_LENGTH 5 * 6 * 2
-
 // current signal state in micro seconds
 int us = 0;
 
-byte initBMBuffer[BYTE_FRAME_LENGTH];
-
-#define XON 0x11
-
-int bytesRead = 0;
+byte initBMBuffer[ATP_FRAME_LENGTH];
 
 // allocate a byte array of the size MASK_LENGTH * 32, 
 // because 5 Bits of a byte will be used by the 5 signals
@@ -95,11 +85,12 @@ void initFixBmPart()
 
 /**
 *	Generate the neutral signal where
-*	throttle       = 0%
+*	throttle       =  0%
 *	roll           = 50%
 *	pitch          = 50%
 *	yaw            = 50%
-*	channel 5 & 6  = 50%
+*	gear           =  0%
+*	aux1           =  0%
 **/
 void initialBMPart(byte *iBMBuffer)
 {
@@ -107,16 +98,21 @@ void initialBMPart(byte *iBMBuffer)
     {
         iBMBuffer[i * 12 + 0] = B00000010;
         iBMBuffer[i * 12 + 1] = B10111100;
+
         iBMBuffer[i * 12 + 2] = B00000100;
         iBMBuffer[i * 12 + 3] = B01011011;
+
         iBMBuffer[i * 12 + 4] = B00000100;
         iBMBuffer[i * 12 + 5] = B01011011;
+
         iBMBuffer[i * 12 + 6] = B00000100;
         iBMBuffer[i * 12 + 7] = B01011011;
-        iBMBuffer[i * 12 + 8] = B00000100;
-        iBMBuffer[i * 12 + 9] = B01011011;
-        iBMBuffer[i * 12 + 10] = B00000100;
-        iBMBuffer[i * 12 + 11] = B01011011;
+
+        iBMBuffer[i * 12 + 8] = B00000010;
+        iBMBuffer[i * 12 + 9] = B10111100;
+
+        iBMBuffer[i * 12 + 10] = B00000010;
+        iBMBuffer[i * 12 + 11] = B10111100;
     }
 }
 
@@ -253,9 +249,6 @@ void clearBuffer()
 
 void setup()
 {
-    // setup the serial port
-    Serial.begin(115200);
-
     // set pins 3 .. 7 as outputs
     pinMode(3, OUTPUT);
     pinMode(4, OUTPUT);
@@ -263,6 +256,12 @@ void setup()
     pinMode(6, OUTPUT);
     pinMode(7, OUTPUT);
 
+    pinMode(ERROR_LED, OUTPUT);
+    digitalWrite(ERROR_LED, LOW);
+
+    // setup the serial port
+    Serial.begin(115200);
+    
     // get registry pointer
     initREG();
 
@@ -270,12 +269,17 @@ void setup()
     initFixBmPart();
     initialBMPart(initBMBuffer);
     setCtrBitmasks(initBMBuffer);
-
+    
     // clear serial buffer
     clearBuffer();
+    Serial.flush();
+
+    // wait a moment
+    delay(1000);
+    
     // send a o.k. to the remote pc,
     // and let the communication begin
-    Serial.write(XON);
+    Serial.write(AXX_DELIMITER);
 
     // Setup the two interrupt timer
     Timer0.attachInterrupt(setDigOut).setPeriod(2);
@@ -337,19 +341,20 @@ void startTimer0()
 **/
 void createNewSignalBitmask()
 {
-    if (Serial.available() == BYTE_FRAME_LENGTH)
+    if (Serial.available() == ATP_FRAME_LENGTH)
     {
-        byte rbuffer[BYTE_FRAME_LENGTH];
-        bytesRead = Serial.readBytes(rbuffer, BYTE_FRAME_LENGTH);
-        bool error = bytesRead != BYTE_FRAME_LENGTH;
-        if (error)
+        byte rbuffer[ATP_FRAME_LENGTH];
+        int bytesRead = Serial.readBytes(rbuffer, ATP_FRAME_LENGTH);
+
+        if (bytesRead == ATP_FRAME_LENGTH)
         {
-            clearBuffer();
+            setCtrBitmasks(rbuffer);
+            Serial.write(AXX_DELIMITER);
         }
         else
         {
-            setCtrBitmasks(rbuffer);
-            Serial.write(XON);
+            digitalWrite(ERROR_LED, HIGH);
+            clearBuffer();
         }
     }
 }

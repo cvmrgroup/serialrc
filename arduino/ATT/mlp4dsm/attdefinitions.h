@@ -21,7 +21,7 @@
 #define ICARUS_ATTDEFINITIONS_H
 
 /// Response delimiter
-#define ATT_DELIMITER 0x3b
+#define AXX_DELIMITER 0x3b
 
 /// Byte frame length
 #define ATT_FRAME_LENGTH 17

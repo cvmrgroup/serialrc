@@ -14,13 +14,13 @@ IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
 
 IOServiceRadio::~IOServiceRadio()
 {
-    for (auto entry: this->radios)
+    for (auto entry: this->txModules)
     {
         AbstractTxModule *radio = entry.second;
         delete radio;
     }
 
-    this->radios.clear();
+    this->txModules.clear();
 
     for (auto entry : this->transmitters)
     {
@@ -57,7 +57,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     }
     if (sender.compare("artp") == 0)
     {
-        tx = new ArTP(sender, "9523335323135180F092", this->io_service);
+        tx = new ArTP(sender, "75439323935351F09221", this->io_service);
     }
 #endif
 
@@ -100,7 +100,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     int copterId = config.copterId;
 
     // check if the copter has already created an radio
-    if (this->radios.find(copterId) != this->radios.end())
+    if (this->txModules.find(copterId) != this->txModules.end())
     {
         // create the exception string
         std::string ex = boost::str(boost::format("Copter [ %1% ] already configured.") % copterId);
@@ -117,21 +117,21 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     ITransmitter *transmitter = this->createAndGetTransmitter(sender);
 
     // radio which is used for the given copter
-    AbstractTxModule *radio = NULL;
+    AbstractTxModule *module = NULL;
 
     if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi") == 0)
     {
-        radio = new DSMXModule(copterId, config);
+        module = new DSMXModule(copterId, config);
     }
 
 #ifdef WITH_CRAZYRADIO
     if (sender.compare("crazy") == 0)
     {
-        radio = new CrazyRadioModule(copterId, config.transmitter, config.txId);
+        module = new CrazyRadioModule(copterId, config.transmitter, config.txId);
     }
 #endif
 
-    if (!radio)
+    if (!module)
     {
         // create the exception string
         std::string ex = boost::str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
@@ -142,11 +142,11 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     }
 
     // add the created radio
-    transmitter->addTxModule(radio);
+    transmitter->addTxModule(module);
     // add the radio to the copter
-    this->radios[copterId] = radio;
+    this->txModules[copterId] = module;
     // notify about the loaded radio
-    this->fireRadioEvent(radio);
+    this->fireRadioEvent(module);
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -258,14 +258,14 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     int copterId = command->getCopterId();
 
     // check if a radio for the given copter is registered
-    if (this->radios.find(copterId) == this->radios.end())
+    if (this->txModules.find(copterId) == this->txModules.end())
     {
         BOOST_LOG_TRIVIAL(error) << "No radio set for copter [ " << copterId << " ].";
     }
     else
     {
         // get th radio for the copter
-        AbstractTxModule *radio = this->radios[copterId];
+        AbstractTxModule *radio = this->txModules[copterId];
         // execute the command for the found radio
         this->commandExecutor.execute(command, radio);
         // fire a radio event, because the state of the radio changed

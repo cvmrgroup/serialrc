@@ -104,7 +104,7 @@ private:
     std::vector<RadioConfig> configs;
 
     /// the map with all radios for the configured copters
-    std::unordered_map<int, AbstractTxModule *> radios;
+    std::unordered_map<int, AbstractTxModule *> txModules;
 
     /// the map with all used ITransmitters
     std::unordered_map<std::string, ITransmitter *> transmitters;

@@ -57,10 +57,9 @@ void ArTT::onData(const char *frame, size_t length)
     if (this->first)
     {
         BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << std::string(frame) << " ].";
-
         this->first = false;
     }
-    else if (length == 3 && frame[2] == ATT_DELIMITER)
+    else if (length == 3 && frame[2] == AXX_DELIMITER)
     {
         int id = (int) frame[0];
         int type = (int) frame[1];

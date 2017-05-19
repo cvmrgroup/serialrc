@@ -67,7 +67,7 @@ void setup()
     byte hi[3];
     hi[0] = (byte) 'h';
     hi[1] = (byte) 'i';
-    hi[2] = ATT_DELIMITER;
+    hi[2] = AXX_DELIMITER;
 
     Serial.write(hi, 3);
 }
@@ -83,7 +83,7 @@ void loop()
         byte reply[3];
         reply[0] = (byte) 0;
         reply[1] = (byte) 0;
-        reply[2] = ATT_DELIMITER;
+        reply[2] = AXX_DELIMITER;
 
         if (bytesRead == ATT_FRAME_LENGTH)
         {

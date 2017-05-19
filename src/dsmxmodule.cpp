@@ -79,7 +79,7 @@ void DSMXModule::setBindSignal()
 }
 
 void DSMXModule::setControls(double throttle, double roll, double pitch,
-                            double yaw)
+                             double yaw)
 {
     if (this->suspended)
     {
