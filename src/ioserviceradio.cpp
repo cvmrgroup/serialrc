@@ -16,7 +16,7 @@ IOServiceRadio::~IOServiceRadio()
 {
     for (auto entry: this->radios)
     {
-        AbstractRadio *radio = entry.second;
+        AbstractTxModule *radio = entry.second;
         delete radio;
     }
 
@@ -25,10 +25,10 @@ IOServiceRadio::~IOServiceRadio()
     for (auto entry : this->transmitters)
     {
         ITransmitter *transmitter = entry.second;
-        // check if the ITransmitter is open
+        // check if the IRadioSender is open
         if (transmitter->isOpen())
         {
-            //close the ITransmitter
+            //close the IRadioSender
             transmitter->close();
         }
         delete transmitter;
@@ -69,9 +69,9 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 #endif
 
 #ifdef WITH_RASPBERRYPI
-    if (sender.compare("raspberrypi") == 0)
+    if (transmitter.compare("raspberrypi") == 0)
     {
-        tx = new RpiTX(sender, this->io_service);
+        tx = new RpiTX(transmitter, this->io_service);
     }
 #endif
 
@@ -110,24 +110,24 @@ void IOServiceRadio::createRadio(RadioConfig &config)
         throw RadioException(ex);
     }
 
-    // get the name of the sender
-    std::string sender = config.sender;
+    // get the name of the transmitter
+    std::string sender = config.transmitter;
 
-    // create or get the transmitter for the configured sender
+    // create or get the transmitter for the configured transmitter
     ITransmitter *transmitter = this->createAndGetTransmitter(sender);
 
     // radio which is used for the given copter
-    AbstractRadio *radio = NULL;
+    AbstractTxModule *radio = NULL;
 
     if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi") == 0)
     {
-        radio = new DSMXRadio(copterId, config);
+        radio = new DSMXModule(copterId, config);
     }
 
 #ifdef WITH_CRAZYRADIO
     if (sender.compare("crazy") == 0)
     {
-        radio = new CrazyRadio(copterId, config.sender, config.txId);
+        radio = new CrazyRadioModule(copterId, config.transmitter, config.txId);
     }
 #endif
 
@@ -142,7 +142,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     }
 
     // add the created radio
-    transmitter->addRadio(radio);
+    transmitter->addTxModule(radio);
     // add the radio to the copter
     this->radios[copterId] = radio;
     // notify about the loaded radio
@@ -223,24 +223,24 @@ void IOServiceRadio::fireTelemetryData(Telemetry data)
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void IOServiceRadio::fireRadioEvent(AbstractRadio *radio)
+void IOServiceRadio::fireRadioEvent(AbstractTxModule *radio)
 {
     // create the RadioEvent
     RadioEvent e;
-    e.sender = radio->getSender();
-    e.txId = radio->getTxId();
-    e.copterId = radio->getId();
+    e.copterId = radio->getCopterId();
+    e.txName = radio->getTxName();
+    e.moduleId = radio->getModuleId();
     e.enabled = radio->isEnabled();
     e.binding = radio->isBinding();
     e.suspended = radio->isSuspended();
 
-    // todo copy signal
-    e.signal[AbstractRadio::Channel::Throttle] = radio->getThrottle();
-    e.signal[AbstractRadio::Channel::Aileron] = radio->getRoll();
-    e.signal[AbstractRadio::Channel::Elevation] = radio->getPitch();
-    e.signal[AbstractRadio::Channel::Rudder] = radio->getYaw();
-    e.signal[AbstractRadio::Channel::Gear] = radio->getGear();
-    e.signal[AbstractRadio::Channel::Aux1] = radio->getAux1();
+    // todo just copy the whole signal
+    e.signal[AbstractTxModule::Channel::Throttle] = radio->getThrottle();
+    e.signal[AbstractTxModule::Channel::Aileron] = radio->getRoll();
+    e.signal[AbstractTxModule::Channel::Elevation] = radio->getPitch();
+    e.signal[AbstractTxModule::Channel::Rudder] = radio->getYaw();
+    e.signal[AbstractTxModule::Channel::Gear] = radio->getGear();
+    e.signal[AbstractTxModule::Channel::Aux1] = radio->getAux1();
 
     // fire the RadioEvent
     this->onRadioChanged(e);
@@ -265,7 +265,7 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     else
     {
         // get th radio for the copter
-        AbstractRadio *radio = this->radios[copterId];
+        AbstractTxModule *radio = this->radios[copterId];
         // execute the command for the found radio
         this->commandExecutor.execute(command, radio);
         // fire a radio event, because the state of the radio changed

@@ -17,10 +17,11 @@
  *       @date:   16.02.2015
  *****************************************************/
 
-#include "abstractradio.h"
+#include "abstracttxmodule.h"
 
-AbstractRadio::AbstractRadio(int id, std::string sender, std::string txId) :
-        id(id), sender(sender), txId(txId)
+AbstractTxModule::AbstractTxModule(int copterId, std::string txName,
+                                   std::string moduleId) :
+        copterId(copterId), txName(txName), moduleId(moduleId)
 {
     binding = false;
     enabled = false;
@@ -33,71 +34,71 @@ AbstractRadio::AbstractRadio(int id, std::string sender, std::string txId) :
     }
 }
 
-AbstractRadio::~AbstractRadio()
+AbstractTxModule::~AbstractTxModule()
 {
 }
 
-int AbstractRadio::getId()
+int AbstractTxModule::getCopterId()
 {
-    return id;
+    return copterId;
 }
 
-std::string AbstractRadio::getSender()
+std::string AbstractTxModule::getTxName()
 {
-    return sender;
+    return txName;
 }
 
-std::string AbstractRadio::getTxId()
+std::string AbstractTxModule::getModuleId()
 {
-    return txId;
+    return moduleId;
 }
 
-bool AbstractRadio::isEnabled()
+bool AbstractTxModule::isEnabled()
 {
     return enabled;
 }
 
-bool AbstractRadio::isBinding()
+bool AbstractTxModule::isBinding()
 {
     return binding;
 }
 
-bool AbstractRadio::isSuspended()
+bool AbstractTxModule::isSuspended()
 {
     return suspended;
 }
 
-double AbstractRadio::getThrottle()
+double AbstractTxModule::getThrottle()
 {
     return this->signal[Throttle];
 }
 
-double AbstractRadio::getRoll()
+double AbstractTxModule::getRoll()
 {
     return this->signal[Aileron];
 }
 
-double AbstractRadio::getPitch()
+double AbstractTxModule::getPitch()
 {
     return this->signal[Elevation];
 }
 
-double AbstractRadio::getYaw()
+double AbstractTxModule::getYaw()
 {
     return this->signal[Rudder];
 }
 
-double AbstractRadio::getGear()
+double AbstractTxModule::getGear()
 {
     return this->signal[Gear];
 }
 
-double AbstractRadio::getAux1()
+double AbstractTxModule::getAux1()
 {
     return this->signal[Aux1];
 }
 
-bool AbstractRadio::isEmergency()
+bool AbstractTxModule::isEmergency()
 {
     return emergency;
 }

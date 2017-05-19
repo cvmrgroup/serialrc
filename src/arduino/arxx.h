@@ -42,8 +42,9 @@
 #include "attdefinitions.h"
 
 /**
- * @brief Software-side class for communication with the software running on the
- * arduino triple transmission built-in arduino board.
+ * @brief Software-side super class for the communication with the software
+ * running on the Arduinos used for Arduino Triple Transmission and Arduino
+ * Trainer Port.
  */
 class ArXX : public ITransmitter
 {
@@ -88,7 +89,7 @@ public:
 
     bool hasCapacity();
 
-    void addRadio(AbstractRadio *radio);
+    void addTxModule(AbstractTxModule *txModule);
 
     void suspendAll();
 
@@ -103,38 +104,38 @@ public:
 protected:
 
     /**
-     * gets called when a frame was received on the underlying serial port
-     * @param frame the received frame as char array
-     * @param length the length of the received frame
+     * Called when a data frame was received on the underlying serial port.
+     * @param frame The received frame as char array.
+     * @param length The length of the received frame.
      */
     virtual void onData(const char *frame, size_t length) = 0;
 
     /**
-     * write the given frame through the serial port
-     * @param frame the frame to write through the serial port
-     * @param the length of the frame
+     * Write the given frame to the serial port.
+     * @param frame The frame to write to the serial port.
+     * @param The length of the frame.
      */
     void writeFrame(const char *frame, size_t length);
 
-    /// the map with all radios for this transmitter
-    std::unordered_map<int, AbstractRadio *> radios;
+    /// A map with all transmitter modules connected to this transmitter.
+    std::unordered_map<int, AbstractTxModule *> modules;
 
 private:
 
-    /// the amout of mximum radios for this transmitter
-    int maxNumberOfRadios;
+    /// Maximum number of connectable transmitter modules.
+    int maxNumberOfModules;
 
-    /// the name of the transmitter
-    std::string name;
+    /// The name of the transmitter.
+    std::string transmitterName;
 
-    /// the erial number of the device
+    /// The serial number of this device.
     std::string serialNumber;
 
-    /// the io service to handle the incoming and outgoing serial data
-    boost::shared_ptr<boost::asio::io_service> io_service;
+    /// The io service to handle incoming and outgoing serial data.
+    boost::shared_ptr<boost::asio::io_service> ioService;
 
-    /// the serial port
+    /// The serial port.
     boost::shared_ptr<boost::asio::serial_port> serialPort;
 };
 
-#endif /* ARXX_H */
+#endif //ARXX_H

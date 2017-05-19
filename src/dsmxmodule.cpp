@@ -17,10 +17,10 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#include "dsmxradio.h"
+#include "dsmxmodule.h"
 
-DSMXRadio::DSMXRadio(int id, RadioConfig &config) :
-        AbstractRadio(id, config.sender, config.txId)
+DSMXModule::DSMXModule(int copterId, RadioConfig &config) :
+        AbstractTxModule(copterId, config.transmitter, config.txId)
 {
     this->config = config;
     this->setSuspensionSignal();
@@ -28,31 +28,31 @@ DSMXRadio::DSMXRadio(int id, RadioConfig &config) :
     this->signal[Aux1] = this->config.channels[Aux1].getSwitchValue();
 }
 
-DSMXRadio::~DSMXRadio()
+DSMXModule::~DSMXModule()
 {
 }
 
-RadioConfig DSMXRadio::getRadioConfig()
+RadioConfig DSMXModule::getRadioConfig()
 {
     return this->config;
 }
 
-void DSMXRadio::toggleSender()
+void DSMXModule::toggleSender()
 {
     this->enabled = !this->enabled;
 }
 
-void DSMXRadio::turnSenderOn()
+void DSMXModule::turnSenderOn()
 {
     this->enabled = true;
 }
 
-void DSMXRadio::turnSenderOff()
+void DSMXModule::turnSenderOff()
 {
     this->enabled = false;
 }
 
-void DSMXRadio::suspend(bool suspended)
+void DSMXModule::suspend(bool suspended)
 {
     this->suspended = suspended;
 
@@ -62,7 +62,7 @@ void DSMXRadio::suspend(bool suspended)
     }
 }
 
-void DSMXRadio::toggleSuspension()
+void DSMXModule::toggleSuspension()
 {
     this->suspended = !this->suspended;
 
@@ -72,13 +72,13 @@ void DSMXRadio::toggleSuspension()
     }
 }
 
-void DSMXRadio::setBindSignal()
+void DSMXModule::setBindSignal()
 {
     this->enabled = true;
     this->binding = true;
 }
 
-void DSMXRadio::setControls(double throttle, double roll, double pitch,
+void DSMXModule::setControls(double throttle, double roll, double pitch,
                             double yaw)
 {
     if (this->suspended)
@@ -95,17 +95,17 @@ void DSMXRadio::setControls(double throttle, double roll, double pitch,
     this->signal[Rudder] = this->config.channels[Rudder].getServoTravel(yaw);
 }
 
-void DSMXRadio::toggleGear()
+void DSMXModule::toggleGear()
 {
     this->signal[Gear] = this->config.channels[Gear].nextPosition();
 }
 
-void DSMXRadio::toggleAux1()
+void DSMXModule::toggleAux1()
 {
     this->signal[Aux1] = this->config.channels[Aux1].nextPosition();
 }
 
-void DSMXRadio::setSuspensionSignal()
+void DSMXModule::setSuspensionSignal()
 {
     for (int i = 1; i < 4; i++)
     {
@@ -115,17 +115,17 @@ void DSMXRadio::setSuspensionSignal()
     this->signal[Throttle] = -config.channels[Throttle].travel;
 }
 
-void DSMXRadio::setArmSignal()
+void DSMXModule::setArmSignal()
 {
     std::copy(std::begin(this->config.armSignal), std::end(this->config.armSignal), std::begin(this->signal));
 }
 
-void DSMXRadio::setDisarmSignal()
+void DSMXModule::setDisarmSignal()
 {
     std::copy(std::begin(this->config.disarmSignal), std::end(this->config.disarmSignal), std::begin(this->signal));
 }
 
-void DSMXRadio::emergencyStop(bool emergency)
+void DSMXModule::emergencyStop(bool emergency)
 {
     suspend(true);
 }

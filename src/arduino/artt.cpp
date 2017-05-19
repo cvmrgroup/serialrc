@@ -24,20 +24,20 @@ ArTT::ArTT(std::string name, std::string serial,
         ArXX(name, ATT_MAX_RADIOS, serial, io_service)
 {
     this->first = true;
-    this->lastId = -1;
+    this->lastModule = -1;
     this->token = 0;
 }
 
-void ArTT::addRadio(AbstractRadio *radio)
+void ArTT::addTxModule(AbstractTxModule *txModule)
 {
-    // this is a dsmx radio
-    DSMXRadio *dsmx = static_cast<DSMXRadio *>(radio);
+    // this is a dsmx module
+    DSMXModule *module = static_cast<DSMXModule *>(txModule);
 
-    // add the radio config to our map of configs
-    this->configs.push_back(dsmx->getRadioConfig());
+    // add the txModule config to our map of configs
+    this->configs.push_back(module->getRadioConfig());
 
     // notify ArXX about add Radio
-    ArXX::addRadio(radio);
+    ArXX::addTxModule(txModule);
 }
 
 void ArTT::close()
@@ -50,9 +50,8 @@ void ArTT::close()
 void ArTT::onData(const char *frame, size_t length)
 {
     // get current transmitter id, increment token, remember tx for next call
-    int tx = this->configs[this->token].id;
+    int tx = boost::lexical_cast<int>(this->configs[this->token].txId);
     this->token = (this->token + 1) % (unsigned int) this->configs.size();
-    this->lastId = tx;
 
     // just ignore the first message (kind of flush serial buffer)
     if (this->first)
@@ -66,7 +65,12 @@ void ArTT::onData(const char *frame, size_t length)
         int id = (int) frame[0];
         int type = (int) frame[1];
 
-        if (this->lastId == id && type == ATT_FRAME_TYPE_CONFIG)
+        if (this->lastModule != id)
+        {
+            BOOST_LOG_TRIVIAL(error) << "Reply did not match last command [ " << this->lastModule << "!=" << id << " ].";
+        }
+
+        if (this->lastModule == id && type == ATT_FRAME_TYPE_CONFIG)
         {
             this->configs[id].initialized = true;
             BOOST_LOG_TRIVIAL(info) << "Transmitter [ " << id << " ] configured.";
@@ -80,19 +84,21 @@ void ArTT::onData(const char *frame, size_t length)
     }
 
     this->writeData(tx);
+
+    this->lastModule = tx;
 }
 
 void ArTT::writeData(int id)
 {
     // check if a radio exists for the given id
-    if (this->radios.find(id) == this->radios.end())
+    if (this->modules.find(id) == this->modules.end())
     {
         std::string ex = boost::str(boost::format("Failed to write data to transmitter with id [ %1% ] on serial port [ %2% ]: No radio set for transmitter.") % id % this->getSerialNumber());
         BOOST_LOG_TRIVIAL(error) << ex;
         throw RadioException(ex);
     }
 
-    AbstractRadio *radio = this->radios[id];
+    AbstractTxModule *radio = this->modules[id];
     RadioConfig &config = this->configs[id];
 
     unsigned char frame[ATT_FRAME_LENGTH] = {0};

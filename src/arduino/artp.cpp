@@ -67,12 +67,12 @@ void ArTP::onData(const char *frame, size_t length)
 
 void ArTP::writeData()
 {
-    for (auto entry: this->radios)
+    for (auto entry: this->modules)
     {
-        AbstractRadio *radio = entry.second;
+        AbstractTxModule *radio = entry.second;
 
         // get the transmitter id as string
-        std::string txIdStr = radio->getTxId();
+        std::string txIdStr = radio->getModuleId();
         // cast the id to int
         int id = boost::lexical_cast<int>(txIdStr);
 

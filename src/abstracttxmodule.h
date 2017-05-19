@@ -17,17 +17,23 @@
  *       @date:   16.02.2015
  *****************************************************/
 
-#ifndef ABSTRACTRADIO_H
-#define ABSTRACTRADIO_H
+#ifndef ABSTRACTTXMODULE_H
+#define ABSTRACTTXMODULE_H
 
 #include <string>
 
-class AbstractRadio
+class AbstractTxModule
 {
 public:
 
+    /**
+     * Number of channels.
+     */
     static const int N_CHANNELS = 6;
 
+    /**
+     * Common channel names.
+     */
     enum Channel
     {
         Throttle = 0,
@@ -38,9 +44,18 @@ public:
         Aux1 = 5
     };
 
-    AbstractRadio(int id, std::string sender, std::string txId);
+    /**
+     * Construct.
+     * @param id The radio id.
+     * @param txName The sender name.
+     * @param moduleId The transmitter name.
+     */
+    AbstractTxModule(int copterId, std::string txName, std::string moduleId);
 
-    virtual ~AbstractRadio();
+    /**
+     * Destroy.
+     */
+    virtual ~AbstractTxModule();
 
     /**
      * Method to toggle transmitter state by its id.
@@ -85,14 +100,14 @@ public:
     virtual void setSuspensionSignal() = 0;
 
     /**
-     *  This method sends low throttle and full yaw to arm multiwii copter.
-     *  @param id The transmitter id.
+     * This method sends low throttle and full yaw to arm multiwii copter.
+     * @param id The transmitter id.
      */
     virtual void setArmSignal() = 0;
 
     /**
-     *  This method sends low throttle and low yaw to disarm multiwii copter.
-     *  @param id The transmitter id.
+     * This method sends low throttle and low yaw to disarm multiwii copter.
+     * @param id The transmitter id.
      */
     virtual void setDisarmSignal() = 0;
 
@@ -107,32 +122,39 @@ public:
     virtual void setControls(double throttle, double roll, double pitch,
                              double yaw) = 0;
 
+    /**
+     * Toggle Gear (Channel 5).
+     */
     virtual void toggleGear() = 0;
 
+    /**
+     * Toggle Aux (Channel 6).
+     */
     virtual void toggleAux1() = 0;
 
     /**
-     * Send Emergency command to copter
+     * Send Emergency command to copter.
+     * @param emergency Bool (todo what for?).
      */
-    virtual void emergencyStop(bool _emergency = true) = 0;
+    virtual void emergencyStop(bool emergency = true) = 0;
 
     /**
-     *  get id
-     *  @return the id
+     * Get the id of the copter this tx module is bound to.
+     * @return The copter id bound to this module.
      */
-    int getId();
+    int getCopterId();
 
     /**
-     * Get the sender name (as defined in config)
-     * @return The sender name
+     * Get the sender name (as defined in config).
+     * @return The sender name.
      */
-    std::string getSender();
+    std::string getTxName();
 
     /**
-     *  get current transmitter id.
-     *  @return the transmitter id
+     * Get the transmitter module id.
+     * @return The transmitter module id.
      */
-    std::string getTxId();
+    std::string getModuleId();
 
     /**
      * Method to retrieve the currently active transmitters.
@@ -141,9 +163,8 @@ public:
     bool isEnabled();
 
     /**
-     *  check if transmitter is in bind mode.
-     *
-     *  @return wether the transmitter is in bind mode or not.
+     * Check if transmitter is in bind mode.
+     * @return wether the transmitter is in bind mode or not.
      */
     bool isBinding();
 
@@ -153,27 +174,55 @@ public:
      */
     bool isSuspended();
 
+    /**
+     * Get throttle value.
+     * @return The throttle value.
+     */
     double getThrottle();
 
+    /**
+     * Get roll value.
+     * @return The roll value.
+     */
     double getRoll();
 
+    /**
+     * Get pitch value.
+     * @return The pitch value.
+     */
     double getPitch();
 
+    /**
+     * Get yaw value.
+     * @return The yaw value.
+     */
     double getYaw();
 
+    /**
+     * Get gear value (Channel 5).
+     * @return The gear value.
+     */
     double getGear();
 
+    /**
+     * Get aux 1 (Channel 6) value.
+     * @return The aux 1 value.
+     */
     double getAux1();
 
+    /**
+     * Check if radio is in emergency mode.
+     * @return True if in emergency mode, otherwise false.
+     */
     bool isEmergency();
 
 protected:
 
-    int id;
+    int copterId;
 
-    std::string sender;
+    std::string txName;
 
-    std::string txId;
+    std::string moduleId;
 
     double signal[N_CHANNELS];
 
@@ -183,4 +232,4 @@ protected:
     bool emergency;
 };
 
-#endif /* ABSTRACTRADIO_H */
+#endif /* ABSTRACTTXMODULE_H */

@@ -132,7 +132,7 @@ void CrazyRadioTransmitter::update()
                                   if (this->radios.find(this->currentRadio) != this->radios.end())
                                   {
                                       // get the current radio
-                                      AbstractRadio *radio = this->radios[this->currentRadio];
+                                      AbstractTxModule *radio = this->radios[this->currentRadio];
                                       // create the Control Values
                                       u = cv::Vec4d(radio->getThrottle(),
                                                     radio->getRoll(),
@@ -173,7 +173,7 @@ void CrazyRadioTransmitter::cleanup()
 
     if (this->radio)
     {
-        // free the radios
+        // free the modules
         this->radio.reset();
         this->radio = NULL;
     }
@@ -190,14 +190,14 @@ void CrazyRadioTransmitter::publishCopterData()
     }
 
     // get the current radio
-    AbstractRadio *radio = this->radios[this->currentRadio];
+    AbstractTxModule *radio = this->radios[this->currentRadio];
 
     Telemetry data;
 
     data.millis = Clock::nowMillis();
 
     // get the copter id
-    data.copterId = radio->getId();
+    data.copterId = radio->getCopterId();
 
     data.batteryLevel = this->copter->batteryLevel();
     data.batteryState = this->copter->batteryState();
@@ -249,10 +249,10 @@ bool CrazyRadioTransmitter::hasCapacity()
     return this->radios.size() < 1;
 }
 
-void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
+void CrazyRadioTransmitter::addTxModule(AbstractTxModule *radio)
 {
     // get the transmitter id
-    std::string radioURI = radio->getTxId();
+    std::string radioURI = radio->getModuleId();
 
     if (!this->hasCapacity())
     {
@@ -264,7 +264,7 @@ void CrazyRadioTransmitter::addRadio(AbstractRadio *radio)
         throw RadioException(ex);
     }
 
-    // insert the AbstractRadio
+    // insert the AbstractTxModule
     this->radios[radioURI] = radio;
 
     // activate the current radio

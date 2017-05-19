@@ -96,16 +96,18 @@ void loop()
 
             if (ftype == ATT_FRAME_TYPE_CONFIG)
             {
-                int frameRate = (int) rbuffer[ATT_FRAME_RATE];
-                tx[id].setFrameRate(frameRate);
-
                 reply[0] = bid;
                 reply[1] = bftype;
+                
+                int frameRate = (int) rbuffer[ATT_FRAME_RATE];
+                tx[id].setFrameRate(frameRate);
             
                 digitalWrite(12, HIGH);
             }
             else if (ftype == ATT_FRAME_TYPE_SIGNAL)
             {
+                reply[0] = bid;
+                
                 // set data in transmitter
                 tx[id].setChannels(
                         rbuffer[ATT_HEADER_1], rbuffer[ATT_HEADER_2],  // header bytes

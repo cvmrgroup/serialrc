@@ -17,31 +17,29 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#ifndef CRAZYRADIO_H
-#define CRAZYRADIO_H
+#ifndef DSMXMODULE_H
+#define DSMXMODULE_H
 
-#include "abstractradio.h"
+#include <algorithm>
 
-class CrazyRadio : public AbstractRadio
+#include <config/radioconfig.h>
+
+#include "abstracttxmodule.h"
+
+class DSMXModule : public AbstractTxModule
 {
 
 public:
 
-    CrazyRadio(int id, std::string sender, std::string txId);
+    DSMXModule(int copterId, RadioConfig &config);
 
-    virtual ~CrazyRadio();
+    virtual ~DSMXModule();
 
-    void setControls(double throttle, double roll, double pitch, double yaw);
-
-    void toggleSuspension();
-
-    void suspend(bool suspend);
-
-    void emergencyStop(bool emergency = true);
-
-    void setSuspensionSignal();
-
-    // not implemented /////////////////////////////////////////////////////////
+    /**
+     * Get the radio configuration.
+     * @return The radio configuration.
+     */
+    RadioConfig getRadioConfig();
 
     void toggleSender();
 
@@ -49,15 +47,29 @@ public:
 
     void turnSenderOff();
 
+    void suspend(bool suspended);
+
+    void toggleSuspension();
+
     void setBindSignal();
+
+    void setControls(double throttle, double roll, double pitch, double yaw);
+
+    void toggleGear();
+
+    void toggleAux1();
+
+    void setSuspensionSignal();
 
     void setArmSignal();
 
     void setDisarmSignal();
 
-    void toggleGear();
+    void emergencyStop(bool emergency = true);
 
-    void toggleAux1();
+private:
+
+    RadioConfig config;
 };
 
-#endif /* CRAZYRADIO_H */
+#endif /* DSMXMODULE_H */

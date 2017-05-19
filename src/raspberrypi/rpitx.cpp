@@ -24,7 +24,7 @@ RpiTX::RpiTX(const std::string name,
         name(name),
         serial(-1),
         initialized(false),
-        radio(NULL)
+        module(NULL)
 {
     this->io_service = io_service;
     this->timer = new DeadlineTimer((1. / 22.) * 1000., this->io_service);
@@ -89,9 +89,9 @@ bool RpiTX::hasCapacity()
     return true;
 }
 
-void RpiTX::addRadio(AbstractRadio *radio)
+void RpiTX::addTxModule(AbstractTxModule *txModule)
 {
-    if (this->radio)
+    if (this->txModule)
     {
         std::string ex = "Raspi Radio already added.";
         BOOST_LOG_TRIVIAL(error) << ex;
@@ -99,10 +99,10 @@ void RpiTX::addRadio(AbstractRadio *radio)
     }
 
     // this is a dsmx radio
-    this->radio = static_cast<DSMXRadio *>(radio);
+    this->module = static_cast<DSMXModule *>(txModule);
 
     // add the radio config to our map of configs
-    RadioConfig config = this->radio->getRadioConfig();
+    RadioConfig config = this->module->getRadioConfig();
     int frameRate = config.frameRate;
 
     BOOST_LOG_TRIVIAL(info) << "DSMX frame rate set to " << frameRate << "ms.";
@@ -120,7 +120,7 @@ void RpiTX::update(const boost::system::error_code &ec)
         throw RadioException(ex);
     }
 
-    if (!this->radio)
+    if (!this->txModule)
     {
         std::string ex = "No radio set.";
         BOOST_LOG_TRIVIAL(error) << ex;
@@ -155,7 +155,7 @@ void RpiTX::update(const boost::system::error_code &ec)
     frame[channel_6_lo] = SerialHelper::loByte(ch6);
 
     // power
-    digitalWrite(POWER_PIN, this->radio->isEnabled() ? HIGH : LOW);
+    digitalWrite(POWER_PIN, this->module->isEnabled() ? HIGH : LOW);
 
     // signal
     write(this->serial, frame, DSM_FRAME_LENGTH);

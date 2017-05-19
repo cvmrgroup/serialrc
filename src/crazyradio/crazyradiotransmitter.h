@@ -55,7 +55,7 @@ public:
 
     bool hasCapacity();
 
-    void addRadio(AbstractRadio *radio);
+    void addTxModule(AbstractTxModule *radio);
 
 private:
 
@@ -69,7 +69,7 @@ private:
     std::string name;
 
     /// the map with radios
-    std::unordered_map<std::string, AbstractRadio *> radios;
+    std::unordered_map<std::string, AbstractTxModule *> radios;
 
     /// the crazyflie copter
     boost::shared_ptr<CCrazyflie> copter;

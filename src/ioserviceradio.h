@@ -19,9 +19,9 @@
 
 #include "i_transmitter.h"
 
-// dsmx tx based radios (arduino and pi)
-#include "abstractradio.h"
-#include "dsmxradio.h"
+// dsmx tx based modules (arduino and pi)
+#include "abstracttxmodule.h"
+#include "dsmxmodule.h"
 
 #ifdef WITH_ARDUINO
 #include "arduino/artp.h"
@@ -30,7 +30,7 @@
 
 #ifdef WITH_CRAZYRADIO
 #include "crazyradio/crazyradiotransmitter.h"
-#include "crazyradio/crazyradio.h"
+#include "crazyradio/crazyradiomodule.h"
 #endif
 
 #ifdef WITH_RASPBERRYPI
@@ -53,7 +53,7 @@ public:
 
 private:
 
-    void fireRadioEvent(AbstractRadio *radio);
+    void fireRadioEvent(AbstractTxModule *radio);
 
     void fireTelemetryData(Telemetry data);
 
@@ -104,7 +104,7 @@ private:
     std::vector<RadioConfig> configs;
 
     /// the map with all radios for the configured copters
-    std::unordered_map<int, AbstractRadio *> radios;
+    std::unordered_map<int, AbstractTxModule *> radios;
 
     /// the map with all used ITransmitters
     std::unordered_map<std::string, ITransmitter *> transmitters;

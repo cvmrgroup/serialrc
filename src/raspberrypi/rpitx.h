@@ -31,10 +31,10 @@
 
 #include <timing/deadlinetimer.h>
 
-#include "dsmxradio.h"
+#include "dsmxmodule.h"
 #include "dsmxconstants.h"
 #include "radioexception.h"
-#include "abstractradio.h"
+#include "abstracttxmodule.h"
 #include "i_transmitter.h"
 #include "serialhelper.h"
 #include "serial.h"
@@ -57,7 +57,7 @@ public:
 
     bool hasCapacity();
 
-    void addRadio(AbstractRadio *radio);
+    void addTxModule(AbstractTxModule *txModule);
 
     void update(const boost::system::error_code &ec);
 
@@ -68,7 +68,7 @@ private:
     int serial;
     bool initialized;
 
-    DSMXRadio *radio;
+    DSMXModule *module;
 
     boost::shared_ptr<boost::asio::io_service> io_service;
     DeadlineTimer *timer;

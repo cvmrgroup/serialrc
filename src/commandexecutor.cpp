@@ -27,7 +27,7 @@ void CommandExecutor::initializeBindings()
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::execute(IRadioCommand *command, AbstractTxModule *radio)
 {
     // get the command type
     RadioCommandType type = command->getType();
@@ -49,21 +49,21 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractRadio *radio)
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void CommandExecutor::onArmCommand(IRadioCommand *command, AbstractRadio *radio)
+void CommandExecutor::onArmCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
     // set the arm signal
     radio->setArmSignal();
 }
 
 void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command,
-                                               AbstractRadio *radio)
+                                               AbstractTxModule *radio)
 {
     // set the bind signal
     radio->setBindSignal();
 }
 
 void CommandExecutor::onControlCommand(IRadioCommand *command,
-                                       AbstractRadio *radio)
+                                       AbstractTxModule *radio)
 {
     // cast the command to ControlCommand
     if (ControlCommand *crtl = dynamic_cast<ControlCommand *>(command))
@@ -76,55 +76,55 @@ void CommandExecutor::onControlCommand(IRadioCommand *command,
 }
 
 void CommandExecutor::onDisarmCommand(IRadioCommand *command,
-                                      AbstractRadio *radio)
+                                      AbstractTxModule *radio)
 {
     // set the disarm signal
     radio->setDisarmSignal();
 }
 
 void CommandExecutor::onResumeCopterCommand(IRadioCommand *command,
-                                            AbstractRadio *radio)
+                                            AbstractTxModule *radio)
 {
     radio->suspend(false);
 }
 
 void CommandExecutor::onSuspendCopterCommand(IRadioCommand *command,
-                                             AbstractRadio *radio)
+                                             AbstractTxModule *radio)
 {
     radio->suspend(true);
 }
 
 void CommandExecutor::onTakeOverCommand(IRadioCommand *command,
-                                        AbstractRadio *radio)
+                                        AbstractTxModule *radio)
 {
 }
 
 void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command,
-                                                AbstractRadio *radio)
+                                                AbstractTxModule *radio)
 {
     radio->toggleSuspension();
 }
 
 void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command,
-                                                 AbstractRadio *radio)
+                                                 AbstractTxModule *radio)
 {
     radio->toggleSender();
 }
 
 void CommandExecutor::onSwitchGearCommand(IRadioCommand *command,
-                                                 AbstractRadio *radio)
+                                                 AbstractTxModule *radio)
 {
     radio->toggleGear();
 }
 
 void CommandExecutor::onSwitchAux1Command(IRadioCommand *command,
-                                                 AbstractRadio *radio)
+                                                 AbstractTxModule *radio)
 {
     radio->toggleAux1();
 }
 
 void CommandExecutor::onEmergencyCommand(IRadioCommand *command,
-                                         AbstractRadio *radio)
+                                         AbstractTxModule *radio)
 {
     radio->emergencyStop();
 }

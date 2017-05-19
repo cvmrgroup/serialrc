@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "arxx.h"
-#include "dsmxradio.h"
+#include "dsmxmodule.h"
 #include "dsmxconstants.h"
 #include "attdefinitions.h"
 
@@ -43,11 +43,14 @@ public:
          boost::shared_ptr<boost::asio::io_service> io_service);
 
     /**
-     * Overwrite addRadio function for getting the transmitter ids
+     * Overwrite addTxModule function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter
      */
-    void addRadio(AbstractRadio *radio);
+    void addTxModule(AbstractTxModule *txModule);
 
+    /**
+     * Overwrite close to switch off the tx modules.
+     */
     void close();
 
 private:
@@ -69,7 +72,7 @@ private:
     std::vector<RadioConfig> configs;
 
     /// The tx id the last frame was sent to.
-    int lastId;
+    int lastModule;
 
     /// We need to know the first serial message arrives to ignore it.
     bool first;

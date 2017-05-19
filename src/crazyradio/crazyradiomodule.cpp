@@ -17,18 +17,18 @@
  *       @date:   24.06.2015
  *****************************************************/
 
-#include "crazyradio.h"
+#include "crazyradiomodule.h"
 
-CrazyRadio::CrazyRadio(int id, std::string sender, std::string txId) :
-        AbstractRadio(id, sender, txId)
+CrazyRadioModule::CrazyRadioModule(int id, std::string sender, std::string txId) :
+        AbstractTxModule(id, sender, txId)
 {
 }
 
-CrazyRadio::~CrazyRadio()
+CrazyRadioModule::~CrazyRadioModule()
 {
 }
 
-void CrazyRadio::setControls(double throttle, double roll, double pitch,
+void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
                              double yaw)
 {
     if (this->suspended)
@@ -45,7 +45,7 @@ void CrazyRadio::setControls(double throttle, double roll, double pitch,
     this->signal[Rudder] = (yaw * -180);
 }
 
-void CrazyRadio::suspend(bool suspended)
+void CrazyRadioModule::suspend(bool suspended)
 {
     this->suspended = suspended;
 
@@ -55,7 +55,7 @@ void CrazyRadio::suspend(bool suspended)
     }
 }
 
-void CrazyRadio::toggleSuspension()
+void CrazyRadioModule::toggleSuspension()
 {
     this->suspended = !this->suspended;
 
@@ -65,12 +65,12 @@ void CrazyRadio::toggleSuspension()
     }
 }
 
-void CrazyRadio::emergencyStop(bool emergency)
+void CrazyRadioModule::emergencyStop(bool emergency)
 {
     suspend(true);
 }
 
-void CrazyRadio::setSuspensionSignal()
+void CrazyRadioModule::setSuspensionSignal()
 {
     for (int i = 0; i < N_CHANNELS; i++)
     {
@@ -80,34 +80,34 @@ void CrazyRadio::setSuspensionSignal()
 
 // not implemented /////////////////////////////////////////////////////////////
 
-void CrazyRadio::toggleSender()
+void CrazyRadioModule::toggleSender()
 {
 }
 
-void CrazyRadio::turnSenderOn()
+void CrazyRadioModule::turnSenderOn()
 {
 }
 
-void CrazyRadio::turnSenderOff()
+void CrazyRadioModule::turnSenderOff()
 {
 }
 
-void CrazyRadio::setBindSignal()
+void CrazyRadioModule::setBindSignal()
 {
 }
 
-void CrazyRadio::setArmSignal()
+void CrazyRadioModule::setArmSignal()
 {
 }
 
-void CrazyRadio::setDisarmSignal()
+void CrazyRadioModule::setDisarmSignal()
 {
 }
 
-void CrazyRadio::toggleGear()
+void CrazyRadioModule::toggleGear()
 {
 }
 
-void CrazyRadio::toggleAux1()
+void CrazyRadioModule::toggleAux1()
 {
 }

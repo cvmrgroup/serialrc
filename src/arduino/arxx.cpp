@@ -23,10 +23,10 @@ ArXX::ArXX(const std::string name, int maxNumberOfRadios,
            std::string serialNumber,
            boost::shared_ptr<boost::asio::io_service> io_service)
 {
-    this->name = name;
-    this->io_service = io_service;
+    this->transmitterName = name;
+    this->ioService = io_service;
     this->serialNumber = serialNumber;
-    this->maxNumberOfRadios = maxNumberOfRadios;
+    this->maxNumberOfModules = maxNumberOfRadios;
 }
 
 void ArXX::open()
@@ -47,7 +47,7 @@ void ArXX::open()
     BOOST_LOG_TRIVIAL(info) << "Found device [ " << deviceDescription << " ] on [ " << portName << " ]";
 
     // create the serial port
-    this->serialPort = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(*this->io_service));
+    this->serialPort = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(*this->ioService));
 
     // open the device name
     boost::system::error_code ec;
@@ -74,7 +74,7 @@ void ArXX::open()
     // the delay to wait for the serial port, before start reading
     boost::posix_time::milliseconds readDelay(600);
     // create the async deadline_timer
-    boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->io_service));
+    boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->ioService));
     // set the wait delay to the timer
     timer->expires_from_now(readDelay);
     // register the async timer to invoke the first reading
@@ -246,67 +246,66 @@ void ArXX::close()
 
 int ArXX::getMaxNumberOfRadios()
 {
-    return this->maxNumberOfRadios;
+    return this->maxNumberOfModules;
 }
 
 int ArXX::getNumberOfRadios()
 {
-    return this->radios.size();
+    return this->modules.size();
 }
 
-void ArXX::addRadio(AbstractRadio *radio)
+void ArXX::addTxModule(AbstractTxModule *txModule)
 {
-    // get the transmitter id as string
-    std::string txIdStr = radio->getTxId();
-    // cast the id to int
+    // get the transmitter id convert to int
+    std::string txIdStr = txModule->getModuleId();
     int txId = boost::lexical_cast<int>(txIdStr);
 
     // check if capacity is left
     if (this->hasCapacity())
     {
-        this->radios[txId] = radio;
+        this->modules[txId] = txModule;
     }
     else
     {
         // create the exception string
-        std::string ex = boost::str(boost::format("Cannot add radio with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % txId % this->serialNumber);
+        std::string ex = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % txId % this->serialNumber);
         // display the error
         //BOOST_LOG_TRIVIAL(error) << ex;
-        // throw an radio exception
+        // throw an txModule exception
         throw RadioException(ex);
     }
 }
 
 bool ArXX::hasCapacity()
 {
-    return this->radios.size() < this->maxNumberOfRadios;
+    return this->modules.size() < this->maxNumberOfModules;
 }
 
 void ArXX::suspendAll()
 {
-    for (auto entry: this->radios)
+    for (auto entry: this->modules)
     {
-        AbstractRadio *radio = entry.second;
+        AbstractTxModule *radio = entry.second;
         radio->suspend(true);
     }
 }
 
 void ArXX::getSuspendedTxs(std::unordered_map<int, bool> &suspended)
 {
-    for (auto entry: this->radios)
+    for (auto entry: this->modules)
     {
         int txId = entry.first;
-        AbstractRadio *radio = entry.second;
+        AbstractTxModule *radio = entry.second;
         suspended[txId] = radio->isSuspended();
     }
 }
 
 void ArXX::getEnabledStates(std::unordered_map<int, bool> &enableds)
 {
-    for (auto entry: this->radios)
+    for (auto entry: this->modules)
     {
         int txId = entry.first;
-        AbstractRadio *radio = entry.second;
+        AbstractTxModule *radio = entry.second;
         enableds[txId] = radio->isEnabled();
     }
 }
@@ -323,5 +322,5 @@ bool ArXX::isOpen()
 
 std::string ArXX::getName()
 {
-    return this->name;
+    return this->transmitterName;
 }

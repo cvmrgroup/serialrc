@@ -15,7 +15,7 @@
 #include <radio/i_radiocommand.h>
 #include <radio/commands/controlcommand.h>
 
-#include "abstractradio.h"
+#include "abstracttxmodule.h"
 #include "radioexception.h"
 
 class CommandExecutor
@@ -31,31 +31,31 @@ private:
 
     // /////////////////////////////////////////////////////////////////////////
 
-    void onArmCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onArmCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onBindTransmitterCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onControlCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onControlCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onDisarmCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onDisarmCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onEmergencyCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onEmergencyCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onResumeCopterCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onResumeCopterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onSuspendCopterCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onSuspendCopterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onTakeOverCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onToggleSuspensionCommand(IRadioCommand *command,
-                                   AbstractRadio *radio);
+                                   AbstractTxModule *radio);
 
     void onToggleTransmitterCommand(IRadioCommand *command,
-                                    AbstractRadio *radio);
+                                    AbstractTxModule *radio);
 
-    void onSwitchGearCommand(IRadioCommand *command, AbstractRadio *radio);
+    void onSwitchGearCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onSwitchAux1Command(IRadioCommand *command, AbstractRadio *radio);
+    void onSwitchAux1Command(IRadioCommand *command, AbstractTxModule *radio);
 
 public:
 
@@ -64,12 +64,12 @@ public:
      * @param command the command to execute
      * @param radio the radio where the command is executed for
      */
-    void execute(IRadioCommand *command, AbstractRadio *radio);
+    void execute(IRadioCommand *command, AbstractTxModule *radio);
 
 private:
 
     std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *,
-                                                              AbstractRadio *)>> bindings;
+                                                              AbstractTxModule *)>> bindings;
 };
 
 #endif //ICARUS_COMMANDEXECUTOR_H

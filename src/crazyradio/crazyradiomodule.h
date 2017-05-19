@@ -17,29 +17,31 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#ifndef DSMXRADIO_H
-#define DSMXRADIO_H
+#ifndef ICARUS_CRAZYRADIOMODULE_H
+#define ICARUS_CRAZYRADIOMODULE_H
 
-#include <algorithm>
+#include "abstracttxmodule.h"
 
-#include <config/radioconfig.h>
-
-#include "abstractradio.h"
-
-class DSMXRadio : public AbstractRadio
+class CrazyRadioModule : public AbstractTxModule
 {
 
 public:
 
-    DSMXRadio(int id, RadioConfig &config);
+    CrazyRadioModule(int id, std::string sender, std::string txId);
 
-    virtual ~DSMXRadio();
+    virtual ~CrazyRadioModule();
 
-    /**
-     * Get the radio configuration.
-     * @return The radio configuration.
-     */
-    RadioConfig getRadioConfig();
+    void setControls(double throttle, double roll, double pitch, double yaw);
+
+    void toggleSuspension();
+
+    void suspend(bool suspend);
+
+    void emergencyStop(bool emergency = true);
+
+    void setSuspensionSignal();
+
+    // not implemented /////////////////////////////////////////////////////////
 
     void toggleSender();
 
@@ -47,29 +49,15 @@ public:
 
     void turnSenderOff();
 
-    void suspend(bool suspended);
-
-    void toggleSuspension();
-
     void setBindSignal();
-
-    void setControls(double throttle, double roll, double pitch, double yaw);
-
-    void toggleGear();
-
-    void toggleAux1();
-
-    void setSuspensionSignal();
 
     void setArmSignal();
 
     void setDisarmSignal();
 
-    void emergencyStop(bool emergency = true);
+    void toggleGear();
 
-private:
-
-    RadioConfig config;
+    void toggleAux1();
 };
 
-#endif /* DSMXRADIO_H */
+#endif //ICARUS_CRAZYRADIOMODULE_H
