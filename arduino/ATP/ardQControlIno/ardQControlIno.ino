@@ -1,31 +1,42 @@
-/******************************************/
-/**         Master Project               **/
-/**                                      **/
-/**   Created by Robert Brylka           **/
-/**   during the summer session of 2014  **/
-/**                                      **/
-/**     version 1.01 // 26.08.15         **/
-/**                                      **/
-/******************************************/
+/******************************************************
+ *
+ *   #, #,         CCCCCC  VV    VV MM      MM RRRRRRR
+ *  %  %(  #%%#   CC    CC VV    VV MMM    MMM RR    RR
+ *  %    %## #    CC        V    V  MM M  M MM RR    RR
+ *   ,%      %    CC        VV  VV  MM  MM  MM RRRRRR
+ *   (%      %,   CC    CC   VVVV   MM      MM RR   RR
+ *     #%    %*    CCCCCC     VV    MM      MM RR    RR
+ *    .%    %/
+ *       (%.      Computer Vision & Mixed Reality Group
+ *
+ *****************************************************/
+/** @copyright:   Hochschule RheinMain,
+ *                University of Applied Sciences
+ *     @author:   Robert Brylka
+ *    @version:   1.02
+ *       @date:   26.08.2015
+ *****************************************************/
 
-/**
-
-       A     B        C        D        E     F        SYNC
-   +  +--+  +-----+  +-----+  +-----+  +--+  +--+  +---    ------+
-   |  |  |  |     |  |     |  |     |  |  |  |  |  |     	 |
-   |  |  |  |     |  |     |  |     |  |  |  |  |  |    	 |
-   |  |  |  |     |  |     |  |     |  |  |  |  |  |     	 |
-   +--+  +--+     +--+     +--+     +--+  +--+  +--+     	 +
-    P     P        P        P        P     P     P
-
- A...F  PULSE      700-1530 us
- P	    PAUSE           400 us
-
- SYNC   22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
- 
- PINS 3...7
-
-**/
+/*
+ *
+ *     A    B       C       D       E    F      SYNC
+ *  + +--+ +-----+ +-----+ +-----+ +--+ +--+ +--    --+
+ *  | |  | |     | |     | |     | |  | |  | |        |
+ *  | |  | |     | |     | |     | |  | |  | |        |
+ *  | |  | |     | |     | |     | |  | |  | |        |
+ *  +-+  +-+     +-+     +-+     +-+  +-+  +-+        +
+ *   P    P       P       P       P    P    P
+ *
+ *  |---------------------- 22ms ---------------------|
+ *
+ *  A..F  PULSE      700-1530 us
+ *  P     PAUSE           400 us
+ *
+ *  SYNC   22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
+ *
+ *  PINS 3..7
+ *
+ */
 
 #include <DueTimer.h>
 
@@ -35,11 +46,11 @@
 #define ERROR_LED 53
 
 /**
-  For 7 Pause and 6 channel with full extent we need at least
-  7 * 400 + 6 * 1530 = 11980 bits to encode any posible state of the signal
-  during the SYNC phase the aoutput can just be set to high
-  Using an unsigned integer for the bitmask we need at least an array of size 11980 / 32 = 374,375 --> 375
-**/
+ * For 7 Pause and 6 channel with full extent we need at least
+ * 7 * 400 + 6 * 1530 = 11980 bits to encode any posible state of the signal
+ * during the SYNC phase the aoutput can just be set to high
+ * Using an unsigned integer for the bitmask we need at least an array of size 11980 / 32 = 374,375 --> 375
+ */
 #define MASK_LENGTH 375
 
 // current signal state in micro seconds
@@ -70,10 +81,9 @@ unsigned int *onesP = &ones;
 volatile uint32_t *PIN_REG;
 
 /**
-*	The first change after the first pause is given
-*	by 400 us so the half of the mask by idx 12
-*	need to be ones
-**/
+ * The first change after the first pause is given by 400 us so the half of the
+ * mask by idx 12 need to be ones.
+ */
 void initFixBmPart()
 {
     bmCtr0[12] = ~(((1 << 16) - 1) << 16);
@@ -84,14 +94,14 @@ void initFixBmPart()
 }
 
 /**
-*	Generate the neutral signal where
-*	throttle       =  0%
-*	roll           = 50%
-*	pitch          = 50%
-*	yaw            = 50%
-*	gear           =  0%
-*	aux1           =  0%
-**/
+ * Generate the neutral signal
+ * throttle =  0%
+ * roll     = 50%
+ * pitch    = 50%
+ * yaw      = 50%
+ * gear     =  0%
+ * aux1     =  0%
+ */
 void initialBMPart(byte *iBMBuffer)
 {
     for (int i = 0; i < 5; i++)
@@ -117,10 +127,9 @@ void initialBMPart(byte *iBMBuffer)
 }
 
 /**
-*	Copy the five int array into one byte array
-*	The acces to a byte array is faster than
-*	to five diferent int array
-**/
+ * Copy the five int array into one byte array The acces to a byte array is
+ * faster than to five diferent int array
+ */
 void fillByteArray()
 {
     for (int i = 0; i < MASK_LENGTH; i++)
@@ -140,9 +149,9 @@ void fillByteArray()
 }
 
 /**
-*	Set the ZEROS and ONES of one channel
-*	to chosen bitmask. Use memset as set method.
-**/
+ * Set the ZEROS and ONES of one channel to the chosen bitmask. Use memset as
+ * set method.
+ */
 void setChannel(unsigned int *mask, short channel, unsigned int *index,
                 unsigned int *zeros, unsigned int *ones, bool last = false)
 {
@@ -167,9 +176,8 @@ void setChannel(unsigned int *mask, short channel, unsigned int *index,
 }
 
 /**
-*	Call the setChannel(..) method to set
-*	the six channel  of one int bitmask
-**/
+ * Call the setChannel(..) method to set the six channels of one int bitmask.
+ */
 void setCtr(unsigned int *mask, short ch1, short ch2, short ch3, short ch4,
             short ch5, short ch6)
 {
@@ -185,12 +193,12 @@ void setCtr(unsigned int *mask, short ch1, short ch2, short ch3, short ch4,
 }
 
 /**
-*	Reads the byte buffer received by comport
-*	and set paired bytes to their primary meaning
-*	of a short value. Call the setCtr(...)
-*	At the end call the fillbyteArray() method
-*	to copy the five int bitmask to one byte array
-**/
+ * Reads a byte buffer received from the USB programming port.
+ * 1. Convert high and low bytes to original short values.
+ * 2. Call the setCtr(..)
+ * 3. Call the fillbyteArray() method to copy the five int bitmask to one byte
+ *    array.
+ */
 void setCtrBitmasks(byte *rbuffer)
 {
     for (int i = 0; i < 5; i++)
@@ -201,6 +209,7 @@ void setCtrBitmasks(byte *rbuffer)
         short ch4 = (short) ((rbuffer[i * 12 + 6] << 8) | rbuffer[i * 12 + 7]);
         short ch5 = (short) ((rbuffer[i * 12 + 8] << 8) | rbuffer[i * 12 + 9]);
         short ch6 = (short) ((rbuffer[i * 12 + 10] << 8) | rbuffer[i * 12 + 11]);
+
         switch (i)
         {
             case 0:
@@ -222,23 +231,23 @@ void setCtrBitmasks(byte *rbuffer)
                 break;
         }
     }
+
     fillByteArray();
 }
 
 /**
-*	Get the registry pointer and the registry masks
-*	Pins 3 to 7 belongs to same registry pointer
-*	so get any of them e.x. 5
-**/
+ * Get the registry pointer and the registry masks. Pins 3 to 7 belong to same
+ * registry pointer, so get any of them (e.g. 5).
+ */
 void initREG()
 {
     PIN_REG = portOutputRegister(digitalPinToPort(5));
 }
 
 /**
-*	If we get some buffer overflow we need to clear
-*	the serial buffer, so read it until it is empty
-**/
+ * If we get some buffer overflow we need to clear the serial buffer, so read
+ * until it is empty.
+ */
 void clearBuffer()
 {
     while (Serial.available())
@@ -247,6 +256,9 @@ void clearBuffer()
     }
 }
 
+/**
+ * Arduinos setup method. Initialize pins, serial and libs.
+ */
 void setup()
 {
     // set pins 3 .. 7 as outputs
@@ -261,7 +273,7 @@ void setup()
 
     // setup the serial port
     Serial.begin(115200);
-    
+
     // get registry pointer
     initREG();
 
@@ -269,14 +281,14 @@ void setup()
     initFixBmPart();
     initialBMPart(initBMBuffer);
     setCtrBitmasks(initBMBuffer);
-    
+
     // clear serial buffer
     clearBuffer();
     Serial.flush();
 
     // wait a moment
     delay(1000);
-    
+
     // send a o.k. to the remote pc,
     // and let the communication begin
     Serial.write(AXX_DELIMITER);
@@ -288,20 +300,19 @@ void setup()
 }
 
 /**
-*    Sets Pins 3 to 7 to high state
-*    0x37E00000 => 00110111111000000000000000000000
-**/
+ * Sets Pins 3 to 7 to high state
+ * 0x37E00000 => 00110111111000000000000000000000
+ */
 void setDigOutToHighLevel()
 {
     *PIN_REG = 0x37E00000;
 }
 
 /**
-*	This function is called by interrupt timer any 2 us
-*	Output pins 3...7 will be set by current value
-*	of the bitmask bArray by given ms which represent
-*	the elapsed time
-**/
+ * This function is called by the interrupt timer every 2us. Output pins 3..7
+ * will be set to the current value of the bitmask bArray by given ms which
+ * represent the elapsed time
+ */
 void setDigOut()
 {
     if (us <= 11980)
@@ -326,19 +337,18 @@ void setDigOut()
 }
 
 /**
-*	Starts timer 0
-**/
+ * Starts timer 0.
+ */
 void startTimer0()
 {
     Timer0.start();
 }
 
 /**
-*	During the SYNC period the serial port will be 
-*	check for new data with signal information
-*	If new data is arrived a new bitmask will be 
-*	create by calling the setCtrBitmask(...) 
-**/
+ * During the SYNC period the serial port will be checked for new data with
+ * signal information. If new data has arrived, a new bitmask will be created by
+ * calling the setCtrBitmask(..) method.
+ */
 void createNewSignalBitmask()
 {
     if (Serial.available() == ATP_FRAME_LENGTH)
