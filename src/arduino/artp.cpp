@@ -17,7 +17,6 @@
  *       @date:   03.06.2014
  *****************************************************/
 
-#include <iostream>
 #include "artp.h"
 
 ArTP::ArTP(const std::string name, std::string serial,
@@ -26,25 +25,61 @@ ArTP::ArTP(const std::string name, std::string serial,
 {
     this->first = true;
 
+    int low = atp_center_value_offset - atp_value_range_scale;
+    int neutral = atp_center_value_offset;
+
     for (int i = 0; i < ATP_N_RADIOS; i++)
     {
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6_init_value);
-        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6_init_value);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(low);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(low);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(neutral);
+        this->frame[i * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(neutral);
     }
 }
 
 ArTP::~ArTP()
 {
+}
+
+void ArTP::addTxModule(AbstractTxModule *txModule)
+{
+    // this is a dsmx module
+    DSMXModule *module = static_cast<DSMXModule *>(txModule);
+
+    // add the txModule config to our map of configs
+    RadioConfig config = module->getRadioConfig();
+    int tx = boost::lexical_cast<int>(config.txId);
+
+    int ch1 = atp_center_value_offset + int(module->getThrottle() * atp_value_range_scale);
+    int ch2 = atp_center_value_offset + int(module->getRoll() * atp_value_range_scale);
+    int ch3 = atp_center_value_offset + int(module->getPitch() * atp_value_range_scale);
+    int ch4 = atp_center_value_offset + int(module->getYaw() * atp_value_range_scale);
+    int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
+    int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
+
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
+    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
+
+    // notify ArXX about add Radio
+    ArXX::addTxModule(txModule);
 }
 
 void ArTP::onData(const char *frame, size_t length)
@@ -57,6 +92,7 @@ void ArTP::onData(const char *frame, size_t length)
     else if (length == 1 && frame[0] == AXX_DELIMITER)
     {
         // cool
+        //BOOST_LOG_TRIVIAL(info) << "Correct frame received";
     }
     else
     {
@@ -70,7 +106,7 @@ void ArTP::onData(const char *frame, size_t length)
 
 void ArTP::writeData()
 {
-    for (auto entry: this->modules)
+    for (auto const entry: this->modules)
     {
         AbstractTxModule *module = entry.second;
 
@@ -78,14 +114,14 @@ void ArTP::writeData()
         std::string txIdStr = module->getModuleId();
         int id = boost::lexical_cast<int>(txIdStr);
 
-        int ch1 = this->center_value_offset + int(module->getThrottle() * this->value_range_scale);
-        int ch2 = this->center_value_offset + int(module->getRoll() * this->value_range_scale);
-        int ch3 = this->center_value_offset + int(module->getPitch() * this->value_range_scale);
-        int ch4 = this->center_value_offset + int(module->getYaw() * this->value_range_scale);
-        int ch5 = this->center_value_offset + int(module->getGear() * this->value_range_scale);
-        int ch6 = this->center_value_offset + int(module->getAux1() * this->value_range_scale);
+        int ch1 = atp_center_value_offset + int(module->getThrottle() * atp_value_range_scale);
+        int ch2 = atp_center_value_offset + int(module->getRoll() * atp_value_range_scale);
+        int ch3 = atp_center_value_offset + int(module->getPitch() * atp_value_range_scale);
+        int ch4 = atp_center_value_offset + int(module->getYaw() * atp_value_range_scale);
+        int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
+        int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
 
-        std::cout << id << ": " << ch1 << " " << ch2 << " " << ch3 << " " << ch4 << " " << ch5 << " " << ch6 << std::endl;
+        //std::cout << id << ": " << ch1 << " " << ch2 << " " << ch3 << " " << ch4 << " " << ch5 << " " << ch6 << std::endl;
 
         // write to byte frame
         this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);

@@ -22,6 +22,7 @@
 
 #include "arxx.h"
 #include "atpdefinitions.h"
+#include "trainerportconstants.h"
 
 /**
  * Software-side class for communication with the software running on the
@@ -42,30 +43,31 @@ public:
     /// Destructor.
     virtual ~ArTP();
 
+    /**
+     * Overwrite addTxModule function for getting the transmitter ids
+     * @param the AbstractRadio to add to this transmitter
+     */
+    void addTxModule(AbstractTxModule *txModule);
+
 private:
 
+    /**
+     * Receive data from the serial port.
+     * @param frame The data frame.
+     * @param length The lenght of the data frame.
+     */
     void onData(const char *frame, size_t length);
 
     /**
-     *  write data to serial port
+     * Send data to the serial port.
      */
     void writeData();
 
-    /// offset from channel offset to center value
-    static const int center_value_offset = 1115;
-    /// scale from normalized values -1...1 to trainer port values 700...1530
-    static const int value_range_scale = 0x19F;
-
+    /// Flag for the first incoming message
     bool first;
 
+    /// The data frame
     unsigned char frame[ATP_FRAME_LENGTH];
-
-    static const int ch1_init_value = 0x2BC; // extern signal
-    static const int ch2_init_value = 0x45b; // extern signal
-    static const int ch3_init_value = 0x45b; // extern signal
-    static const int ch4_init_value = 0x45b; // extern signal
-    static const int ch5_init_value = 0x5fa; // extern signal
-    static const int ch6_init_value = 0x45b; // extern signal
 };
 
 #endif /* ARTP_H */

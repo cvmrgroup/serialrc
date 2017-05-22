@@ -28,6 +28,10 @@ ArTT::ArTT(std::string name, std::string serial,
     this->token = 0;
 }
 
+ArTT::~ArTT()
+{
+}
+
 void ArTT::addTxModule(AbstractTxModule *txModule)
 {
     // this is a dsmx module

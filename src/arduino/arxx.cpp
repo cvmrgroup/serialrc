@@ -29,6 +29,10 @@ ArXX::ArXX(const std::string name, int maxNumberOfRadios,
     this->maxNumberOfModules = maxNumberOfRadios;
 }
 
+ArXX::~ArXX()
+{
+}
+
 void ArXX::open()
 {
     std::string deviceDescription;
@@ -64,7 +68,7 @@ void ArXX::open()
         throw RadioException(ex);
     }
 
-    // set the serial port opetions
+    // set the serial port options
     this->serialPort->set_option(boost::asio::serial_port::baud_rate(115200));
     this->serialPort->set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
     this->serialPort->set_option(boost::asio::serial_port::character_size(boost::asio::serial_port::character_size(8)));
@@ -72,7 +76,7 @@ void ArXX::open()
     this->serialPort->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));
 
     // the delay to wait for the serial port, before start reading
-    boost::posix_time::milliseconds readDelay(600);
+    boost::posix_time::milliseconds readDelay(200);
     // create the async deadline_timer
     boost::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(*this->ioService));
     // set the wait delay to the timer
@@ -251,7 +255,7 @@ int ArXX::getMaxNumberOfRadios()
 
 int ArXX::getNumberOfRadios()
 {
-    return this->modules.size();
+    return (int) this->modules.size();
 }
 
 void ArXX::addTxModule(AbstractTxModule *txModule)

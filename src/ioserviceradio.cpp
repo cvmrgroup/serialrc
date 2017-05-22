@@ -62,7 +62,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 #endif
 
 #ifdef WITH_CRAZYRADIO
-    if (sender.compare("crazy") == 0)
+    if (sender.compare("crazyradio") == 0)
     {
         tx = new CrazyRadioTransmitter(sender, this->io_service);
     }
@@ -125,7 +125,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     }
 
 #ifdef WITH_CRAZYRADIO
-    if (sender.compare("crazy") == 0)
+    if (sender.compare("crazyradio") == 0)
     {
         module = new CrazyRadioModule(copterId, config.transmitter, config.txId);
     }

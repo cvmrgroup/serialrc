@@ -35,6 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include "dsmxmodule.h"
 #include "serialhelper.h"
 #include "i_transmitter.h"
 #include "radioexception.h"
@@ -57,6 +58,8 @@ public:
     ArXX(const std::string name, int maxNumberOfRadios,
          std::string serialNumber,
          boost::shared_ptr<boost::asio::io_service> io_service);
+
+    virtual ~ArXX();
 
 private:
 

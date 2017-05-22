@@ -29,12 +29,12 @@
  *
  *  |---------------------- 22ms ---------------------|
  *
- *  A..F  PULSE      700-1530 us
- *  P     PAUSE           400 us
+ *  A..F  PULSE  516-1710 us (at 150% max servo travel)
+ *  P     PAUSE       400 us
  *
- *  SYNC   22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
+ *  SYNC  22ms - (|A|+|B|+|C|+|D|+|E|+|F|+7*|P|)
  *
- *  PINS 3..7
+ *  PINS  3..7
  *
  */
 
@@ -46,12 +46,14 @@
 #define ERROR_LED 53
 
 /**
- * For 7 Pause and 6 channel with full extent we need at least
- * 7 * 400 + 6 * 1530 = 11980 bits to encode any posible state of the signal
- * during the SYNC phase the aoutput can just be set to high
- * Using an unsigned integer for the bitmask we need at least an array of size 11980 / 32 = 374,375 --> 375
+ * For 7 pauses and 6 channels at full servo travel we need at least
+ *   7 * 400 + 6 * 1710 = 13060 bits
+ * to encode any possible state of the signal.
+ * During the SYNC phase the output is set to high.
+ * Using an unsigned integer for the bitmask we at least need an array of size
+ *   13060 / 32 = 408,125 --> 409
  */
-#define MASK_LENGTH 375
+#define MASK_LENGTH 409
 
 // current signal state in micro seconds
 int us = 0;
@@ -261,7 +263,7 @@ void clearBuffer()
  */
 void setup()
 {
-    // set pins 3 .. 7 as outputs
+    // set pins 3..7 as outputs
     pinMode(3, OUTPUT);
     pinMode(4, OUTPUT);
     pinMode(5, OUTPUT);
@@ -271,9 +273,6 @@ void setup()
     pinMode(ERROR_LED, OUTPUT);
     digitalWrite(ERROR_LED, LOW);
 
-    // setup the serial port
-    Serial.begin(115200);
-
     // get registry pointer
     initREG();
 
@@ -282,18 +281,20 @@ void setup()
     initialBMPart(initBMBuffer);
     setCtrBitmasks(initBMBuffer);
 
+    // setup the serial port
+    Serial.begin(115200);
+
     // clear serial buffer
     clearBuffer();
     Serial.flush();
 
-    // wait a moment
+    // wait a second
     delay(1000);
 
-    // send a o.k. to the remote pc,
-    // and let the communication begin
+    // initiate communication with remote pc
     Serial.write(AXX_DELIMITER);
 
-    // Setup the two interrupt timer
+    // setup the two interrupt timer
     Timer0.attachInterrupt(setDigOut).setPeriod(2);
     Timer1.attachInterrupt(startTimer0).setPeriod(22000);
     Timer1.start();
@@ -315,7 +316,7 @@ void setDigOutToHighLevel()
  */
 void setDigOut()
 {
-    if (us <= 11980)
+    if (us <= 13060)
     {
         unsigned int regTMP = 0x20000000;
         regTMP |= ((bArray[us] & 1) << 28);
