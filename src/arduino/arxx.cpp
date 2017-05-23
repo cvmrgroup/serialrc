@@ -147,23 +147,18 @@ void ArXX::readData()
         return;
     }
 
-    // create the new streambuf
-    boost::shared_ptr<boost::asio::streambuf> buf(new boost::asio::streambuf());
     // read until semicolon
-    boost::asio::async_read_until(*this->serialPort, *buf, AXX_DELIMITER,
+    boost::asio::async_read_until(*this->serialPort, this->response, AXX_DELIMITER,
                                   boost::bind(&ArXX::onDataRead,
                                               this,
                                               boost::asio::placeholders::error,
-                                              buf,
                                               boost::asio::placeholders::bytes_transferred));
 }
 
-void ArXX::onDataRead(boost::system::error_code ec,
-                      boost::shared_ptr<boost::asio::streambuf> buf,
-                      size_t bytes)
+void ArXX::onDataRead(boost::system::error_code ec, size_t bytes_transferred)
 {
     // check if an error happens
-    if (ec)
+    if (ec || !bytes_transferred)
     {
         // create the exception string
         std::string ex = boost::str(boost::format("Failed reading data from serial port with S/N [ %1% ]: [ %2% ].") % this->serialNumber % ec.message());
@@ -173,24 +168,17 @@ void ArXX::onDataRead(boost::system::error_code ec,
         throw RadioException(ex);
     }
 
+    std::istream istream(&this->response);
+    std::string str;
+    istream >> str;
+    // clear EOF bit
+    istream.clear();
+
+    // notify about received message
+    this->onData(str);
+
     // read the next data
     this->readData();
-
-    // check if same bytes read
-    if (bytes <= 0)
-    {
-        return;
-    }
-
-    // create the input stream
-    std::istream input(buf.get());
-
-    // create the array with the buffer
-    char data[bytes];
-    // read the bytes from the input stream
-    input.read(data, bytes);
-    // notify about received data
-    this->onData(data, bytes);
 }
 
 void ArXX::writeFrame(const char *frame, size_t length)
@@ -242,6 +230,7 @@ void ArXX::close()
     if (this->serialPort && this->serialPort->is_open())
     {
         // close the serial port
+        BOOST_LOG_TRIVIAL(info) << "Closing serial connection.";
         this->serialPort->close();
     }
 }

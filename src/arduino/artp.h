@@ -56,7 +56,7 @@ private:
      * @param frame The data frame.
      * @param length The lenght of the data frame.
      */
-    void onData(const char *frame, size_t length);
+    void onData(std::string frame);
 
     /**
      * Send data to the serial port.

@@ -82,14 +82,14 @@ void ArTP::addTxModule(AbstractTxModule *txModule)
     ArXX::addTxModule(txModule);
 }
 
-void ArTP::onData(const char *frame, size_t length)
+void ArTP::onData(std::string frame)
 {
     if (this->first)
     {
-        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << std::string(frame) << " ].";
+        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << frame << " ].";
         this->first = false;
     }
-    else if (length == 1 && frame[0] == AXX_DELIMITER)
+    else if (frame[0] == AXX_DELIMITER)
     {
         // cool
         //BOOST_LOG_TRIVIAL(info) << "Correct frame received";

@@ -17,6 +17,7 @@
  *       @date:   13.05.2014
  *****************************************************/
 
+#include <iostream>
 #include "artt.h"
 
 ArTT::ArTT(std::string name, std::string serial,
@@ -24,7 +25,7 @@ ArTT::ArTT(std::string name, std::string serial,
         ArXX(name, ATT_MAX_RADIOS, serial, io_service)
 {
     this->first = true;
-    this->lastModule = -1;
+    this->lastModuleId = -1;
     this->token = 0;
 }
 
@@ -37,8 +38,12 @@ void ArTT::addTxModule(AbstractTxModule *txModule)
     // this is a dsmx module
     DSMXModule *module = static_cast<DSMXModule *>(txModule);
 
-    // add the txModule config to our map of configs
-    this->configs.push_back(module->getRadioConfig());
+    // get id as int
+    int id = boost::lexical_cast<int>(module->getModuleId());
+
+    // add the txModule to our configs list
+    this->configs[id] = module->getRadioConfig();
+    this->moduleIds.push_back(id);
 
     // notify ArXX about add Radio
     ArXX::addTxModule(txModule);
@@ -51,44 +56,44 @@ void ArTT::close()
     ArXX::close();
 }
 
-void ArTT::onData(const char *frame, size_t length)
+void ArTT::onData(std::string frame)
 {
     // get current transmitter id, increment token, remember tx for next call
-    int tx = boost::lexical_cast<int>(this->configs[this->token].txId);
+    int moduleId = boost::lexical_cast<int>(this->moduleIds[this->token]);
     this->token = (this->token + 1) % (unsigned int) this->configs.size();
 
     // just ignore the first message (kind of flush serial buffer)
     if (this->first)
     {
-        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << std::string(frame) << " ].";
+        BOOST_LOG_TRIVIAL(info) << "First serial message ignored successfully [ " << frame << " ].";
         this->first = false;
     }
-    else if (length == 3 && frame[2] == AXX_DELIMITER)
+    else if (frame[2] == AXX_DELIMITER)
     {
-        int id = (int) frame[0];
-        int type = (int) frame[1];
+        int responseId = (int) frame[0];
+        int responseType = (int) frame[1];
 
-        if (this->lastModule != id)
+        if (this->lastModuleId != responseId)
         {
-            BOOST_LOG_TRIVIAL(error) << "Reply did not match last command [ " << this->lastModule << "!=" << id << " ].";
+            BOOST_LOG_TRIVIAL(error) << "Reply did not match last command [ " << this->lastModuleId << "!=" << moduleId << " ].";
         }
 
-        if (this->lastModule == id && type == ATT_FRAME_TYPE_CONFIG)
+        if (this->lastModuleId == responseId && responseType == ATT_FRAME_TYPE_CONFIG)
         {
-            this->configs[id].initialized = true;
-            BOOST_LOG_TRIVIAL(info) << "Transmitter [ " << id << " ] configured.";
+            this->configs[this->lastModuleId].initialized = true;
+            BOOST_LOG_TRIVIAL(info) << "Transmitter [ " << this->lastModuleId << " ] configured.";
         }
     }
     else
     {
-        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ], message [ %2% ].") % this->getSerialNumber() % std::string(frame));
+        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ], message [ %2% ].") % this->getSerialNumber() % frame);
         BOOST_LOG_TRIVIAL(info) << ex;
         throw RadioException(ex);
     }
 
-    this->writeData(tx);
+    this->writeData(moduleId);
 
-    this->lastModule = tx;
+    this->lastModuleId = moduleId;
 }
 
 void ArTT::writeData(int id)
@@ -126,8 +131,6 @@ void ArTT::writeData(int id)
         int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
         int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
         int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
-
-        //std::cout << ch1 << " " << ch2 << " " << ch3 << " " << ch4 << " " << ch5 << " " << ch6 << std::endl;
 
         // write to byte frame
         frame[ATT_CH1_HI] = SerialHelper::hiByte(ch1);

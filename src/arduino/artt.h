@@ -62,7 +62,7 @@ private:
      * @param frame The data frame.
      * @param length Length of the array.
      */
-    void onData(const char *frame, size_t length);
+    void onData(std::string frame);
 
     /**
      * Write data to the serial port.
@@ -71,10 +71,11 @@ private:
     void writeData(int id = 0);
 
     /// Radio configs.
-    std::vector<RadioConfig> configs;
+    std::unordered_map<int, RadioConfig> configs;
+    std::vector<int> moduleIds;
 
     /// The tx id the last frame was sent to.
-    int lastModule;
+    int lastModuleId;
 
     /// We need to know the first serial message arrives to ignore it.
     bool first;

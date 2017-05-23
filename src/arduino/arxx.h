@@ -71,7 +71,6 @@ private:
     void readData();
 
     void onDataRead(boost::system::error_code ec,
-                    boost::shared_ptr<boost::asio::streambuf> buf,
                     size_t bytes);
 
     void onDataWritten(boost::system::error_code ec,
@@ -111,7 +110,7 @@ protected:
      * @param frame The received frame as char array.
      * @param length The length of the received frame.
      */
-    virtual void onData(const char *frame, size_t length) = 0;
+    virtual void onData(std::string frame) = 0;
 
     /**
      * Write the given frame to the serial port.
@@ -139,6 +138,9 @@ private:
 
     /// The serial port.
     boost::shared_ptr<boost::asio::serial_port> serialPort;
+
+    /// The response stream buffer
+    boost::asio::streambuf response;
 };
 
 #endif //ARXX_H
