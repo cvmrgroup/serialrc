@@ -284,13 +284,6 @@ void setup()
     // setup the serial port
     Serial.begin(115200);
 
-    // clear serial buffer
-    clearBuffer();
-    Serial.flush();
-
-    // wait a second
-    delay(1000);
-
     // initiate communication with remote pc
     Serial.write(AXX_DELIMITER);
 

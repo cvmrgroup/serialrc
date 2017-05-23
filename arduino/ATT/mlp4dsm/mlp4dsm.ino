@@ -49,26 +49,19 @@ void setup()
     tx[1].init(&Serial2, RLA_2);
     tx[2].init(&Serial3, RLA_3);
 
-    // inititialize serial connection to computer
-    Serial.begin(115200);
-
-    // clear buffer
-    clearBuffer();
-    Serial.flush();
-
     pinMode(12, OUTPUT);
     pinMode(ERROR_LED, OUTPUT);
 
     digitalWrite(12, LOW);
     digitalWrite(ERROR_LED, LOW);
 
-    delay(1000);
-
     byte hi[3];
     hi[0] = (byte) 'h';
     hi[1] = (byte) 'i';
     hi[2] = AXX_DELIMITER;
-
+    
+    // inititialize serial connection to computer
+    Serial.begin(115200);
     Serial.write(hi, 3);
 }
 
@@ -80,13 +73,13 @@ void loop()
         byte rbuffer[ATT_FRAME_LENGTH];
         int bytesRead = Serial.readBytes(rbuffer, ATT_FRAME_LENGTH);
 
-        byte reply[3];
-        reply[0] = (byte) 0;
-        reply[1] = (byte) 0;
-        reply[2] = AXX_DELIMITER;
-
         if (bytesRead == ATT_FRAME_LENGTH)
         {
+            byte reply[3];
+            reply[0] = (byte) '!';
+            reply[1] = (byte) '?';
+            reply[2] = AXX_DELIMITER;
+
             // get id
             byte bid = rbuffer[ATT_TX_ID];
             byte bftype = rbuffer[ATT_FRAME_TYPE];
@@ -107,6 +100,7 @@ void loop()
             else if (ftype == ATT_FRAME_TYPE_SIGNAL)
             {
                 reply[0] = bid;
+                reply[1] = bftype;
                 
                 // set data in transmitter
                 tx[id].setChannels(
