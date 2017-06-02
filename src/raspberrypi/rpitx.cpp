@@ -91,7 +91,7 @@ bool RpiTX::hasCapacity()
 
 void RpiTX::addTxModule(AbstractTxModule *txModule)
 {
-    if (this->txModule)
+    if (this->module)
     {
         std::string ex = "Raspi Radio already added.";
         BOOST_LOG_TRIVIAL(error) << ex;
@@ -120,7 +120,7 @@ void RpiTX::update(const boost::system::error_code &ec)
         throw RadioException(ex);
     }
 
-    if (!this->txModule)
+    if (!this->module)
     {
         std::string ex = "No radio set.";
         BOOST_LOG_TRIVIAL(error) << ex;
@@ -129,6 +129,8 @@ void RpiTX::update(const boost::system::error_code &ec)
 
     unsigned char frame[DSM_FRAME_LENGTH] = {};
 
+    DSMXModule *radio = this->module;
+    
     // prepare array and send signal
     frame[header_1] = (unsigned char) radio->isBinding() ? header_1_bind_mode : header_1_default;
     frame[header_2] = (unsigned char) header_2_default;

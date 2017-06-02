@@ -69,9 +69,9 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 #endif
 
 #ifdef WITH_RASPBERRYPI
-    if (transmitter.compare("raspberrypi") == 0)
+    if (sender.compare("raspberrypi") == 0)
     {
-        tx = new RpiTX(transmitter, this->io_service);
+        tx = new RpiTX(sender, this->io_service);
     }
 #endif
 
