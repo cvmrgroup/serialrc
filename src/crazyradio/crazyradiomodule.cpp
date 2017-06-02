@@ -96,14 +96,6 @@ void CrazyRadioModule::setBindSignal()
 {
 }
 
-void CrazyRadioModule::setArmSignal()
-{
-}
-
-void CrazyRadioModule::setDisarmSignal()
-{
-}
-
 void CrazyRadioModule::toggleGear()
 {
 }

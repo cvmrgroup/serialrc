@@ -31,13 +31,9 @@ private:
 
     // /////////////////////////////////////////////////////////////////////////
 
-    void onArmCommand(IRadioCommand *command, AbstractTxModule *radio);
-
     void onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onControlCommand(IRadioCommand *command, AbstractTxModule *radio);
-
-    void onDisarmCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onEmergencyCommand(IRadioCommand *command, AbstractTxModule *radio);
 

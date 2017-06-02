@@ -11,10 +11,8 @@ CommandExecutor::CommandExecutor()
 
 void CommandExecutor::initializeBindings()
 {
-    this->bindings[RadioCommandType::ARM] = boost::bind(&CommandExecutor::onArmCommand, this, _1, _2);
     this->bindings[RadioCommandType::BIND_TRANSMITTER] = boost::bind(&CommandExecutor::onBindTransmitterCommand, this, _1, _2);
     this->bindings[RadioCommandType::CONTROL] = boost::bind(&CommandExecutor::onControlCommand, this, _1, _2);
-    this->bindings[RadioCommandType::DISARM] = boost::bind(&CommandExecutor::onDisarmCommand, this, _1, _2);
     this->bindings[RadioCommandType::EMERGENCY] = boost::bind(&CommandExecutor::onEmergencyCommand, this, _1, _2);
     this->bindings[RadioCommandType::RESUME_COPTER] = boost::bind(&CommandExecutor::onResumeCopterCommand, this, _1, _2);
     this->bindings[RadioCommandType::SUSPEND_COPTER] = boost::bind(&CommandExecutor::onSuspendCopterCommand, this, _1, _2);
@@ -49,12 +47,6 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractTxModule *radio)
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void CommandExecutor::onArmCommand(IRadioCommand *command, AbstractTxModule *radio)
-{
-    // set the arm signal
-    radio->setArmSignal();
-}
-
 void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command,
                                                AbstractTxModule *radio)
 {
@@ -73,13 +65,6 @@ void CommandExecutor::onControlCommand(IRadioCommand *command,
         // update the controls
         radio->setControls(u[0], u[1], u[2], u[3]);
     }
-}
-
-void CommandExecutor::onDisarmCommand(IRadioCommand *command,
-                                      AbstractTxModule *radio)
-{
-    // set the disarm signal
-    radio->setDisarmSignal();
 }
 
 void CommandExecutor::onResumeCopterCommand(IRadioCommand *command,

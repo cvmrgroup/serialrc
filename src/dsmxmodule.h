@@ -59,8 +59,6 @@ public:
 
     void toggleAux1();
 
-    void setSuspensionSignal();
-
     void setArmSignal();
 
     void setDisarmSignal();

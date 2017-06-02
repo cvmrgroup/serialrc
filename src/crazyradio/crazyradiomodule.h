@@ -51,10 +51,6 @@ public:
 
     void setBindSignal();
 
-    void setArmSignal();
-
-    void setDisarmSignal();
-
     void toggleGear();
 
     void toggleAux1();

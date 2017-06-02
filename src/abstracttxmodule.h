@@ -95,23 +95,6 @@ public:
     virtual void suspend(bool suspend) = 0;
 
     /**
-     * Sets the suspension signal (lower throttle lever position).
-     */
-    virtual void setSuspensionSignal() = 0;
-
-    /**
-     * This method sends low throttle and full yaw to arm multiwii copter.
-     * @param id The transmitter id.
-     */
-    virtual void setArmSignal() = 0;
-
-    /**
-     * This method sends low throttle and low yaw to disarm multiwii copter.
-     * @param id The transmitter id.
-     */
-    virtual void setDisarmSignal() = 0;
-
-    /**
      * Method to set commands by flight control. Values normalized
      * between -1.0 and 1.0
      * @param ch1 Normalized throttle value.

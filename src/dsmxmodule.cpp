@@ -23,9 +23,15 @@ DSMXModule::DSMXModule(int copterId, RadioConfig &config) :
         AbstractTxModule(copterId, config.transmitter, config.txId)
 {
     this->config = config;
-    this->setSuspensionSignal();
+
+    this->signal[Throttle] = -config.channels[Throttle].travel;
+    this->signal[Aileron] = 0.;
+    this->signal[Elevation] = 0.;
+    this->signal[Rudder] = 0.;
     this->signal[Gear] = this->config.channels[Gear].getSwitchValue();
     this->signal[Aux1] = this->config.channels[Aux1].getSwitchValue();
+
+    this->setDisarmSignal();
 }
 
 DSMXModule::~DSMXModule()
@@ -58,18 +64,19 @@ void DSMXModule::suspend(bool suspended)
 
     if (this->suspended)
     {
-        this->setSuspensionSignal();
+        this->signal[Throttle] = -config.channels[Throttle].travel;
+        this->setDisarmSignal(); // if provided
+    }
+    else
+    {
+        this->setArmSignal(); // if provided
     }
 }
 
 void DSMXModule::toggleSuspension()
 {
     this->suspended = !this->suspended;
-
-    if (this->suspended)
-    {
-        this->setSuspensionSignal();
-    }
+    this->suspend(this->suspended);
 }
 
 void DSMXModule::setBindSignal()
@@ -105,24 +112,38 @@ void DSMXModule::toggleAux1()
     this->signal[Aux1] = this->config.channels[Aux1].nextPosition();
 }
 
-void DSMXModule::setSuspensionSignal()
-{
-    for (int i = 1; i < 4; i++)
-    {
-        this->signal[i] = 0.0;
-    }
-
-    this->signal[Throttle] = -config.channels[Throttle].travel;
-}
-
 void DSMXModule::setArmSignal()
 {
-    std::copy(std::begin(this->config.armSignal), std::end(this->config.armSignal), std::begin(this->signal));
+    if (this->config.armSignalProvided)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (this->config.armSignalMask[i])
+            {
+                this->signal[i] = this->config.channels[i].getServoTravel(this->config.armSignal[i]);
+            }
+        }
+    }
+
+    // sync with suspension
+    this->suspended = false;
 }
 
 void DSMXModule::setDisarmSignal()
 {
-    std::copy(std::begin(this->config.disarmSignal), std::end(this->config.disarmSignal), std::begin(this->signal));
+    if (this->config.disarmSignalProvided)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (this->config.disarmSignalMask[i])
+            {
+                this->signal[i] = this->config.channels[i].getServoTravel(this->config.disarmSignal[i]);
+            }
+        }
+    }
+
+    // sync with suspension
+    this->suspended = true;
 }
 
 void DSMXModule::emergencyStop(bool emergency)
