@@ -47,7 +47,7 @@ void CrazyRadioTransmitter::close()
 void CrazyRadioTransmitter::run()
 {
     // display info message
-    BOOST_LOG_TRIVIAL(info) << "starting crazyradio thread...";
+    BOOST_LOG_TRIVIAL(info) << "Starting crazyradio thread...";
     // initialize the radio
     this->initialize();
 
@@ -65,7 +65,7 @@ void CrazyRadioTransmitter::run()
         }
         catch (boost::thread_interrupted &)
         {
-            BOOST_LOG_TRIVIAL(error) << "the crazy radio thread has been interrupred";
+            BOOST_LOG_TRIVIAL(error) << "Crazyradio thread interrupted.";
         }
     }
 
@@ -73,7 +73,7 @@ void CrazyRadioTransmitter::run()
     this->cleanup();
 
     // display info message
-    BOOST_LOG_TRIVIAL(info) << "crazyradio thread stopped";
+    BOOST_LOG_TRIVIAL(info) << "Crazyradio thread stopped.";
 }
 
 void CrazyRadioTransmitter::initialize()
@@ -85,7 +85,7 @@ void CrazyRadioTransmitter::initialize()
     // the url to open the crazy radio
     std::string crazyRadioUrl = this->currentRadio;
 
-    BOOST_LOG_TRIVIAL(info) << "connecting crazyflie with radio url [ " << crazyRadioUrl << " ]";
+    BOOST_LOG_TRIVIAL(info) << "Connecting crazyflie with crazyradio url [ " << crazyRadioUrl << " ].";
 
     // create a new radio
     this->radio = boost::shared_ptr<CCrazyRadio>(new CCrazyRadio(crazyRadioUrl));
@@ -105,7 +105,7 @@ void CrazyRadioTransmitter::initialize()
         // set running to false
         this->running = false;
         // create the exception string
-        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ]") % crazyRadioUrl);
+        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ].") % crazyRadioUrl);
         // display the error
         BOOST_LOG_TRIVIAL(error) << ex;
         // throw an radio exception
