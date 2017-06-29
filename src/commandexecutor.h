@@ -13,9 +13,9 @@
 #include <boost/log/trivial.hpp>
 
 #include <radio/i_radiocommand.h>
+#include <radio/abstracttxmodule.h>
 #include <radio/commands/controlcommand.h>
 
-#include "abstracttxmodule.h"
 #include "radioexception.h"
 
 class CommandExecutor

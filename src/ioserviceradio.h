@@ -17,11 +17,16 @@
 #include <radio/i_radio.h>
 #include <radio/commands/controlcommand.h>
 
-#include "i_transmitter.h"
+#include <radio/i_transmitter.h>
+
+#include <radio/abstracttxmodule.h>
 
 // dsmx tx based modules (arduino and pi)
-#include "abstracttxmodule.h"
 #include "dsmxmodule.h"
+
+// simulation
+#include "dyscotx.h"
+#include "dyscomodule.h"
 
 #ifdef WITH_ARDUINO
 #include "arduino/artp.h"
@@ -60,6 +65,8 @@ private:
     void createRadio(RadioConfig &config);
 
     ITransmitter *createAndGetTransmitter(const std::string sender);
+
+    AbstractTxModule *getTxModule(int copterId);
 
     // /////////////////////////////////////////////////////////////////////////
 

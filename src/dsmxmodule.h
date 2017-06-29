@@ -24,7 +24,7 @@
 
 #include <config/radioconfig.h>
 
-#include "abstracttxmodule.h"
+#include <radio/abstracttxmodule.h>
 
 class DSMXModule : public AbstractTxModule
 {

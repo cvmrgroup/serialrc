@@ -41,7 +41,7 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractTxModule *radio)
         throw RadioException(ex);
     }
 
-    // execute the binded method wfor the given command
+    // execute function bound to the given command
     this->bindings[type](command, radio);
 }
 

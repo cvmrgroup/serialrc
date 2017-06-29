@@ -10,28 +10,37 @@
  *       (%.      Computer Vision & Mixed Reality Group
  *
  *****************************************************/
-/** @copyright:   Hochschule RheinMain,
+/** @copyright    Hochschule RheinMain,
  *                University of Applied Sciences
- *     @author:   Marc Lieser
- *    @version:   1.0
- *       @date:   13.05.2014
- *****************************************************/
+ *     @author    Marc Lieser
+ *    @version    1.0
+ *       @date    27.06.2017
+*****************************************************/
 
-#ifndef ICARUS_CRAZYRADIOMODULE_H
-#define ICARUS_CRAZYRADIOMODULE_H
+#ifndef ICARUS_DYSCOMODULE_H
+#define ICARUS_DYSCOMODULE_H
+
+#include <opencv2/core.hpp>
+
+#include <boost/signals2.hpp>
 
 #include <radio/abstracttxmodule.h>
 
-class CrazyRadioModule : public AbstractTxModule
+class DyscoModule : public AbstractTxModule
 {
-
 public:
 
-    CrazyRadioModule(int id, std::string sender, std::string txId);
+    DyscoModule(int copterId, std::string txName, std::string moduleId);
 
-    virtual ~CrazyRadioModule();
+    virtual ~DyscoModule();
 
     void setControls(double throttle, double roll, double pitch, double yaw);
+
+    void toggleGear();
+
+    void toggleAux1();
+
+    // not implemented /////////////////////////////////////////////////////////
 
     void toggleSuspension();
 
@@ -41,8 +50,6 @@ public:
 
     void setSuspensionSignal();
 
-    // not implemented /////////////////////////////////////////////////////////
-
     void toggleSender();
 
     void turnSenderOn();
@@ -51,9 +58,11 @@ public:
 
     void setBindSignal();
 
-    void toggleGear();
+    // /////////////////////////////////////////////////////////////////////////
 
-    void toggleAux1();
+    boost::signals2::signal<void(int, cv::Vec4d)> onControlCommand;
+    boost::signals2::signal<void(int)> onResetCommand;
+    boost::signals2::signal<void(int)> onHorizonCommand;
 };
 
-#endif //ICARUS_CRAZYRADIOMODULE_H
+#endif //ICARUS_DYSCOMODULE_H

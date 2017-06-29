@@ -10,11 +10,17 @@ IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
     this->started = false;
     this->configs = configs;
     this->io_service = io_service;
+
+    // create tx/module for each config
+    for (auto config : this->configs)
+    {
+        this->createRadio(config);
+    }
 }
 
 IOServiceRadio::~IOServiceRadio()
 {
-    for (auto entry: this->txModules)
+    for (auto entry : this->txModules)
     {
         AbstractTxModule *radio = entry.second;
         delete radio;
@@ -49,6 +55,11 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
 
     // create the correct transmitter
     ITransmitter *tx = NULL;
+
+    if (sender.compare("simulation") == 0)
+    {
+        tx = new DyscoTx(sender);
+    }
 
 #ifdef WITH_ARDUINO
     if (sender.compare("artt") == 0)
@@ -124,6 +135,11 @@ void IOServiceRadio::createRadio(RadioConfig &config)
         module = new DSMXModule(copterId, config);
     }
 
+    if (sender.compare("simulation") == 0)
+    {
+        module = new DyscoModule(copterId, config.transmitter, config.txId);
+    }
+
 #ifdef WITH_CRAZYRADIO
     if (sender.compare("crazyradio") == 0)
     {
@@ -134,7 +150,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     if (!module)
     {
         // create the exception string
-        std::string ex = boost::str(boost::format("Unable to create radio for radio type [ %1% ]") % sender);
+        std::string ex = boost::str(boost::format("Unable to create module for transmitter type [ %1% ]") % sender);
         // display the exception with logger
         BOOST_LOG_TRIVIAL(error) << ex;
         // trow an exception
@@ -149,6 +165,16 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     this->fireRadioEvent(module);
 }
 
+AbstractTxModule *IOServiceRadio::getTxModule(int copterId)
+{
+        if (this->txModules.find(copterId) != this->txModules.end())
+            {
+            return this->txModules[copterId];
+            }
+
+            return NULL;
+}
+
 // /////////////////////////////////////////////////////////////////////////////
 
 void IOServiceRadio::start()
@@ -160,10 +186,10 @@ void IOServiceRadio::start()
 void IOServiceRadio::doStart()
 {
     // create for each given configuration an radio
-    for (auto config : this->configs)
+    /*for (auto config : this->configs)
     {
         this->createRadio(config);
-    }
+    }*/
 
     // start the transmitters
     for (auto entry: this->transmitters)
@@ -260,14 +286,16 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     // check if a radio for the given copter is registered
     if (this->txModules.find(copterId) == this->txModules.end())
     {
-        BOOST_LOG_TRIVIAL(error) << "No radio set for copter [ " << copterId << " ].";
+        BOOST_LOG_TRIVIAL(error) << "No transmitter module set for copter [ " << copterId << " ].";
     }
     else
     {
-        // get th radio for the copter
+        // get the radio for the copter
         AbstractTxModule *radio = this->txModules[copterId];
+
         // execute the command for the found radio
         this->commandExecutor.execute(command, radio);
+
         // fire a radio event, because the state of the radio changed
         this->fireRadioEvent(radio);
     }
