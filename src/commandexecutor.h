@@ -43,11 +43,9 @@ private:
 
     void onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onToggleSuspensionCommand(IRadioCommand *command,
-                                   AbstractTxModule *radio);
+    void onToggleSuspensionCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onToggleTransmitterCommand(IRadioCommand *command,
-                                    AbstractTxModule *radio);
+    void onToggleTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onSwitchGearCommand(IRadioCommand *command, AbstractTxModule *radio);
 
@@ -64,8 +62,7 @@ public:
 
 private:
 
-    std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *,
-                                                              AbstractTxModule *)>> bindings;
+    std::unordered_map<RadioCommandType, boost::function<void(IRadioCommand *, AbstractTxModule *)>> bindings;
 };
 
 #endif //ICARUS_COMMANDEXECUTOR_H

@@ -167,12 +167,12 @@ void IOServiceRadio::createRadio(RadioConfig &config)
 
 AbstractTxModule *IOServiceRadio::getTxModule(int copterId)
 {
-        if (this->txModules.find(copterId) != this->txModules.end())
-            {
-            return this->txModules[copterId];
-            }
+    if (this->txModules.find(copterId) != this->txModules.end())
+    {
+        return this->txModules[copterId];
+    }
 
-            return NULL;
+    return NULL;
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -253,6 +253,7 @@ void IOServiceRadio::fireRadioEvent(AbstractTxModule *radio)
 {
     // create the RadioEvent
     RadioEvent e;
+
     e.copterId = radio->getCopterId();
     e.txName = radio->getTxName();
     e.moduleId = radio->getModuleId();
@@ -291,13 +292,13 @@ void IOServiceRadio::executeCommand(IRadioCommand *command)
     else
     {
         // get the radio for the copter
-        AbstractTxModule *radio = this->txModules[copterId];
+        AbstractTxModule *module = this->txModules[copterId];
 
         // execute the command for the found radio
-        this->commandExecutor.execute(command, radio);
+        this->commandExecutor.execute(command, module);
 
         // fire a radio event, because the state of the radio changed
-        this->fireRadioEvent(radio);
+        this->fireRadioEvent(module);
     }
 
     // remove the command

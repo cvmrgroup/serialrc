@@ -97,13 +97,13 @@ void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command,
 }
 
 void CommandExecutor::onSwitchGearCommand(IRadioCommand *command,
-                                                 AbstractTxModule *radio)
+                                          AbstractTxModule *radio)
 {
     radio->toggleGear();
 }
 
 void CommandExecutor::onSwitchAux1Command(IRadioCommand *command,
-                                                 AbstractTxModule *radio)
+                                          AbstractTxModule *radio)
 {
     radio->toggleAux1();
 }

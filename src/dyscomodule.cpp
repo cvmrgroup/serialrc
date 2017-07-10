@@ -33,6 +33,12 @@ DyscoModule::~DyscoModule()
 void DyscoModule::setControls(double throttle, double roll, double pitch,
                               double yaw)
 {
+    // set control values
+    this->signal[Throttle] = throttle;
+    this->signal[Aileron] = roll;
+    this->signal[Elevation] = pitch;
+    this->signal[Rudder] = yaw;
+
     if (this->onControlCommand.empty())
     {
         BOOST_LOG_TRIVIAL(info) << "onControlCommand callback empty.";
