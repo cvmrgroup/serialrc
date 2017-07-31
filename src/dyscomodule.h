@@ -23,6 +23,7 @@
 #include <opencv2/core.hpp>
 
 #include <boost/signals2.hpp>
+#include <boost/log/trivial.hpp>
 
 #include <radio/abstracttxmodule.h>
 
@@ -32,11 +33,13 @@ public:
 
     DyscoModule(int copterId, std::string txName, std::string moduleId);
 
-    virtual ~DyscoModule();
+    virtual ~DyscoModule() = default;
 
     void setControls(double throttle, double roll, double pitch, double yaw);
 
     void toggleGear();
+
+    void setGear(bool state);
 
     void toggleAux1();
 
@@ -46,7 +49,7 @@ public:
 
     void suspend(bool suspend);
 
-    void emergencyStop(bool emergency = true);
+    void emergencyStop();
 
     void setSuspensionSignal();
 
@@ -62,7 +65,7 @@ public:
 
     boost::signals2::signal<void(int, cv::Vec4d)> onControlCommand;
     boost::signals2::signal<void(int)> onResetCommand;
-    boost::signals2::signal<void(int)> onHorizonCommand;
+    boost::signals2::signal<void(int, bool)> onHorizonCommand;
 };
 
 #endif //ICARUS_DYSCOMODULE_H

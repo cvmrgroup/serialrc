@@ -65,7 +65,7 @@ void CrazyRadioModule::toggleSuspension()
     }
 }
 
-void CrazyRadioModule::emergencyStop(bool emergency)
+void CrazyRadioModule::emergencyStop()
 {
     suspend(true);
 }

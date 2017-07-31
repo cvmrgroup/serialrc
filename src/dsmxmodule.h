@@ -33,7 +33,7 @@ public:
 
     DSMXModule(int copterId, RadioConfig &config);
 
-    virtual ~DSMXModule();
+    virtual ~DSMXModule() = default;
 
     /**
      * Get the radio configuration.
@@ -57,13 +57,15 @@ public:
 
     void toggleGear();
 
+    void setGear(bool state);
+
     void toggleAux1();
 
     void setArmSignal();
 
     void setDisarmSignal();
 
-    void emergencyStop(bool emergency = true);
+    void emergencyStop();
 
 private:
 

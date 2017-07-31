@@ -25,10 +25,6 @@ DyscoTx::DyscoTx(std::string name)
 {
 }
 
-DyscoTx::~DyscoTx()
-{
-}
-
 void DyscoTx::open()
 {
 }

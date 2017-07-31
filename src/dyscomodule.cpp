@@ -17,16 +17,11 @@
  *       @date    27.06.2017
 *****************************************************/
 
-#include <boost/log/trivial.hpp>
 #include "dyscomodule.h"
 
 DyscoModule::DyscoModule(int copterId, std::string txName, std::string moduleId)
         :
         AbstractTxModule(copterId, txName, moduleId)
-{
-}
-
-DyscoModule::~DyscoModule()
 {
 }
 
@@ -56,7 +51,22 @@ void DyscoModule::toggleGear()
         return;
     }
 
-    this->onHorizonCommand(this->copterId);
+    this->horizon = !this->horizon;
+
+    this->onHorizonCommand(this->copterId, this->horizon);
+}
+
+void DyscoModule::setGear(bool state)
+{
+    if (this->onHorizonCommand.empty())
+    {
+        BOOST_LOG_TRIVIAL(info) << "onHorizonCommand callback empty.";
+        return;
+    }
+
+    this->horizon = state;
+
+    this->onHorizonCommand(this->copterId, this->horizon);
 }
 
 void DyscoModule::toggleAux1()
@@ -80,7 +90,7 @@ void DyscoModule::toggleSuspension()
 {
 }
 
-void DyscoModule::emergencyStop(bool emergency)
+void DyscoModule::emergencyStop()
 {
 }
 

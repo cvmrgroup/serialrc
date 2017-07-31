@@ -15,6 +15,7 @@
 #include <radio/i_radiocommand.h>
 #include <radio/abstracttxmodule.h>
 #include <radio/commands/controlcommand.h>
+#include <radio/commands/setgearcommand.h>
 
 #include "radioexception.h"
 
@@ -48,6 +49,8 @@ private:
     void onToggleTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onSwitchGearCommand(IRadioCommand *command, AbstractTxModule *radio);
+
+    void onSetGearCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onSwitchAux1Command(IRadioCommand *command, AbstractTxModule *radio);
 

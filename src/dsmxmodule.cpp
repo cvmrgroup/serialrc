@@ -34,10 +34,6 @@ DSMXModule::DSMXModule(int copterId, RadioConfig &config) :
     this->setDisarmSignal();
 }
 
-DSMXModule::~DSMXModule()
-{
-}
-
 RadioConfig DSMXModule::getRadioConfig()
 {
     return this->config;
@@ -107,6 +103,11 @@ void DSMXModule::toggleGear()
     this->signal[Gear] = this->config.channels[Gear].nextPosition();
 }
 
+void DSMXModule::setGear(bool state)
+{
+    this->signal[Gear] = this->config.channels[Gear].getServoTravel(state ? 1. : -1.);
+}
+
 void DSMXModule::toggleAux1()
 {
     this->signal[Aux1] = this->config.channels[Aux1].nextPosition();
@@ -146,7 +147,7 @@ void DSMXModule::setDisarmSignal()
     this->suspended = true;
 }
 
-void DSMXModule::emergencyStop(bool emergency)
+void DSMXModule::emergencyStop()
 {
     suspend(true);
 }

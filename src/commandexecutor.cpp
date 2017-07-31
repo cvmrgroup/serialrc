@@ -20,6 +20,7 @@ void CommandExecutor::initializeBindings()
     this->bindings[RadioCommandType::TOGGLE_SUSPEND_COPTER] = boost::bind(&CommandExecutor::onToggleSuspensionCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_TRANSMITTER] = boost::bind(&CommandExecutor::onToggleTransmitterCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_GEAR] = boost::bind(&CommandExecutor::onSwitchGearCommand, this, _1, _2);
+    this->bindings[RadioCommandType::SET_GEAR] = boost::bind(&CommandExecutor::onSetGearCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_AUX1] = boost::bind(&CommandExecutor::onSwitchAux1Command, this, _1, _2);
 }
 
@@ -100,6 +101,15 @@ void CommandExecutor::onSwitchGearCommand(IRadioCommand *command,
                                           AbstractTxModule *radio)
 {
     radio->toggleGear();
+}
+
+void CommandExecutor::onSetGearCommand(IRadioCommand *command,
+                                       AbstractTxModule *radio)
+{
+    if (SetGearCommand *cmd = dynamic_cast<SetGearCommand *>(command))
+    {
+        radio->setGear(cmd->getState());
+    }
 }
 
 void CommandExecutor::onSwitchAux1Command(IRadioCommand *command,

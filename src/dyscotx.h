@@ -37,7 +37,7 @@ public:
 
     DyscoTx(std::string name);
 
-    virtual ~DyscoTx();
+    virtual ~DyscoTx() = default;
 
     virtual void open();
 

@@ -37,7 +37,7 @@ public:
 
     void suspend(bool suspend);
 
-    void emergencyStop(bool emergency = true);
+    void emergencyStop();
 
     void setSuspensionSignal();
 
