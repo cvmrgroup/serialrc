@@ -19,7 +19,8 @@
 
 #include "crazyradiomodule.h"
 
-CrazyRadioModule::CrazyRadioModule(int id, std::string sender, std::string txId) :
+CrazyRadioModule::CrazyRadioModule(int id, std::string sender, std::string txId)
+        :
         AbstractTxModule(id, sender, txId)
 {
 }
@@ -29,7 +30,7 @@ CrazyRadioModule::~CrazyRadioModule()
 }
 
 void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
-                             double yaw)
+                                   double yaw)
 {
     if (this->suspended)
     {
@@ -97,6 +98,10 @@ void CrazyRadioModule::setBindSignal()
 }
 
 void CrazyRadioModule::toggleGear()
+{
+}
+
+void CrazyRadioModule::setGear(bool state)
 {
 }
 

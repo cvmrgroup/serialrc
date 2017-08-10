@@ -53,6 +53,8 @@ public:
 
     void toggleGear();
 
+    void setGear(bool state);
+
     void toggleAux1();
 };
 
