@@ -54,7 +54,7 @@ public:
     IOServiceRadio(std::vector<RadioConfig> configs,
                    boost::shared_ptr<boost::asio::io_service> io_service);
 
-    virtual ~IOServiceRadio();
+    ~IOServiceRadio() override;
 
 private:
 
@@ -64,9 +64,9 @@ private:
 
     void createRadio(RadioConfig &config);
 
-    ITransmitter *createAndGetTransmitter(const std::string sender);
+    ITransmitter *createAndGetTransmitter(std::string sender);
 
-    AbstractTxModule *getTxModule(int copterId);
+    AbstractTxModule *getTxModule(int copterId) override;
 
     // /////////////////////////////////////////////////////////////////////////
 
@@ -80,24 +80,24 @@ private:
 
 public:
 
-    void fireRadioCommand(IRadioCommand *command);
+    void fireRadioCommand(IRadioCommand *command) override;
 
     /**
      * starts the IOServiceRadio, which means to open and connect to all configured transmitters
      * the method is thread safe, because the call gets invoke into the underlying io_service.
      */
-    void start();
+    void start() override;
 
     /**
      * stops the IOServiceRadio, which means to close all connected transmitters,
      * the method is thread safe, because the call gets invoke into the underlying io_service.
      */
-    void stop();
+    void stop() override;
 
     /**
      * waits for the IOServiceRadio to finish
      */
-    void join();
+    void join() override;
 
 private:
 
