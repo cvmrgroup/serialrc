@@ -4,13 +4,13 @@
 
 #include "crazyradiotransmitter.h"
 
-CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name,
-                                             boost::shared_ptr<boost::asio::io_service> ioService)
+CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name, boost::shared_ptr<boost::asio::io_service> ioService)
+        :
+        name(name),
+        ioService(ioService),
+        running(false),
+        currentRadio("-1")
 {
-    this->name = name;
-    this->running = false;
-    this->currentRadio = -1;
-    this->ioService = ioService;
 }
 
 void CrazyRadioTransmitter::open()
@@ -21,23 +21,17 @@ void CrazyRadioTransmitter::open()
         return;
     }
 
-    // set running to true
     this->running = true;
-    // start the boost thread
     this->thread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&CrazyRadioTransmitter::run, this)));
 }
 
 void CrazyRadioTransmitter::close()
 {
-    // set running to false
     this->running = false;
 
-    // check if the thread is avalaibe
     if (this->thread && this->thread->joinable())
     {
-        // interrupt the thread
         this->thread->interrupt();
-        // wait for the thread has been finished
         this->thread->join();
     }
 }
@@ -46,27 +40,114 @@ void CrazyRadioTransmitter::close()
 
 void CrazyRadioTransmitter::run()
 {
-    // display info message
     BOOST_LOG_TRIVIAL(info) << "Starting crazyradio thread...";
-    // initialize the radio
+
     this->initialize();
 
-    // run until running is false
-    while (this->running)
+    if (!this->running)
     {
-        try
-        {
-            // update the crazy radio
-            this->update();
+        return;
+    }
 
-            // sleep for 10 millis
-            boost::posix_time::milliseconds timeout(10);
-            boost::this_thread::sleep(timeout);
-        }
-        catch (boost::thread_interrupted &)
+    this->copter->logReset();
+
+    std::function<void(float)> cb_lq = std::bind(&CrazyRadioTransmitter::onLinkQuality, this, std::placeholders::_1);
+    this->copter->setLinkQualityCallback(cb_lq);
+
+    std::unique_ptr<LogBlock<logImu> > logBlockImu;
+    std::unique_ptr<LogBlock<log2> > logBlock2;
+    //std::vector<std::unique_ptr<LogBlockGeneric> > logBlocksGeneric(m_logBlocks.size());
+
+    if (this->enableLogging)
+    {
+        std::function<void(const crtpPlatformRSSIAck *)> cb_ack = std::bind(&CrazyRadioTransmitter::onCfEmptyAck, this, std::placeholders::_1);
+        this->copter->setEmptyAckCallback(cb_ack);
+
+        std::cout << "Requesting Logging variables..." << std::endl;
+        this->copter->requestLogToc();
+
+        if (this->enableLoggingImu)
         {
-            BOOST_LOG_TRIVIAL(error) << "Crazyradio thread interrupted.";
+            std::function<void(uint32_t, logImu *)> cb = std::bind(&CrazyRadioTransmitter::onCfImuData, this, std::placeholders::_1, std::placeholders::_2);
+
+            logBlockImu.reset(new LogBlock<logImu>(
+                    this->copter, {
+                            {"acc",  "x"},
+                            {"acc",  "y"},
+                            {"acc",  "z"},
+                            {"gyro", "x"},
+                            {"gyro", "y"},
+                            {"gyro", "z"},
+                    }, cb));
+            logBlockImu->start(1); // 10ms
         }
+
+        if (this->enableLoggingTemperature
+            || this->enableLoggingMagneticField
+            || this->enableLoggingPressure
+            || this->enableLoggingBattery)
+        {
+            std::function<void(uint32_t, log2 *)> cb2 = std::bind(&CrazyRadioTransmitter::onCfLog2Data, this, std::placeholders::_1, std::placeholders::_2);
+
+            logBlock2.reset(new LogBlock<log2>(
+                    this->copter, {
+                            {"mag",  "x"},
+                            {"mag",  "y"},
+                            {"mag",  "z"},
+                            {"baro", "temp"},
+                            {"baro", "pressure"},
+                            {"pm",   "vbat"},
+                    }, cb2));
+            logBlock2->start(100); // 1000ms
+        }
+
+        // custom log blocks
+        /*size_t i = 0;
+        for (auto &logBlock : m_logBlocks)
+        {
+            std::function<void(uint32_t, std::vector<double> *, void *userData)> cb =
+                    std::bind(
+                            &CrazyflieROS::onLogCustom,
+                            this,
+                            std::placeholders::_1,
+                            std::placeholders::_2,
+                            std::placeholders::_3);
+
+            logBlocksGeneric[i].reset(new LogBlockGeneric(
+                    &m_cf,
+                    logBlock.variables,
+                    (void *) &m_pubLogDataGeneric[i],
+                    cb));
+            logBlocksGeneric[i]->start(logBlock.frequency / 10);
+            ++i;
+        }*/
+    }
+
+    std::cout << "Ready..." << std::endl;
+
+    // Send 0 thrust initially for thrust-lock
+    for (int i = 0; i < 100; ++i)
+    {
+        this->copter->sendSetpoint(0, 0, 0, 0);
+    }
+
+    try
+    {
+        while (this->running)
+        {
+            this->update();
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+        }
+    }
+    catch (boost::thread_interrupted &)
+    {
+        BOOST_LOG_TRIVIAL(error) << "Crazyradio thread interrupted.";
+    }
+
+    // Make sure we turn the engines off
+    for (int i = 0; i < 100; ++i)
+    {
+        this->copter->sendSetpoint(0, 0, 0, 0);
     }
 
     // clean up the crazy radio
@@ -82,154 +163,154 @@ void CrazyRadioTransmitter::initialize()
     // see: http://www.solved.online/311063/why-does-qt-change-behaviour-of-sscanf
     setlocale(LC_NUMERIC, "C");
 
-    // the url to open the crazy radio
-    std::string crazyRadioUrl = this->currentRadio;
+    std::string uri = this->currentRadio;
 
-    BOOST_LOG_TRIVIAL(info) << "Connecting crazyflie with crazyradio url [ " << crazyRadioUrl << " ].";
+    BOOST_LOG_TRIVIAL(info) << "Connecting crazyflie with crazyradio url [ " << uri << " ].";
 
-    // create a new radio
-    this->radio = boost::shared_ptr<CCrazyRadio>(new CCrazyRadio(crazyRadioUrl));
+    this->enableLogging = true;
+    this->enableLoggingImu = true;
+    this->enableLoggingTemperature = false;
+    this->enableLoggingMagneticField = false;
+    this->enableLoggingPressure = true;
+    this->enableLoggingBattery = true;
 
-    // start the radio
-    if (this->radio->startRadio())
+    try
     {
-        // create the copter
-        this->copter = boost::shared_ptr<CCrazyflie>(new CCrazyflie(radio.get()));
-        // configure the copter
-        this->copter->setSendSetpoints(true);
-        // set thrust to zero
-        this->copter->setThrust(0);
+        this->copter = new Crazyflie(uri);
     }
-    else
+    catch (std::exception &e)
     {
-        // set running to false
         this->running = false;
-        // create the exception string
-        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ].") % crazyRadioUrl);
-        // display the error
+
+        // create and throw radio exception
+        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ].") % uri);
         BOOST_LOG_TRIVIAL(error) << ex;
-        // throw an radio exception
         throw RadioException(ex);
     }
 }
 
 void CrazyRadioTransmitter::update()
 {
-    // update the copter radio
-    if (this->copter->cycle())
-    {
-        // flag if request was successful
-        bool success = false;
-        // the control signals
-        cv::Vec4d u(0.0, 0.0, 0.0, 0.0);
-        // the latch to wait for the request
-        boost::latch latch(2);
+    bool success = false;
 
-        // invoke the radio control request inside the io_service to be thread save
-        this->ioService->post([this, &latch, &success, &u]()
+    // the control signals
+    cv::Vec4d u(0., 0., 0., 0.);
+
+    // the latch to wait for the request
+    boost::latch latch(2);
+
+    // invoke the radio control request inside the io_service to be thread save
+    this->ioService->post([this, &latch, &success, &u]()
+                          {
+                              // check if current radio exists
+                              if (this->radios.find(this->currentRadio) != this->radios.end())
                               {
-                                  // check if current radio exists
-                                  if (this->radios.find(this->currentRadio) != this->radios.end())
-                                  {
-                                      // get the current radio
-                                      AbstractTxModule *radio = this->radios[this->currentRadio];
-                                      // create the Control Values
-                                      u = cv::Vec4d(radio->getThrottle(),
-                                                    radio->getRoll(),
-                                                    radio->getPitch(),
-                                                    radio->getYaw());
-                                      // set success to true
-                                      success = true;
-                                  }
-                                  // release the latch
-                                  latch.count_down();
-                              });
-        // countdown and wait for the latch release
-        latch.count_down_and_wait();
+                                  AbstractTxModule *radio = this->radios[this->currentRadio];
 
-        // check if the request was successful
-        if (success)
-        {
-            // update the control signals
-            this->copter->setThrust((int) u[0]);
-            this->copter->setRoll((float) u[1]);
-            this->copter->setPitch((float) u[2]);
-            this->copter->setYaw((float) u[3]);
-        }
+                                  u = cv::Vec4d(radio->getThrottle(),
+                                                radio->getRoll(),
+                                                radio->getPitch(),
+                                                radio->getYaw());
 
-        // publish the copter data from the cflie radio
-        this->publishCopterData();
+                                  success = true;
+                              }
+
+                              latch.count_down();
+                          });
+
+    latch.count_down_and_wait();
+
+    if (success)
+    {
+        this->copter->sendSetpoint((float) u[1], (float) u[2], (float) u[3], (uint16_t) u[0]);
+    }
+    else
+    {
+        this->copter->sendPing();
     }
 }
 
 void CrazyRadioTransmitter::cleanup()
 {
-    if (this->copter)
-    {
-        // free the copter
-        this->copter.reset();
-        this->copter = NULL;
-    }
-
-    if (this->radio)
-    {
-        // free the modules
-        this->radio.reset();
-        this->radio = NULL;
-    }
+    this->copter = nullptr;
 }
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void CrazyRadioTransmitter::publishCopterData()
+void CrazyRadioTransmitter::onCfEmptyAck(const crtpPlatformRSSIAck *data)
 {
-    // check if the current radio is available
-    if (this->radios.find(this->currentRadio) == this->radios.end())
+    if (this->enableLogging)
     {
-        return;
+        // dB
+        //std::cout << "empty ack " << data->rssi << std::endl;
+    }
+}
+
+void CrazyRadioTransmitter::onCfImuData(uint32_t time_in_ms, logImu *data)
+{
+    ImuData imuData;
+
+    imuData.millis = Clock::nowMillis();
+
+    float g = 9.80665f;
+
+    // measured in mG; need to convert to m/s^2
+    imuData.linearAcceleration[0] = data->acc_x * g;
+    imuData.linearAcceleration[1] = data->acc_y * g;
+    imuData.linearAcceleration[2] = data->acc_z * g;
+
+    // measured in deg/s; need to convert to rad/s
+    imuData.angularVelocity[0] = (float) MathHelper::deg2rad(data->gyro_x);
+    imuData.angularVelocity[1] = (float) MathHelper::deg2rad(data->gyro_y);
+    imuData.angularVelocity[2] = (float) MathHelper::deg2rad(data->gyro_z);
+
+    // move into the given ioService to ensure thread safety
+    this->ioService->dispatch([this, imuData]()
+                              {
+                                  this->onImuData(imuData);
+                              });
+}
+
+void CrazyRadioTransmitter::onCfLog2Data(uint32_t time_in_ms, log2 *data)
+{
+    if (this->enableLoggingTemperature)
+    {
+        // measured in degC
+        float temperature = data->baro_temp;
+        std::cout << "Temperature " << temperature << " °C" << std::endl;
     }
 
-    // get the current radio
-    AbstractTxModule *radio = this->radios[this->currentRadio];
+    if (this->enableLoggingMagneticField)
+    {
+        // measured in Tesla
+        cv::Vec3f magneticField;
+        magneticField[0] = data->mag_x;
+        magneticField[1] = data->mag_y;
+        magneticField[2] = data->mag_z;
+        std::cout << "Magnetic Field " << magneticField << " Tesla" << std::endl;
+    }
 
-    Telemetry data;
+    if (this->enableLoggingPressure)
+    {
+        // hPa (=mbar)
+        float pressure = data->baro_pressure;
+        std::cout << "Pressure " << pressure << " mbar" << std::endl;
+    }
 
-    data.millis = Clock::nowMillis();
+    if (this->enableLoggingBattery)
+    {
+        // V
+        float voltage = data->pm_vbat;
+        std::cout << "Voltage " << voltage << " V" << std::endl;
+    }
+}
 
-    // get the copter id
-    data.copterId = radio->getCopterId();
-
-    data.batteryLevel = this->copter->batteryLevel();
-    data.batteryState = this->copter->batteryState();
-
-    data.asl = this->copter->asl();
-    data.aslLong = this->copter->aslLong();
-
-    data.pressure = this->copter->pressure();
-    data.temperature = this->copter->temperature();
-
-    data.accX = this->copter->accX();
-    data.accY = this->copter->accY();
-    data.accZ = this->copter->accZ();
-    data.accZW = this->copter->accZW();
-
-    data.gyroX = this->copter->gyroX();
-    data.gyroY = this->copter->gyroY();
-    data.gyroZ = this->copter->gyroZ();
-
-    data.magX = this->copter->magX();
-    data.magY = this->copter->magY();
-    data.magZ = this->copter->magZ();
-    data.roll = this->copter->roll();
-    data.pitch = this->copter->pitch();
-    data.yaw = this->copter->yaw();
-
-    // move into the given io_service to be thread safe
-    this->ioService->dispatch([this, data]()
-                              {
-                                  // publish the telementry data
-                                  this->onTelemetry(data);
-                              });
+void CrazyRadioTransmitter::onLinkQuality(float linkQuality)
+{
+    if (linkQuality < 0.7)
+    {
+        std::cout << "Link quality low [ " << linkQuality << " ]." << std::endl;
+    }
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -251,22 +332,15 @@ bool CrazyRadioTransmitter::hasCapacity()
 
 void CrazyRadioTransmitter::addTxModule(AbstractTxModule *radio)
 {
-    // get the transmitter id
     std::string radioURI = radio->getModuleId();
 
     if (!this->hasCapacity())
     {
-        // create the exception string
-        std::string ex = boost::str(boost::format("Cannot add radio with transmitter id [ %1% ] to crazy radio. No capacity free.") % radioURI);
-        // display the error
+        std::string ex = boost::str(boost::format("Cannot add radio with link uri [ %1% ]. Capacity exceeded.") % radioURI);
         BOOST_LOG_TRIVIAL(error) << ex;
-        // throw an radio exception
         throw RadioException(ex);
     }
 
-    // insert the AbstractTxModule
     this->radios[radioURI] = radio;
-
-    // activate the current radio
     this->currentRadio = radioURI;
 }

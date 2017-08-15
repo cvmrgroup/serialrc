@@ -60,7 +60,7 @@ private:
 
     void fireRadioEvent(AbstractTxModule *radio);
 
-    void fireTelemetryData(Telemetry data);
+    void fireImuData(ImuData data);
 
     void createRadio(RadioConfig &config);
 

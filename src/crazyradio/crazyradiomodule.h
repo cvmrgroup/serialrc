@@ -29,33 +29,33 @@ public:
 
     CrazyRadioModule(int id, std::string sender, std::string txId);
 
-    virtual ~CrazyRadioModule();
-
-    void setControls(double throttle, double roll, double pitch, double yaw);
-
-    void toggleSuspension();
-
-    void suspend(bool suspend);
-
-    void emergencyStop();
-
     void setSuspensionSignal();
+
+    // /////////////////////////////////////////////////////////////////////////
+
+    void setControls(double throttle, double roll, double pitch, double yaw) override;
+
+    void toggleSuspension() override;
+
+    void suspend(bool suspend) override;
+
+    void emergencyStop() override;
 
     // not implemented /////////////////////////////////////////////////////////
 
-    void toggleSender();
+    void toggleSender() override;
 
-    void turnSenderOn();
+    void turnSenderOn() override;
 
-    void turnSenderOff();
+    void turnSenderOff() override;
 
-    void setBindSignal();
+    void setBindSignal() override;
 
-    void toggleGear();
+    void toggleGear() override;
 
-    void setGear(bool state);
+    void setGear(bool state) override;
 
-    void toggleAux1();
+    void toggleAux1() override;
 };
 
 #endif //ICARUS_CRAZYRADIOMODULE_H

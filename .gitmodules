@@ -1,3 +1,6 @@
 [submodule "ext/libcflie"]
 	path = ext/libcflie
 	url = https://scm.mi.hs-rm.de/rhodecode/ag/vision/ICARUS/Extern/libcflie
+[submodule "ext/crazyflie_ros"]
+	path = ext/crazyflie_ros
+	url = http://scm.mi.hs-rm.de/rhodecode/ag/vision/ICARUS/Extern/crazyflie_ros

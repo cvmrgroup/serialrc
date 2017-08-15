@@ -53,13 +53,13 @@ if (${WITH_RASPBERRYPI})
 endif ()
 
 if (${WITH_CRAZYRADIO})
-    add_subdirectory(ext/libcflie)
+    add_subdirectory(ext/crazyflie_ros/crazyflie_cpp)
     file(GLOB CRAZYRADIO_HEADERS src/crazyradio/*.h)
     file(GLOB CRAZYRADIO_SOURCES src/crazyradio/*.cpp)
     list(APPEND ${PROJECT_NAME}_HEADERS ${CRAZYRADIO_HEADERS})
     list(APPEND ${PROJECT_NAME}_SOURCES ${CRAZYRADIO_SOURCES})
-    list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS cflie)
-    list(APPEND ${PROJECT_NAME}_LINK_LIBS cflie)
+    list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ext/crazyflie_ros/crazyflie_cpp/include)
+    list(APPEND ${PROJECT_NAME}_LINK_LIBS crazyflie_cpp)
     list(APPEND ${PROJECT_NAME}_FLAGS WITH_CRAZYRADIO)
 endif ()
 
@@ -72,6 +72,8 @@ message(STATUS "WITH_CRAZYRADIO: ${WITH_CRAZYRADIO}")
 add_library(${PROJECT_NAME} STATIC
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_HEADERS})
+
+message(STATUS "multiradio include dirs: " ${${PROJECT_NAME}_INCLUDE_DIRS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     src

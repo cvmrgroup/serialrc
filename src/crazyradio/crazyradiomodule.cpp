@@ -25,10 +25,6 @@ CrazyRadioModule::CrazyRadioModule(int id, std::string sender, std::string txId)
 {
 }
 
-CrazyRadioModule::~CrazyRadioModule()
-{
-}
-
 void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
                                    double yaw)
 {
@@ -42,7 +38,7 @@ void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
 
     this->signal[Throttle] = (throttle_center_value_offset + throttle * throttle_value_range_scale);
     this->signal[Aileron] = (roll * 45);
-    this->signal[Elevation] = (pitch * 45);
+    this->signal[Elevation] = (-pitch * 45);
     this->signal[Rudder] = (yaw * -180);
 }
 

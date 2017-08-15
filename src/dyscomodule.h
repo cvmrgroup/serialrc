@@ -33,33 +33,31 @@ public:
 
     DyscoModule(int copterId, std::string txName, std::string moduleId);
 
-    virtual ~DyscoModule() = default;
+    // /////////////////////////////////////////////////////////////////////////
 
-    void setControls(double throttle, double roll, double pitch, double yaw);
+    void setControls(double throttle, double roll, double pitch, double yaw) override;
 
-    void toggleGear();
+    void toggleGear() override;
 
-    void setGear(bool state);
+    void setGear(bool state) override;
 
-    void toggleAux1();
+    void toggleAux1() override;
 
     // not implemented /////////////////////////////////////////////////////////
 
-    void toggleSuspension();
+    void toggleSuspension() override;
 
-    void suspend(bool suspend);
+    void suspend(bool suspend) override;
 
-    void emergencyStop();
+    void emergencyStop() override;
 
-    void setSuspensionSignal();
+    void toggleSender() override;
 
-    void toggleSender();
+    void turnSenderOn() override;
 
-    void turnSenderOn();
+    void turnSenderOff() override;
 
-    void turnSenderOff();
-
-    void setBindSignal();
+    void setBindSignal() override;
 
     // /////////////////////////////////////////////////////////////////////////
 

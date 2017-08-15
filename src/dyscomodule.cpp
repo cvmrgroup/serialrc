@@ -95,10 +95,6 @@ void DyscoModule::emergencyStop()
     this->toggleAux1();
 }
 
-void DyscoModule::setSuspensionSignal()
-{
-}
-
 void DyscoModule::toggleSender()
 {
 }

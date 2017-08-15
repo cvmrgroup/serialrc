@@ -8,7 +8,7 @@
 #include <atomic>
 #include <unordered_map>
 
-#include <cflie/CCrazyflie.h>
+#include <crazyflie_cpp/Crazyflie.h>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -19,8 +19,10 @@
 
 #include <opencv2/core.hpp>
 
-#include <radio/i_transmitter.h>
+#include <mathhelper.h>
 #include <timing/clock.h>
+
+#include <radio/i_transmitter.h>
 
 #include "radioexception.h"
 
@@ -28,7 +30,7 @@ class CrazyRadioTransmitter : public ITransmitter
 {
 public:
 
-    CrazyRadioTransmitter(const std::string name,
+    CrazyRadioTransmitter(std::string name,
                           boost::shared_ptr<boost::asio::io_service> ioService);
 
 private:
@@ -41,46 +43,77 @@ private:
 
     void cleanup();
 
-    void publishCopterData();
+    struct logImu
+    {
+        float acc_x;
+        float acc_y;
+        float acc_z;
+        float gyro_x;
+        float gyro_y;
+        float gyro_z;
+    } __attribute__((packed));
+
+    struct log2
+    {
+        float mag_x;
+        float mag_y;
+        float mag_z;
+        float baro_temp;
+        float baro_pressure;
+        float pm_vbat;
+    } __attribute__((packed));
+
+    void onCfEmptyAck(const crtpPlatformRSSIAck *data);
+
+    void onCfImuData(uint32_t time_in_ms, logImu *data);
+
+    void onCfLog2Data(uint32_t time_in_ms, log2 *imu);
+
+    void onLinkQuality(float linkQuality);
 
 public:
 
-    void open();
+    void open() override;
 
-    void close();
+    void close() override;
 
-    std::string getName();
+    std::string getName() override;
 
-    bool isOpen();
+    bool isOpen() override;
 
-    bool hasCapacity();
+    bool hasCapacity() override;
 
-    void addTxModule(AbstractTxModule *radio);
+    void addTxModule(AbstractTxModule *radio) override;
 
 private:
 
-    /// the id of the current radio
-    std::string currentRadio;
+    /// the name of the i_transmitter
+    std::string name;
+
+    /// the underlying used io_service
+    boost::shared_ptr<boost::asio::io_service> ioService;
 
     /// flag if the CrazyRadioTransmitter is running
     std::atomic<bool> running;
 
-    /// the name of the i_transmitter
-    std::string name;
+    /// the id of the current radio
+    std::string currentRadio;
 
     /// the map with radios
     std::unordered_map<std::string, AbstractTxModule *> radios;
 
     /// the crazyflie copter
-    boost::shared_ptr<CCrazyflie> copter;
-    /// the crazy radio
-    boost::shared_ptr<CCrazyRadio> radio;
+    Crazyflie *copter;
+
+    bool enableLogging;
+    bool enableLoggingImu;
+    bool enableLoggingTemperature;
+    bool enableLoggingMagneticField;
+    bool enableLoggingPressure;
+    bool enableLoggingBattery;
 
     /// the boost thread for the update
     boost::shared_ptr<boost::thread> thread;
-
-    /// the underlying used io_service
-    boost::shared_ptr<boost::asio::io_service> ioService;
 };
 
 #endif //ICARUS_CRAZYRADIOTRANSMITTER_H

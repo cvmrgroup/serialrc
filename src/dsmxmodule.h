@@ -33,39 +33,39 @@ public:
 
     DSMXModule(int copterId, RadioConfig &config);
 
-    virtual ~DSMXModule() = default;
-
     /**
      * Get the radio configuration.
      * @return The radio configuration.
      */
     RadioConfig getRadioConfig();
 
-    void toggleSender();
-
-    void turnSenderOn();
-
-    void turnSenderOff();
-
-    void suspend(bool suspended);
-
-    void toggleSuspension();
-
-    void setBindSignal();
-
-    void setControls(double throttle, double roll, double pitch, double yaw);
-
-    void toggleGear();
-
-    void setGear(bool state);
-
-    void toggleAux1();
-
     void setArmSignal();
 
     void setDisarmSignal();
 
-    void emergencyStop();
+    // /////////////////////////////////////////////////////////////////////////
+
+    void toggleSender() override;
+
+    void turnSenderOn() override;
+
+    void turnSenderOff() override;
+
+    void suspend(bool suspended) override;
+
+    void toggleSuspension() override;
+
+    void setBindSignal() override;
+
+    void setControls(double throttle, double roll, double pitch, double yaw) override;
+
+    void toggleGear() override;
+
+    void setGear(bool state) override;
+
+    void toggleAux1() override;
+
+    void emergencyStop() override;
 
 private:
 
