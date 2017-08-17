@@ -19,8 +19,6 @@
 
 #include "artp.h"
 
-#include <iostream>
-
 ArTP::ArTP(const std::string name, std::string serial,
            boost::shared_ptr<boost::asio::io_service> io_service) :
         ArXX(name, ATP_N_RADIOS, serial, io_service)

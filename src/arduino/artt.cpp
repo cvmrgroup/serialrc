@@ -17,7 +17,6 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#include <iostream>
 #include "artt.h"
 
 ArTT::ArTT(std::string name, std::string serial,
