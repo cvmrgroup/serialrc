@@ -36,11 +36,11 @@ void ArTT::addTxModule(AbstractTxModule *txModule)
     // get id as int
     int id = boost::lexical_cast<int>(module->getModuleId());
 
-    // add the txModule to our configs list
+    // add tx module to our configs list
     this->configs[id] = module->getRadioConfig();
     this->moduleIds.push_back(id);
 
-    // notify ArXX about add Radio
+    // notify ArXX about the tx module
     ArXX::addTxModule(txModule);
 }
 
@@ -104,7 +104,7 @@ void ArTT::writeData(int id)
     AbstractTxModule *radio = this->modules[id];
     RadioConfig &config = this->configs[id];
 
-    unsigned char frame[ATT_FRAME_LENGTH] = {0};
+    unsigned char frame[ATT_FRAME_LENGTH] = { 0 };
     frame[ATT_TX_ID] = (unsigned char) id;
 
     if (!config.initialized)
