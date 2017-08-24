@@ -45,10 +45,6 @@ ArTP::ArTP(const std::string name, std::string serial,
     }
 }
 
-ArTP::~ArTP()
-{
-}
-
 void ArTP::addTxModule(AbstractTxModule *txModule)
 {
     // this is a dsmx module

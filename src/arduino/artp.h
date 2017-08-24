@@ -37,11 +37,8 @@ class ArTP : public ArXX
 public:
 
     /// Constructor.
-    ArTP(const std::string name, std::string serial,
+    ArTP(std::string name, std::string serial,
          boost::shared_ptr<boost::asio::io_service> io_service);
-
-    /// Destructor.
-    virtual ~ArTP();
 
     /**
      * Overwrite addTxModule function for getting the transmitter ids

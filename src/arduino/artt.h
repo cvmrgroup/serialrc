@@ -41,9 +41,6 @@ public:
     ArTT(std::string name, std::string serial,
          boost::shared_ptr<boost::asio::io_service> io_service);
 
-    /// Destructor.
-    virtual ~ArTT();
-
     /**
      * Overwrite addTxModule function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter

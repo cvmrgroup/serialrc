@@ -54,45 +54,64 @@ class ArXX : public ITransmitter
 public:
 
     /**
-     * @brief Constructor.
+     * Constructor.
+     * @param name The device name.
+     * @param maxNumberOfRadios The number of radios.
+     * @param serialNumber The Arduino's serial number.
+     * @param ioService The boost io service.
      */
-    ArXX(const std::string name, int maxNumberOfRadios,
+    ArXX(std::string name,
+         int maxNumberOfRadios,
          std::string serialNumber,
-         boost::shared_ptr<boost::asio::io_service> io_service);
+         boost::shared_ptr<boost::asio::io_service> ioService);
 
-    virtual ~ArXX();
+    ArXX() = delete;
+
+    ~ArXX() = default;
+
+    ArXX(ArXX const &other) = delete;
+
+    void operator=(ArXX const &other) = delete;
 
 private:
 
-    std::string findDeviceName(std::string &description);
+    std::string findPortName(std::string &description);
 
-    void invokeReading(boost::system::error_code ec,
+    void invokeReading(boost::system::error_code errorCode,
                        boost::shared_ptr<boost::asio::deadline_timer> timer);
 
     void readData();
 
-    void onDataRead(boost::system::error_code ec,
+    void onDataRead(boost::system::error_code errorCode,
                     size_t bytes);
 
-    void onDataWritten(boost::system::error_code ec,
+    void onDataWritten(boost::system::error_code errorCode,
                        boost::shared_ptr<boost::asio::streambuf> buf,
                        size_t bytes);
 
 public:
 
-    void open();
+    // ITransmitter ////////////////////////////////////////////////////////////
 
-    void close();
+    void open() override;
 
-    int getMaxNumberOfRadios();
+    void close() override;
+
+    std::string getName() override;
+
+    bool isOpen() override;
+
+    bool hasCapacity() override;
+
+    void addTxModule(AbstractTxModule *txModule) override;
+
+    // /////////////////////////////////////////////////////////////////////////
 
     int getNumberOfRadios();
 
+    int getMaxNumberOfRadios();
+
     std::string getSerialNumber();
-
-    bool hasCapacity();
-
-    void addTxModule(AbstractTxModule *txModule);
 
     void suspendAll();
 
@@ -100,18 +119,7 @@ public:
 
     void getEnabledStates(std::unordered_map<int, bool> &enableds);
 
-    std::string getName();
-
-    bool isOpen();
-
 protected:
-
-    /**
-     * Called when a data frame was received on the underlying serial port.
-     * @param frame The received frame as char array.
-     * @param length The length of the received frame.
-     */
-    virtual void onData(std::string frame) = 0;
 
     /**
      * Write the given frame to the serial port.
@@ -120,16 +128,20 @@ protected:
      */
     void writeFrame(const char *frame, size_t length);
 
-    /// A map with all transmitter modules connected to this transmitter.
-    std::unordered_map<int, AbstractTxModule *> modules;
+    /**
+     * Called when a data frame was received on the underlying serial port.
+     * @param frame The received frame as char array.
+     * @param length The length of the received frame.
+     */
+    virtual void onData(std::string frame) = 0;
 
 private:
 
-    /// Maximum number of connectable transmitter modules.
-    int maxNumberOfModules;
-
     /// The name of the transmitter.
     std::string transmitterName;
+
+    /// Maximum number of connectable transmitter modules.
+    int maxNumberOfModules;
 
     /// The serial number of this device.
     std::string serialNumber;
@@ -142,6 +154,11 @@ private:
 
     /// The response stream buffer
     boost::asio::streambuf response;
+
+protected:
+
+    /// A map with all transmitter modules connected to this transmitter.
+    std::unordered_map<int, AbstractTxModule *> modules;
 };
 
 #endif //ARXX_H
