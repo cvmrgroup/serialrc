@@ -6,10 +6,10 @@
 
 IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
                                boost::shared_ptr<boost::asio::io_service> io_service)
+        : configs(configs),
+          io_service(io_service)
 {
     this->started = false;
-    this->configs = configs;
-    this->io_service = io_service;
 
     // create tx/module for each config
     for (auto config : this->configs)
@@ -23,6 +23,7 @@ IOServiceRadio::~IOServiceRadio()
     for (auto entry : this->txModules)
     {
         AbstractTxModule *radio = entry.second;
+
         delete radio;
     }
 
@@ -31,12 +32,12 @@ IOServiceRadio::~IOServiceRadio()
     for (auto entry : this->transmitters)
     {
         ITransmitter *transmitter = entry.second;
-        // check if the IRadioSender is open
+
         if (transmitter->isOpen())
         {
-            //close the IRadioSender
             transmitter->close();
         }
+
         delete transmitter;
     }
 
@@ -45,8 +46,10 @@ IOServiceRadio::~IOServiceRadio()
 
 // /////////////////////////////////////////////////////////////////////////////
 
-ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
+ITransmitter *IOServiceRadio::createAndGetTransmitter(const RadioConfig &config)
 {
+    std::string sender = config.transmitter;
+
     // check if a transmitter is already created
     if (this->transmitters.find(sender) != this->transmitters.end())
     {
@@ -54,46 +57,46 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const std::string sender)
     }
 
     // create the correct transmitter
-    ITransmitter *tx = NULL;
+    ITransmitter *tx = nullptr;
 
-    if (sender.compare("simulation") == 0)
+    if (sender == "simulation")
     {
         tx = new DyscoTx(sender);
     }
 
 #ifdef WITH_ARDUINO
-    if (sender.compare("artt") == 0)
+    if (sender == "artt")
     {
-        tx = new ArTT(sender, "75232303235351816182", this->io_service);
+        tx = new ArTT(sender, config.serialPort, this->io_service);
     }
-    if (sender.compare("artp") == 0)
+    if (sender == "artp")
     {
-        tx = new ArTP(sender, "75439323935351F09221", this->io_service);
+        tx = new ArTP(sender, config.serialPort, this->io_service);
     }
 #endif
 
 #ifdef WITH_CRAZYRADIO
-    if (sender.compare("crazyradio") == 0)
+    if (sender == "crazyradio")
     {
         tx = new CrazyRadioTransmitter(sender, this->io_service);
     }
 #endif
 
 #ifdef WITH_RASPBERRYPI
-    if (sender.compare("raspberrypi") == 0)
+    if (sender == "raspberrypi")
     {
         tx = new RpiTX(sender, this->io_service);
     }
 #endif
 
-    if (!tx)
+    if (tx == nullptr)
     {
         // create the exception string
-        std::string ex = boost::str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
+        std::string msg = boost::str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
         // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
+        BOOST_LOG_TRIVIAL(error) << msg;
         // trow an exception
-        throw RadioException(ex);
+        throw RadioException(msg);
     }
 
     this->transmitters[sender] = tx;
@@ -125,23 +128,23 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     std::string sender = config.transmitter;
 
     // create or get the transmitter for the configured transmitter
-    ITransmitter *transmitter = this->createAndGetTransmitter(sender);
+    ITransmitter *transmitter = this->createAndGetTransmitter(config);
 
     // radio which is used for the given copter
-    AbstractTxModule *module = NULL;
+    AbstractTxModule *module = nullptr;
 
-    if (sender.compare("artt") == 0 || sender.compare("artp") == 0 || sender.compare("raspberrypi") == 0)
+    if (sender == "artt" || sender == "artp" || sender == "raspberrypi")
     {
         module = new DSMXModule(copterId, config);
     }
 
-    if (sender.compare("simulation") == 0)
+    if (sender == "simulation")
     {
         module = new DyscoModule(copterId, config.transmitter, config.txId);
     }
 
 #ifdef WITH_CRAZYRADIO
-    if (sender.compare("crazyradio") == 0)
+    if (sender == "crazyradio")
     {
         module = new CrazyRadioModule(copterId, config.transmitter, config.txId);
     }
@@ -172,7 +175,7 @@ AbstractTxModule *IOServiceRadio::getTxModule(int copterId)
         return this->txModules[copterId];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // /////////////////////////////////////////////////////////////////////////////

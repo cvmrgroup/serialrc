@@ -64,7 +64,7 @@ private:
 
     void createRadio(RadioConfig &config);
 
-    ITransmitter *createAndGetTransmitter(std::string sender);
+    ITransmitter *createAndGetTransmitter(const RadioConfig &config);
 
     AbstractTxModule *getTxModule(int copterId) override;
 

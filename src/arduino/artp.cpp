@@ -92,7 +92,7 @@ void ArTP::onData(std::string frame)
     }
     else
     {
-        std::string ex = boost::str(boost::format("Received frame is not of expected type, S/N [ %1% ], message [ %2% ].") % this->getSerialNumber() % std::string(frame));
+        std::string ex = boost::str(boost::format("Received frame is not of expected type, name [ %1% ], message [ %2% ].") % this->getName() % std::string(frame));
         BOOST_LOG_TRIVIAL(info) << ex;
         throw RadioException(ex);
     }
@@ -116,8 +116,6 @@ void ArTP::writeData()
         int ch4 = atp_center_value_offset + int(module->getYaw() * atp_value_range_scale);
         int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
         int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
-
-        //std::cout << id << ": " << ch1 << " " << ch2 << " " << ch3 << " " << ch4 << " " << ch5 << " " << ch6 << std::endl;
 
         // write to byte frame
         this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);

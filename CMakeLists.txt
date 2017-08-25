@@ -31,13 +31,10 @@ file(GLOB ${PROJECT_NAME}_SOURCES src/*.cpp)
 # Select Radio(s) ##############################################################
 
 if (${WITH_ARDUINO})
-    find_package(Qt5SerialPort REQUIRED)
     file(GLOB ARDUINO_HEADERS src/arduino/*.h)
     file(GLOB ARDUINO_SOURCES src/arduino/*.cpp)
     list(APPEND ${PROJECT_NAME}_HEADERS ${ARDUINO_HEADERS})
     list(APPEND ${PROJECT_NAME}_SOURCES ${ARDUINO_SOURCES})
-    list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${Qt5SerialPort_INCLUDE_DIRS})
-    list(APPEND ${PROJECT_NAME}_LINK_LIBS Qt5::SerialPort)
     list(APPEND ${PROJECT_NAME}_FLAGS WITH_ARDUINO)
 endif ()
 

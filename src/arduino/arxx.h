@@ -24,10 +24,6 @@
 #include <fstream>
 #include <unordered_map>
 
-#include <QObject>
-#include <QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
-
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
@@ -57,12 +53,12 @@ public:
      * Constructor.
      * @param name The device name.
      * @param maxNumberOfRadios The number of radios.
-     * @param serialNumber The Arduino's serial number.
+     * @param portName The port name of the Arduino is connected to.
      * @param ioService The boost io service.
      */
     ArXX(std::string name,
          int maxNumberOfRadios,
-         std::string serialNumber,
+         std::string portName,
          boost::shared_ptr<boost::asio::io_service> ioService);
 
     ArXX() = delete;
@@ -74,8 +70,6 @@ public:
     void operator=(ArXX const &other) = delete;
 
 private:
-
-    std::string findPortName(std::string &description);
 
     void invokeReading(boost::system::error_code errorCode,
                        boost::shared_ptr<boost::asio::deadline_timer> timer);
@@ -111,8 +105,6 @@ public:
 
     int getMaxNumberOfRadios();
 
-    std::string getSerialNumber();
-
     void suspendAll();
 
     void getSuspendedTxs(std::unordered_map<int, bool> &suspended);
@@ -135,6 +127,11 @@ protected:
      */
     virtual void onData(std::string frame) = 0;
 
+protected:
+
+    /// The port name the Arduino is connected to.
+    std::string portName;
+
 private:
 
     /// The name of the transmitter.
@@ -143,16 +140,13 @@ private:
     /// Maximum number of connectable transmitter modules.
     int maxNumberOfModules;
 
-    /// The serial number of this device.
-    std::string serialNumber;
-
     /// The io service to handle incoming and outgoing serial data.
     boost::shared_ptr<boost::asio::io_service> ioService;
 
     /// The serial port.
     boost::shared_ptr<boost::asio::serial_port> serialPort;
 
-    /// The response stream buffer
+    /// The response stream buffer.
     boost::asio::streambuf response;
 
 protected:
