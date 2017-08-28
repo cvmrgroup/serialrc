@@ -91,12 +91,8 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const RadioConfig &config)
 
     if (tx == nullptr)
     {
-        // create the exception string
         std::string msg = boost::str(boost::format("Unable to create transmitter for transmitter type [ %1% ]") % sender);
-        // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << msg;
-        // trow an exception
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 
     this->transmitters[sender] = tx;
@@ -116,12 +112,8 @@ void IOServiceRadio::createRadio(RadioConfig &config)
     // check if the copter has already created an radio
     if (this->txModules.find(copterId) != this->txModules.end())
     {
-        // create the exception string
         std::string ex = boost::str(boost::format("Copter [ %1% ] already configured.") % copterId);
-        // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
-        // trow an exception
-        throw RadioException(ex);
+        throw std::runtime_error(ex);
     }
 
     // get the name of the transmitter
@@ -152,12 +144,8 @@ void IOServiceRadio::createRadio(RadioConfig &config)
 
     if (!module)
     {
-        // create the exception string
-        std::string ex = boost::str(boost::format("Unable to create module for transmitter type [ %1% ]") % sender);
-        // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
-        // trow an exception
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Unable to create module for transmitter type [ %1% ]") % sender);
+        throw std::runtime_error(msg);
     }
 
     // add the created radio

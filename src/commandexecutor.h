@@ -17,8 +17,6 @@
 #include <radio/commands/controlcommand.h>
 #include <radio/commands/setgearcommand.h>
 
-#include "radioexception.h"
-
 class CommandExecutor
 {
 

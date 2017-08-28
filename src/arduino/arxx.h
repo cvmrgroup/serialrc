@@ -35,7 +35,6 @@
 
 #include "dsmxmodule.h"
 #include "serialhelper.h"
-#include "radioexception.h"
 
 #include "attdefinitions.h"
 
@@ -63,7 +62,7 @@ public:
 
     ArXX() = delete;
 
-    ~ArXX() = default;
+    ~ArXX() override = default;
 
     ArXX(ArXX const &other) = delete;
 

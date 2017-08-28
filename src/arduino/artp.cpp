@@ -92,9 +92,8 @@ void ArTP::onData(std::string frame)
     }
     else
     {
-        std::string ex = boost::str(boost::format("Received frame is not of expected type, name [ %1% ], message [ %2% ].") % this->getName() % std::string(frame));
-        BOOST_LOG_TRIVIAL(info) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Received frame is not of expected type, name [ %1% ], message [ %2% ].") % this->getName() % std::string(frame));
+        throw std::runtime_error(msg);
     }
 
     this->writeData();

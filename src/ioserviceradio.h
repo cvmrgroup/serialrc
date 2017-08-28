@@ -44,7 +44,6 @@
 
 #include "radio/radioevent.h"
 
-#include "radioexception.h"
 #include "commandexecutor.h"
 #include "config/radioconfig.h"
 

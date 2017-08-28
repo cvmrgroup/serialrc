@@ -81,9 +81,8 @@ void ArTT::onData(std::string frame)
     }
     else
     {
-        std::string ex = boost::str(boost::format("Received frame is not of expected type, name [ %1% ], message [ %2% ].") % this->getName() % frame);
-        BOOST_LOG_TRIVIAL(info) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Received frame is not of expected type, name [ %1% ], message [ %2% ].") % this->getName() % frame);
+        throw std::runtime_error(msg);
     }
 
     this->writeData(moduleId);
@@ -96,9 +95,8 @@ void ArTT::writeData(int id)
     // check if a radio exists for the given id
     if (this->modules.find(id) == this->modules.end())
     {
-        std::string ex = boost::str(boost::format("Failed to write data to transmitter with id [ %1% ] on serial port [ %2% ]: No radio set for transmitter.") % id % this->portName);
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Failed to write data to transmitter with id [ %1% ] on serial port [ %2% ]: No radio set for transmitter.") % id % this->portName);
+        throw std::runtime_error(msg);
     }
 
     AbstractTxModule *radio = this->modules[id];

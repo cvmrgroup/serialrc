@@ -183,9 +183,8 @@ void CrazyRadioTransmitter::initialize()
         this->running = false;
 
         // create and throw radio exception
-        std::string ex = boost::str(boost::format("Failed to open crazy radio with url [ %1% ].") % uri);
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Failed to open crazy radio with url [ %1% ].") % uri);
+        throw std::runtime_error(msg);
     }
 }
 
@@ -336,9 +335,8 @@ void CrazyRadioTransmitter::addTxModule(AbstractTxModule *radio)
 
     if (!this->hasCapacity())
     {
-        std::string ex = boost::str(boost::format("Cannot add radio with link uri [ %1% ]. Capacity exceeded.") % radioURI);
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Cannot add radio with link uri [ %1% ]. Capacity exceeded.") % radioURI);
+        throw std::runtime_error(msg);
     }
 
     this->radios[radioURI] = radio;

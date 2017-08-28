@@ -34,12 +34,8 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractTxModule *radio)
     // check if a method is binded for the given command
     if (this->bindings.find(type) == this->bindings.end())
     {
-        // create the exception string
-        std::string ex = boost::str(boost::format("no method binding for radio-command-type [ %1% ]") % ((int) type));
-        // display the exception with logger
-        BOOST_LOG_TRIVIAL(error) << ex;
-        // trow an exception
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("No method binding for radio command type [ %1% ].") % ((int) type));
+        throw std::runtime_error(msg);
     }
 
     // execute function bound to the given command

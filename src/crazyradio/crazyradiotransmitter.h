@@ -24,8 +24,6 @@
 
 #include <radio/i_transmitter.h>
 
-#include "radioexception.h"
-
 class CrazyRadioTransmitter : public ITransmitter
 {
 public:

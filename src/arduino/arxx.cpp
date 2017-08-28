@@ -38,7 +38,7 @@ void ArXX::invokeReading(boost::system::error_code errorCode,
     if (errorCode)
     {
         std::string msg = boost::str(boost::format("Failed reading data from serial port [ %1% ]: [ %2% ].") % this->portName % errorCode.message());
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 
     // register the first read callback
@@ -65,8 +65,7 @@ void ArXX::onDataRead(boost::system::error_code errorCode, size_t bytes_transfer
     if (errorCode || !bytes_transferred)
     {
         std::string msg = boost::str(boost::format("Reading data from serial port [ %1% ] failed with error [ %2% ].") % this->portName % errorCode.message());
-        BOOST_LOG_TRIVIAL(error) << msg;
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 
     std::istream istream(&this->response);
@@ -90,8 +89,7 @@ void ArXX::onDataWritten(boost::system::error_code errorCode,
     if (errorCode)
     {
         std::string msg = boost::str(boost::format("Writing to port [ %1% ] failed with error [ %2% ].") % this->portName % errorCode.message());
-        BOOST_LOG_TRIVIAL(error) << msg;
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 
     // free the buffer
@@ -111,8 +109,7 @@ void ArXX::open()
     if (errorCode)
     {
         std::string msg = boost::str(boost::format("Cannot open serial port [ %1% ], error [ %2% ].") % this->portName % errorCode.message());
-        BOOST_LOG_TRIVIAL(error) << msg;
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 
     // set serial port options
@@ -166,8 +163,7 @@ void ArXX::addTxModule(AbstractTxModule *txModule)
     else
     {
         std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % txId % this->portName);
-        BOOST_LOG_TRIVIAL(error) << msg;
-        throw RadioException(msg);
+        throw std::runtime_error(msg);
     }
 }
 
