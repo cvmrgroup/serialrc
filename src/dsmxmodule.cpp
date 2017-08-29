@@ -19,7 +19,8 @@
 
 #include "dsmxmodule.h"
 
-DSMXModule::DSMXModule(int copterId, RadioConfig &config) :
+DSMXModule::DSMXModule(int copterId, RadioConfig &config)
+        :
         AbstractTxModule(copterId, config.transmitter, config.txId)
 {
     this->config = config;
@@ -81,8 +82,7 @@ void DSMXModule::setBindSignal()
     this->binding = true;
 }
 
-void DSMXModule::setControls(double throttle, double roll, double pitch,
-                             double yaw)
+void DSMXModule::setControls(double throttle, double roll, double pitch, double yaw)
 {
     if (this->suspended)
     {

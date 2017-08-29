@@ -23,9 +23,9 @@ ArXX::ArXX(std::string name,
            int maxNumberOfRadios,
            std::string portName,
            boost::shared_ptr<boost::asio::io_service> ioService)
-        : transmitterName(name),
+        : portName(portName),
+          transmitterName(name),
           maxNumberOfModules(maxNumberOfRadios),
-          portName(portName),
           ioService(ioService)
 {
 }

@@ -87,7 +87,7 @@ public:
 
     void open() override;
 
-    void close() override;
+    virtual void close() override;
 
     std::string getName() override;
 

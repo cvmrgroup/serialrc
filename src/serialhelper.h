@@ -27,12 +27,12 @@ struct SerialHelper
 {
     static unsigned char loByte(int value)
     {
-        return (value >> 8) & 0x00FF;
+        return value & 0x00FF;
     }
 
     static unsigned char hiByte(int value)
     {
-        return value & 0x00FF;
+        return (value >> 8) & 0x00FF;
     }
 
     static int joinHiLoBytes(unsigned char hi, unsigned char lo)
