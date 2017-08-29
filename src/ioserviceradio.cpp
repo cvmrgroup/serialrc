@@ -5,14 +5,14 @@
 #include "ioserviceradio.h"
 
 IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
-                               boost::shared_ptr<boost::asio::io_service> io_service)
+                               boost::shared_ptr<boost::asio::io_service> ioService)
         : configs(configs),
-          io_service(io_service)
+          ioService(ioService)
 {
     this->started = false;
 
     // create tx/module for each config
-    for (auto config : this->configs)
+    for (auto &config : this->configs)
     {
         this->createRadio(config);
     }
@@ -67,18 +67,18 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const RadioConfig &config)
 #ifdef WITH_ARDUINO
     if (sender == "artt")
     {
-        tx = new ArTT(sender, config.serialPort, this->io_service);
+        tx = new ArTT(sender, config.serialPort, this->ioService);
     }
     if (sender == "artp")
     {
-        tx = new ArTP(sender, config.serialPort, this->io_service);
+        tx = new ArTP(sender, config.serialPort, this->ioService);
     }
 #endif
 
 #ifdef WITH_CRAZYRADIO
     if (sender == "crazyradio")
     {
-        tx = new CrazyRadioTransmitter(sender, this->io_service);
+        tx = new CrazyRadioTransmitter(sender, this->ioService);
     }
 #endif
 
@@ -171,7 +171,7 @@ AbstractTxModule *IOServiceRadio::getTxModule(int copterId)
 void IOServiceRadio::start()
 {
     // execute the start of the radio inside the io_service to be thread safe
-    this->io_service->post(boost::bind(&IOServiceRadio::doStart, this));
+    this->ioService->post(boost::bind(&IOServiceRadio::doStart, this));
 }
 
 void IOServiceRadio::doStart()
@@ -203,7 +203,7 @@ void IOServiceRadio::doStart()
 void IOServiceRadio::stop()
 {
     // execute the stop inside the io_service, to be thread safe
-    this->io_service->post(boost::bind(&IOServiceRadio::doStop, this));
+    this->ioService->post(boost::bind(&IOServiceRadio::doStop, this));
 }
 
 void IOServiceRadio::doStop()
@@ -267,7 +267,7 @@ void IOServiceRadio::fireRadioEvent(AbstractTxModule *radio)
 void IOServiceRadio::fireRadioCommand(IRadioCommand *command)
 {
     // invoke the fireRadioCommand inside the io_service to be thread safe
-    this->io_service->post(boost::bind(&IOServiceRadio::executeCommand, this, command));
+    this->ioService->post(boost::bind(&IOServiceRadio::executeCommand, this, command));
 }
 
 void IOServiceRadio::executeCommand(IRadioCommand *command)

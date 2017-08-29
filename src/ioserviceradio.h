@@ -29,13 +29,17 @@
 #include "dyscomodule.h"
 
 #ifdef WITH_ARDUINO
+
 #include "arduino/artp.h"
 #include "arduino/artt.h"
+
 #endif
 
 #ifdef WITH_CRAZYRADIO
+
 #include "crazyradio/crazyradiotransmitter.h"
 #include "crazyradio/crazyradiomodule.h"
+
 #endif
 
 #ifdef WITH_RASPBERRYPI
@@ -51,7 +55,7 @@ class IOServiceRadio : public IRadio
 {
 public:
     IOServiceRadio(std::vector<RadioConfig> configs,
-                   boost::shared_ptr<boost::asio::io_service> io_service);
+                   boost::shared_ptr<boost::asio::io_service> ioService);
 
     ~IOServiceRadio() override;
 
@@ -100,20 +104,20 @@ public:
 
 private:
 
-    /// the CommandExecutor to execute the correct logic for a received IRadioCommand
+    /// the executor of received radio commands
     CommandExecutor commandExecutor;
 
-    /// the underlying and used io_service
-    boost::shared_ptr<boost::asio::io_service> io_service;
-
-    /// the list with RadioConfiguration
+    /// the list of radio configs
     std::vector<RadioConfig> configs;
 
-    /// the map with all radios for the configured copters
-    std::unordered_map<int, AbstractTxModule *> txModules;
+    /// the underlying io_service
+    boost::shared_ptr<boost::asio::io_service> ioService;
 
-    /// the map with all used ITransmitters
+    /// a map with all used transmitters
     std::unordered_map<std::string, ITransmitter *> transmitters;
+
+    /// a map with all transmitter modules
+    std::unordered_map<int, AbstractTxModule *> txModules;
 };
 
 #endif //ICARUS_RADIOMANAGER_H

@@ -149,20 +149,15 @@ bool ArXX::hasCapacity()
     return this->modules.size() < this->maxNumberOfModules;
 }
 
-void ArXX::addTxModule(AbstractTxModule *txModule)
+void ArXX::addToModules(int id, AbstractTxModule *txModule)
 {
-    // get the transmitter id convert to int
-    std::string txIdStr = txModule->getModuleId();
-    int txId = boost::lexical_cast<int>(txIdStr);
-
-    // check if capacity is left
     if (this->hasCapacity())
     {
-        this->modules[txId] = txModule;
+        this->modules[id] = txModule;
     }
     else
     {
-        std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % txId % this->portName);
+        std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % id % this->portName);
         throw std::runtime_error(msg);
     }
 }

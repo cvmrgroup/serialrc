@@ -20,8 +20,8 @@
 #include "artt.h"
 
 ArTT::ArTT(std::string name, std::string serial,
-           boost::shared_ptr<boost::asio::io_service> io_service) :
-        ArXX(name, ATT_MAX_RADIOS, serial, io_service)
+           boost::shared_ptr<boost::asio::io_service> ioService) :
+        ArXX(name, ATT_MAX_RADIOS, serial, ioService)
 {
     this->first = true;
     this->lastModuleId = -1;
@@ -40,8 +40,7 @@ void ArTT::addTxModule(AbstractTxModule *txModule)
     this->configs[id] = module->getRadioConfig();
     this->moduleIds.push_back(id);
 
-    // notify ArXX about the tx module
-    ArXX::addTxModule(txModule);
+    this->addToModules(id, txModule);
 }
 
 void ArTT::close()
@@ -54,7 +53,7 @@ void ArTT::close()
 void ArTT::onData(std::string frame)
 {
     // get current transmitter id, increment token, remember tx for next call
-    int moduleId = boost::lexical_cast<int>(this->moduleIds[this->token]);
+    int moduleId = this->moduleIds[this->token];
     this->token = (this->token + 1) % (unsigned int) this->configs.size();
 
     // just ignore the first message (kind of flush serial buffer)

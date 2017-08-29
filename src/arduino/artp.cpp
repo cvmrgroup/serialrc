@@ -20,8 +20,8 @@
 #include "artp.h"
 
 ArTP::ArTP(const std::string name, std::string serial,
-           boost::shared_ptr<boost::asio::io_service> io_service) :
-        ArXX(name, ATP_N_RADIOS, serial, io_service)
+           boost::shared_ptr<boost::asio::io_service> ioService) :
+        ArXX(name, ATP_N_RADIOS, serial, ioService)
 {
     this->first = true;
 
@@ -52,7 +52,7 @@ void ArTP::addTxModule(AbstractTxModule *txModule)
 
     // add the txModule config to our map of configs
     RadioConfig config = module->getRadioConfig();
-    int tx = boost::lexical_cast<int>(config.txId);
+    int id = boost::lexical_cast<int>(config.txId);
 
     int ch1 = atp_center_value_offset + int(module->getThrottle() * atp_value_range_scale);
     int ch2 = atp_center_value_offset + int(module->getRoll() * atp_value_range_scale);
@@ -61,21 +61,21 @@ void ArTP::addTxModule(AbstractTxModule *txModule)
     int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
     int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
 
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
-    this->frame[tx * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
+    this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
 
     // notify ArXX about add Radio
-    ArXX::addTxModule(txModule);
+    this->addToModules(id, txModule);
 }
 
 void ArTP::onData(std::string frame)

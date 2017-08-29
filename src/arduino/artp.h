@@ -36,15 +36,21 @@ class ArTP : public ArXX
 
 public:
 
-    /// Constructor.
-    ArTP(std::string name, std::string serial,
-         boost::shared_ptr<boost::asio::io_service> io_service);
+    /**
+     * Constructor.
+     * @param name Device name.
+     * @param serial Device's serial number.
+     * @param ioService The boost io service.
+     */
+    ArTP(std::string name,
+         std::string serial,
+         boost::shared_ptr<boost::asio::io_service> ioService);
 
     /**
      * Overwrite addTxModule function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter
      */
-    void addTxModule(AbstractTxModule *txModule);
+    void addTxModule(AbstractTxModule *txModule) override;
 
 private:
 
@@ -53,7 +59,7 @@ private:
      * @param frame The data frame.
      * @param length The lenght of the data frame.
      */
-    void onData(std::string frame);
+    void onData(std::string frame) override;
 
     /**
      * Send data to the serial port.

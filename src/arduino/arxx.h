@@ -39,9 +39,8 @@
 #include "attdefinitions.h"
 
 /**
- * @brief Software-side super class for the communication with the software
- * running on the Arduinos used for Arduino Triple Transmission and Arduino
- * Trainer Port.
+ * Software-side super class for the communication with the software running on
+ * the Arduinos used for Arduino Triple Transmission and Arduino Trainer Port.
  */
 class ArXX : public ITransmitter
 {
@@ -62,7 +61,7 @@ public:
 
     ArXX() = delete;
 
-    ~ArXX() override = default;
+    virtual ~ArXX() override = default;
 
     ArXX(ArXX const &other) = delete;
 
@@ -96,7 +95,9 @@ public:
 
     bool hasCapacity() override;
 
-    void addTxModule(AbstractTxModule *txModule) override;
+    void addToModules(int id, AbstractTxModule *txModule);
+
+    virtual void addTxModule(AbstractTxModule *txModule) override = 0;
 
     // /////////////////////////////////////////////////////////////////////////
 

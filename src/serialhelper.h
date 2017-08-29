@@ -17,22 +17,28 @@
  *       @date:   13.05.2014
  *****************************************************/
 
-#ifndef SERIALHELPER_H
-#define SERIALHELPER_H
+#ifndef ICARUS_SERIALHELPER_H
+#define ICARUS_SERIALHELPER_H
 
 /**
  * Serial helper class to calculate or join low and high bytes.
  */
-class SerialHelper
+struct SerialHelper
 {
+    static unsigned char loByte(int value)
+    {
+        return (value >> 8) & 0x00FF;
+    }
 
-public:
+    static unsigned char hiByte(int value)
+    {
+        return value & 0x00FF;
+    }
 
-    static unsigned char loByte(int value);
-
-    static unsigned char hiByte(int value);
-
-    static int joinHiLoBytes(unsigned char hi, unsigned char lo);
+    static int joinHiLoBytes(unsigned char hi, unsigned char lo)
+    {
+        return (hi << 8) | lo;
+    }
 };
 
-#endif /* SERIALHELPER_H */
+#endif //ICARUS_SERIALHELPER_H

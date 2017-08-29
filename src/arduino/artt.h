@@ -27,8 +27,8 @@
 #include "attdefinitions.h"
 
 /**
- * @brief Software-side class for communication with the software running on the
- * arduino triple transmission built-in Arduino board.
+ * Software-side class for communication with the software running on the
+ * Arduino triple transmission built-in Arduino board.
  */
 class ArTT : public ArXX
 {
@@ -36,21 +36,25 @@ class ArTT : public ArXX
 public:
 
     /**
-     * @brief Constructor.
+     * Constructor.
+     * @param name Device name.
+     * @param serial Device's serial number.
+     * @param ioService The boost io service.
      */
-    ArTT(std::string name, std::string serial,
-         boost::shared_ptr<boost::asio::io_service> io_service);
+    ArTT(std::string name,
+         std::string serial,
+         boost::shared_ptr<boost::asio::io_service> ioService);
 
     /**
      * Overwrite addTxModule function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter
      */
-    void addTxModule(AbstractTxModule *txModule);
+    void addTxModule(AbstractTxModule *txModule) override;
 
     /**
      * Overwrite close to switch off the tx modules.
      */
-    void close();
+    void close() override;
 
 private:
 
@@ -59,7 +63,7 @@ private:
      * @param frame The data frame.
      * @param length Length of the array.
      */
-    void onData(std::string frame);
+    void onData(std::string frame) override;
 
     /**
      * Write data to the serial port.
