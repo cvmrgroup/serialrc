@@ -208,6 +208,7 @@ void IOServiceRadio::stop()
 
 void IOServiceRadio::doStop()
 {
+    // todo gets never called...
     // stop each transmitter
     for (auto entry: this->transmitters)
     {

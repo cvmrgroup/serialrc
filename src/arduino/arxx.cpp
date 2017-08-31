@@ -127,6 +127,8 @@ void ArXX::open()
 
 void ArXX::close()
 {
+    this->stop();
+
     if (this->serialPort && this->serialPort->is_open())
     {
         BOOST_LOG_TRIVIAL(info) << "Closing serial connection.";

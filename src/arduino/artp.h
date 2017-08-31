@@ -52,6 +52,11 @@ public:
      */
     void addTxModule(AbstractTxModule *txModule) override;
 
+    /**
+     * Clean up.
+     */
+    void stop() override;
+
 private:
 
     /**

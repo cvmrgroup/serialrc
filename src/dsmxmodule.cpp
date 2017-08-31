@@ -93,7 +93,7 @@ void DSMXModule::setControls(double throttle, double roll, double pitch, double 
     this->binding = false;
 
     this->signal[Throttle] = this->config.channels[Throttle].getServoTravel(throttle);
-    this->signal[Aileron] = this->config.channels[Aileron].getServoTravel(-roll);
+    this->signal[Aileron] = this->config.channels[Aileron].getServoTravel(roll);
     this->signal[Elevation] = this->config.channels[Elevation].getServoTravel(pitch);
     this->signal[Rudder] = this->config.channels[Rudder].getServoTravel(yaw);
 }

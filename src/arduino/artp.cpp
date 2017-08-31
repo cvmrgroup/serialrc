@@ -19,9 +19,10 @@
 
 #include "artp.h"
 
-ArTP::ArTP(const std::string name, std::string serial,
-           boost::shared_ptr<boost::asio::io_service> ioService) :
-        ArXX(name, ATP_N_RADIOS, serial, ioService)
+ArTP::ArTP(const std::string name,
+           std::string serial,
+           boost::shared_ptr<boost::asio::io_service> ioService)
+        : ArXX(name, ATP_N_RADIOS, serial, ioService)
 {
     this->first = true;
 
@@ -133,4 +134,8 @@ void ArTP::writeData()
 
     // write to serial port
     this->writeFrame(reinterpret_cast<const char *>(this->frame), (size_t) (ATP_FRAME_LENGTH));
+}
+
+void ArTP::stop()
+{
 }

@@ -52,9 +52,9 @@ public:
     void addTxModule(AbstractTxModule *txModule) override;
 
     /**
-     * Overwrite close to switch off the tx modules.
+     * Clean up.
      */
-    void close() override;
+    void stop() override;
 
 private:
 

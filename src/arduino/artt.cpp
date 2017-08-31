@@ -19,9 +19,10 @@
 
 #include "artt.h"
 
-ArTT::ArTT(std::string name, std::string serial,
-           boost::shared_ptr<boost::asio::io_service> ioService) :
-        ArXX(name, ATT_MAX_RADIOS, serial, ioService)
+ArTT::ArTT(std::string name,
+           std::string serial,
+           boost::shared_ptr<boost::asio::io_service> ioService)
+        : ArXX(name, ATT_MAX_RADIOS, serial, ioService)
 {
     this->first = true;
     this->lastModuleId = -1;
@@ -43,11 +44,9 @@ void ArTT::addTxModule(AbstractTxModule *txModule)
     this->addToModules(id, txModule);
 }
 
-void ArTT::close()
+void ArTT::stop()
 {
-    // todo turn off relays somehow
-
-    ArXX::close();
+    // todo switch off transmitters
 }
 
 void ArTT::onData(std::string frame)

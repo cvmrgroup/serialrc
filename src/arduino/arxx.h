@@ -87,7 +87,7 @@ public:
 
     void open() override;
 
-    virtual void close() override;
+    void close() override;
 
     std::string getName() override;
 
@@ -98,6 +98,8 @@ public:
     void addToModules(int id, AbstractTxModule *txModule);
 
     virtual void addTxModule(AbstractTxModule *txModule) override = 0;
+
+    virtual void stop() = 0;
 
     // /////////////////////////////////////////////////////////////////////////
 

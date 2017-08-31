@@ -20,8 +20,7 @@
 #include "dyscomodule.h"
 
 DyscoModule::DyscoModule(int copterId, std::string txName, std::string moduleId)
-        :
-        AbstractTxModule(copterId, txName, moduleId)
+        : AbstractTxModule(copterId, txName, moduleId)
 {
 }
 
