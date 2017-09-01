@@ -11,14 +11,16 @@ CommandExecutor::CommandExecutor()
 
 void CommandExecutor::initializeBindings()
 {
-    this->bindings[RadioCommandType::BIND_TRANSMITTER] = boost::bind(&CommandExecutor::onBindTransmitterCommand, this, _1, _2);
-    this->bindings[RadioCommandType::CONTROL] = boost::bind(&CommandExecutor::onControlCommand, this, _1, _2);
-    this->bindings[RadioCommandType::EMERGENCY] = boost::bind(&CommandExecutor::onEmergencyCommand, this, _1, _2);
-    this->bindings[RadioCommandType::RESUME_COPTER] = boost::bind(&CommandExecutor::onResumeCopterCommand, this, _1, _2);
-    this->bindings[RadioCommandType::SUSPEND_COPTER] = boost::bind(&CommandExecutor::onSuspendCopterCommand, this, _1, _2);
     this->bindings[RadioCommandType::TAKE_OVER] = boost::bind(&CommandExecutor::onTakeOverCommand, this, _1, _2);
+    this->bindings[RadioCommandType::EMERGENCY] = boost::bind(&CommandExecutor::onSuspendCopterCommand, this, _1, _2);
+
     this->bindings[RadioCommandType::TOGGLE_SUSPEND_COPTER] = boost::bind(&CommandExecutor::onToggleSuspensionCommand, this, _1, _2);
+    this->bindings[RadioCommandType::SUSPEND_COPTER] = boost::bind(&CommandExecutor::onSuspendCopterCommand, this, _1, _2);
+    this->bindings[RadioCommandType::RESUME_COPTER] = boost::bind(&CommandExecutor::onResumeCopterCommand, this, _1, _2);
+    this->bindings[RadioCommandType::CONTROL] = boost::bind(&CommandExecutor::onControlCommand, this, _1, _2);
+
     this->bindings[RadioCommandType::TOGGLE_TRANSMITTER] = boost::bind(&CommandExecutor::onToggleTransmitterCommand, this, _1, _2);
+    this->bindings[RadioCommandType::BIND_TRANSMITTER] = boost::bind(&CommandExecutor::onBindTransmitterCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_GEAR] = boost::bind(&CommandExecutor::onSwitchGearCommand, this, _1, _2);
     this->bindings[RadioCommandType::SET_GEAR] = boost::bind(&CommandExecutor::onSetGearCommand, this, _1, _2);
     this->bindings[RadioCommandType::TOGGLE_AUX1] = boost::bind(&CommandExecutor::onSwitchAux1Command, this, _1, _2);
@@ -44,24 +46,15 @@ void CommandExecutor::execute(IRadioCommand *command, AbstractTxModule *radio)
 
 // /////////////////////////////////////////////////////////////////////////////
 
-void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio)
+void CommandExecutor::onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
-    // set the bind signal
-    radio->setBindSignal();
 }
 
-void CommandExecutor::onControlCommand(IRadioCommand *command, AbstractTxModule *radio)
-{
-    if (ControlCommand *crtl = dynamic_cast<ControlCommand *>(command))
-    {
-        ControlInput u = crtl->getSignals();
-        radio->setControls(u[0], u[1], u[2], u[3]);
-    }
-}
+// /////////////////////////////////////////////////////////////////////////////
 
-void CommandExecutor::onResumeCopterCommand(IRadioCommand *command, AbstractTxModule *radio)
+void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
-    radio->suspend(false);
+    radio->toggleSuspension();
 }
 
 void CommandExecutor::onSuspendCopterCommand(IRadioCommand *command, AbstractTxModule *radio)
@@ -69,18 +62,30 @@ void CommandExecutor::onSuspendCopterCommand(IRadioCommand *command, AbstractTxM
     radio->suspend(true);
 }
 
-void CommandExecutor::onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio)
+void CommandExecutor::onResumeCopterCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
+    radio->suspend(false);
 }
 
-void CommandExecutor::onToggleSuspensionCommand(IRadioCommand *command, AbstractTxModule *radio)
+void CommandExecutor::onControlCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
-    radio->toggleSuspension();
+    if (ControlCommand *crtl = dynamic_cast<ControlCommand *>(command))
+    {
+        radio->setControls(crtl->getSignals());
+    }
 }
+
+// /////////////////////////////////////////////////////////////////////////////
 
 void CommandExecutor::onToggleTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio)
 {
     radio->toggleSender();
+}
+
+void CommandExecutor::onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio)
+{
+    // set the bind signal
+    radio->setBindSignal();
 }
 
 void CommandExecutor::onSwitchGearCommand(IRadioCommand *command, AbstractTxModule *radio)
@@ -99,9 +104,4 @@ void CommandExecutor::onSetGearCommand(IRadioCommand *command, AbstractTxModule 
 void CommandExecutor::onSwitchAux1Command(IRadioCommand *command, AbstractTxModule *radio)
 {
     radio->toggleAux1();
-}
-
-void CommandExecutor::onEmergencyCommand(IRadioCommand *command, AbstractTxModule *radio)
-{
-    radio->emergencyStop();
 }

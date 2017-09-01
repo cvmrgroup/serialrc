@@ -95,11 +95,9 @@ public:
 
     bool hasCapacity() override;
 
-    void addToModules(int id, AbstractTxModule *txModule);
+    virtual void addTxModule(AbstractTxModule *module) override = 0;
 
-    virtual void addTxModule(AbstractTxModule *txModule) override = 0;
-
-    virtual void stop() = 0;
+    virtual void finalize() = 0;
 
     // /////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +152,7 @@ private:
 protected:
 
     /// A map with all transmitter modules connected to this transmitter.
-    std::unordered_map<int, AbstractTxModule *> modules;
+    std::unordered_map<int, DSMXModule *> modules;
 };
 
 #endif //ARXX_H

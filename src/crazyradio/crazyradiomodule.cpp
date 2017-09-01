@@ -19,14 +19,18 @@
 
 #include "crazyradiomodule.h"
 
-CrazyRadioModule::CrazyRadioModule(int id, std::string sender, std::string txId)
-        :
-        AbstractTxModule(id, sender, txId)
+CrazyRadioModule::CrazyRadioModule(int copterId, std::string sender, int txId, std::string radioUri)
+        : AbstractTxModule(copterId, sender, txId),
+          radioUri(radioUri)
 {
 }
 
-void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
-                                   double yaw)
+std::string CrazyRadioModule::getRadioUri()
+{
+    return this->radioUri;
+}
+
+void CrazyRadioModule::setControls(ControlInput u)
 {
     if (this->suspended)
     {
@@ -36,10 +40,10 @@ void CrazyRadioModule::setControls(double throttle, double roll, double pitch,
     int throttle_center_value_offset = 30000;
     int throttle_value_range_scale = 30000;
 
-    this->signal[Throttle] = (throttle_center_value_offset + throttle * throttle_value_range_scale);
-    this->signal[Aileron] = (roll * 45);
-    this->signal[Elevation] = (-pitch * 45);
-    this->signal[Rudder] = (yaw * -180);
+    this->signal[Throttle] = (throttle_center_value_offset + u.thrust * throttle_value_range_scale);
+    this->signal[Aileron] = (-u.roll * 45);
+    this->signal[Elevation] = (-u.pitch * 45);
+    this->signal[Rudder] = (u.yaw * -180);
 }
 
 void CrazyRadioModule::suspend(bool suspended)
@@ -62,45 +66,10 @@ void CrazyRadioModule::toggleSuspension()
     }
 }
 
-void CrazyRadioModule::emergencyStop()
-{
-    suspend(true);
-}
-
 void CrazyRadioModule::setSuspensionSignal()
 {
-    for (int i = 0; i < N_CHANNELS; i++)
+    for (int i = 0; i < this->nChannels; i++)
     {
-        this->signal[i] = 0;
+        this->signal[i] = 0.;
     }
-}
-
-// not implemented /////////////////////////////////////////////////////////////
-
-void CrazyRadioModule::toggleSender()
-{
-}
-
-void CrazyRadioModule::turnSenderOn()
-{
-}
-
-void CrazyRadioModule::turnSenderOff()
-{
-}
-
-void CrazyRadioModule::setBindSignal()
-{
-}
-
-void CrazyRadioModule::toggleGear()
-{
-}
-
-void CrazyRadioModule::setGear(bool state)
-{
-}
-
-void CrazyRadioModule::toggleAux1()
-{
 }

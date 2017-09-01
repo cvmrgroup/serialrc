@@ -27,35 +27,25 @@ class CrazyRadioModule : public AbstractTxModule
 
 public:
 
-    CrazyRadioModule(int id, std::string sender, std::string txId);
+    CrazyRadioModule(int copterId, std::string sender, int txId, std::string radioUri);
 
-    void setSuspensionSignal();
+    // AbstractTxModule ////////////////////////////////////////////////////////
 
-    // /////////////////////////////////////////////////////////////////////////
-
-    void setControls(double throttle, double roll, double pitch, double yaw) override;
+    void setControls(ControlInput u) override;
 
     void toggleSuspension() override;
 
     void suspend(bool suspend) override;
 
-    void emergencyStop() override;
+    // /////////////////////////////////////////////////////////////////////////
 
-    // not implemented /////////////////////////////////////////////////////////
+    std::string getRadioUri();
 
-    void toggleSender() override;
+    void setSuspensionSignal();
 
-    void turnSenderOn() override;
+private:
 
-    void turnSenderOff() override;
-
-    void setBindSignal() override;
-
-    void toggleGear() override;
-
-    void setGear(bool state) override;
-
-    void toggleAux1() override;
+    std::string radioUri;
 };
 
 #endif //ICARUS_CRAZYRADIOMODULE_H

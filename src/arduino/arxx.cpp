@@ -127,7 +127,7 @@ void ArXX::open()
 
 void ArXX::close()
 {
-    this->stop();
+    this->finalize();
 
     if (this->serialPort && this->serialPort->is_open())
     {
@@ -149,19 +149,6 @@ bool ArXX::isOpen()
 bool ArXX::hasCapacity()
 {
     return this->modules.size() < this->maxNumberOfModules;
-}
-
-void ArXX::addToModules(int id, AbstractTxModule *txModule)
-{
-    if (this->hasCapacity())
-    {
-        this->modules[id] = txModule;
-    }
-    else
-    {
-        std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % id % this->portName);
-        throw std::runtime_error(msg);
-    }
 }
 
 int ArXX::getNumberOfRadios()

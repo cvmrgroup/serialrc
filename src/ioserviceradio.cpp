@@ -4,7 +4,7 @@
 
 #include "ioserviceradio.h"
 
-IOServiceRadio::IOServiceRadio(std::vector<RadioConfig> configs,
+IOServiceRadio::IOServiceRadio(std::vector<TxModuleConfig> configs,
                                boost::shared_ptr<boost::asio::io_service> ioService)
         : configs(configs),
           ioService(ioService)
@@ -46,7 +46,7 @@ IOServiceRadio::~IOServiceRadio()
 
 // /////////////////////////////////////////////////////////////////////////////
 
-ITransmitter *IOServiceRadio::createAndGetTransmitter(const RadioConfig &config)
+ITransmitter *IOServiceRadio::createAndGetTransmitter(const TxModuleConfig &config)
 {
     std::string sender = config.transmitter;
 
@@ -105,7 +105,7 @@ ITransmitter *IOServiceRadio::createAndGetTransmitter(const RadioConfig &config)
     return transmitter;
 }
 
-void IOServiceRadio::createRadio(RadioConfig &config)
+void IOServiceRadio::createRadio(TxModuleConfig &config)
 {
     int copterId = config.copterId;
 
@@ -138,7 +138,7 @@ void IOServiceRadio::createRadio(RadioConfig &config)
 #ifdef WITH_CRAZYRADIO
     if (sender == "crazyradio")
     {
-        module = new CrazyRadioModule(copterId, config.transmitter, config.txId);
+        module = new CrazyRadioModule(copterId, config.transmitter, config.txId, config.radioLink);
     }
 #endif
 
@@ -243,23 +243,13 @@ void IOServiceRadio::fireImuData(ImuData data)
 
 void IOServiceRadio::fireRadioEvent(AbstractTxModule *radio)
 {
-    // create the RadioEvent
     RadioEvent e;
 
     e.copterId = radio->getCopterId();
     e.txName = radio->getTxName();
     e.moduleId = radio->getModuleId();
     e.enabled = radio->isEnabled();
-    e.binding = radio->isBinding();
-    e.suspended = radio->isSuspended();
-
-    // todo just copy the whole signal
-    e.signal[AbstractTxModule::Channel::Throttle] = radio->getThrottle();
-    e.signal[AbstractTxModule::Channel::Aileron] = radio->getRoll();
-    e.signal[AbstractTxModule::Channel::Elevation] = radio->getPitch();
-    e.signal[AbstractTxModule::Channel::Rudder] = radio->getYaw();
-    e.signal[AbstractTxModule::Channel::Gear] = radio->getGear();
-    e.signal[AbstractTxModule::Channel::Aux1] = radio->getAux1();
+    e.signal = radio->getSignal();
 
     // fire the RadioEvent
     this->onRadioChanged(e);

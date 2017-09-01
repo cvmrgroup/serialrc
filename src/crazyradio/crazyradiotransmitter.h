@@ -81,7 +81,7 @@ public:
 
     bool hasCapacity() override;
 
-    void addTxModule(AbstractTxModule *radio) override;
+    void addTxModule(AbstractTxModule *module) override;
 
 private:
 
@@ -94,8 +94,8 @@ private:
     /// flag if the CrazyRadioTransmitter is running
     std::atomic<bool> running;
 
-    /// the id of the current radio
-    std::string currentRadio;
+    /// the radio uri
+    std::string radioUri;
 
     /// the map with radios
     std::unordered_map<std::string, AbstractTxModule *> radios;

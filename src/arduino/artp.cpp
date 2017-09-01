@@ -46,21 +46,17 @@ ArTP::ArTP(const std::string name,
     }
 }
 
-void ArTP::addTxModule(AbstractTxModule *txModule)
+void ArTP::updateFrame(AbstractTxModule *module)
 {
-    // this is a dsmx module
-    DSMXModule *module = static_cast<DSMXModule *>(txModule);
+    int id = module->getModuleId();
+    std::vector<double> signal = module->getSignal();
 
-    // add the txModule config to our map of configs
-    RadioConfig config = module->getRadioConfig();
-    int id = boost::lexical_cast<int>(config.txId);
-
-    int ch1 = atp_center_value_offset + int(module->getThrottle() * atp_value_range_scale);
-    int ch2 = atp_center_value_offset + int(module->getRoll() * atp_value_range_scale);
-    int ch3 = atp_center_value_offset + int(module->getPitch() * atp_value_range_scale);
-    int ch4 = atp_center_value_offset + int(module->getYaw() * atp_value_range_scale);
-    int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
-    int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
+    int ch1 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Throttle] * atp_value_range_scale);
+    int ch2 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aileron] * atp_value_range_scale);
+    int ch3 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Elevation] * atp_value_range_scale);
+    int ch4 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Rudder] * atp_value_range_scale);
+    int ch5 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Gear] * atp_value_range_scale);
+    int ch6 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aux1] * atp_value_range_scale);
 
     this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
     this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
@@ -74,9 +70,23 @@ void ArTP::addTxModule(AbstractTxModule *txModule)
     this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
     this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
     this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
+}
 
-    // notify ArXX about add Radio
-    this->addToModules(id, txModule);
+void ArTP::addTxModule(AbstractTxModule *module)
+{
+    this->updateFrame(module);
+
+    int id = module->getModuleId();
+
+    if (this->hasCapacity())
+    {
+        this->modules[id] = static_cast<DSMXModule *>(module);
+    }
+    else
+    {
+        std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % id % this->portName);
+        throw std::runtime_error(msg);
+    }
 }
 
 void ArTP::onData(std::string frame)
@@ -105,37 +115,13 @@ void ArTP::writeData()
     for (auto const entry: this->modules)
     {
         AbstractTxModule *module = entry.second;
-
-        // get the transmitter id as string and cast to int
-        std::string txIdStr = module->getModuleId();
-        int id = boost::lexical_cast<int>(txIdStr);
-
-        int ch1 = atp_center_value_offset + int(module->getThrottle() * atp_value_range_scale);
-        int ch2 = atp_center_value_offset + int(module->getRoll() * atp_value_range_scale);
-        int ch3 = atp_center_value_offset + int(module->getPitch() * atp_value_range_scale);
-        int ch4 = atp_center_value_offset + int(module->getYaw() * atp_value_range_scale);
-        int ch5 = atp_center_value_offset + int(module->getGear() * atp_value_range_scale);
-        int ch6 = atp_center_value_offset + int(module->getAux1() * atp_value_range_scale);
-
-        // write to byte frame
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_HI] = SerialHelper::hiByte(ch1);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH1_LO] = SerialHelper::loByte(ch1);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_HI] = SerialHelper::hiByte(ch2);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH2_LO] = SerialHelper::loByte(ch2);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_HI] = SerialHelper::hiByte(ch3);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH3_LO] = SerialHelper::loByte(ch3);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_HI] = SerialHelper::hiByte(ch4);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH4_LO] = SerialHelper::loByte(ch4);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_HI] = SerialHelper::hiByte(ch5);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH5_LO] = SerialHelper::loByte(ch5);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_HI] = SerialHelper::hiByte(ch6);
-        this->frame[id * ATP_COMMAND_LENGTH + ATP_CH6_LO] = SerialHelper::loByte(ch6);
+        this->updateFrame(module);
     }
 
     // write to serial port
     this->writeFrame(reinterpret_cast<const char *>(this->frame), (size_t) (ATP_FRAME_LENGTH));
 }
 
-void ArTP::stop()
+void ArTP::finalize()
 {
 }

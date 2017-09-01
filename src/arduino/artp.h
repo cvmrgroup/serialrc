@@ -47,15 +47,21 @@ public:
          boost::shared_ptr<boost::asio::io_service> ioService);
 
     /**
+     * Update the frame to be sent via serial connection.
+     * @param module The transmitter module.
+     */
+    void updateFrame(AbstractTxModule *module);
+
+    /**
      * Overwrite addTxModule function for getting the transmitter ids
      * @param the AbstractRadio to add to this transmitter
      */
-    void addTxModule(AbstractTxModule *txModule) override;
+    void addTxModule(AbstractTxModule *module) override;
 
     /**
      * Clean up.
      */
-    void stop() override;
+    void finalize() override;
 
 private:
 

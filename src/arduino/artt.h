@@ -46,15 +46,15 @@ public:
          boost::shared_ptr<boost::asio::io_service> ioService);
 
     /**
-     * Overwrite addTxModule function for getting the transmitter ids
-     * @param the AbstractRadio to add to this transmitter
+     * Add a module to the transmitter.
+     * @param module The transmitter module to add.
      */
-    void addTxModule(AbstractTxModule *txModule) override;
+    void addTxModule(AbstractTxModule *module) override;
 
     /**
      * Clean up.
      */
-    void stop() override;
+    void finalize() override;
 
 private:
 
@@ -72,7 +72,7 @@ private:
     void writeData(int id = 0);
 
     /// Radio configs.
-    std::unordered_map<int, RadioConfig> configs;
+    std::unordered_map<int, TxModuleConfig> configs;
     std::vector<int> moduleIds;
 
     /// The tx id the last frame was sent to.

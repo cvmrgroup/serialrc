@@ -20,8 +20,11 @@
 #include "rpitx.h"
 
 RpiTX::RpiTX(const std::string name,
-             boost::shared_ptr<boost::asio::io_service> io_service) :
+             const std::string serialPortName,
+             boost::shared_ptr<boost::asio::io_service> io_service)
+        :
         name(name),
+        serialPortName(serialPortName),
         serial(-1),
         initialized(false),
         module(NULL)
@@ -32,18 +35,16 @@ RpiTX::RpiTX(const std::string name,
 
 void RpiTX::open()
 {
-    if ((this->serial = Serial::serialOpen("/dev/serial0", DSM_BAUD_RATE)) < 0)
+    if ((this->serial = Serial::serialOpen(this->serialPortName, DSM_BAUD_RATE)) < 0)
     {
-        std::string ex = "Unable to open serial device.";
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = "Unable to open serial device.";
+        throw std::runtime_error(msg);
     }
 
     if (wiringPiSetup() == -1)
     {
-        std::string ex = "Unable to start wiringPi.";
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = "Unable to start wiringPi.";
+        throw std::runtime_error(msg);
     }
 
     BOOST_LOG_TRIVIAL(info) << "GPIO serial port initialized.";
@@ -93,9 +94,8 @@ void RpiTX::addTxModule(AbstractTxModule *txModule)
 {
     if (this->module)
     {
-        std::string ex = "Raspi Radio already added.";
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = "Raspi Radio already added.";
+        throw std::runtime_error(msg);
     }
 
     // this is a dsmx radio
@@ -115,32 +115,32 @@ void RpiTX::update(const boost::system::error_code &ec)
 {
     if (ec)
     {
-        std::string ex = boost::str(boost::format("Raspi Radio timer update failed with exception [ %1% ].") % ec.message());
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = boost::str(boost::format("Raspi Radio timer update failed with exception [ %1% ].") % ec.message());
+        throw std::runtime_error(msg);
     }
 
     if (!this->module)
     {
-        std::string ex = "No radio set.";
-        BOOST_LOG_TRIVIAL(error) << ex;
-        throw RadioException(ex);
+        std::string msg = "No radio set.";
+        throw std::runtime_error(msg);
     }
 
     unsigned char frame[DSM_FRAME_LENGTH] = {};
 
     DSMXModule *radio = this->module;
-    
+
     // prepare array and send signal
     frame[header_1] = (unsigned char) radio->isBinding() ? header_1_bind_mode : header_1_default;
     frame[header_2] = (unsigned char) header_2_default;
 
-    int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
-    int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
-    int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
-    int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-    int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
-    int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
+    std::vector<double> signal = radio->getSignal();
+
+    int ch1 = ch1_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Throttle] * value_range_scale);
+    int ch2 = ch2_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aileron] * value_range_scale);
+    int ch3 = ch3_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Elevation] * value_range_scale);
+    int ch4 = ch4_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Rudder] * value_range_scale);
+    int ch5 = ch5_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Gear] * value_range_scale);
+    int ch6 = ch6_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aux1] * value_range_scale);
 
     // convert to byte frame
     frame[channel_1_hi] = SerialHelper::hiByte(ch1);

@@ -31,11 +31,15 @@ class DyscoModule : public AbstractTxModule
 {
 public:
 
-    DyscoModule(int copterId, std::string txName, std::string moduleId);
+    DyscoModule(int copterId, std::string txName, int moduleId);
 
     // /////////////////////////////////////////////////////////////////////////
 
-    void setControls(double throttle, double roll, double pitch, double yaw) override;
+    void toggleSuspension() override;
+
+    void suspend(bool suspend) override;
+
+    void setControls(ControlInput u) override;
 
     void toggleGear() override;
 
@@ -43,27 +47,15 @@ public:
 
     void toggleAux1() override;
 
-    // not implemented /////////////////////////////////////////////////////////
-
-    void toggleSuspension() override;
-
-    void suspend(bool suspend) override;
-
-    void emergencyStop() override;
-
-    void toggleSender() override;
-
-    void turnSenderOn() override;
-
-    void turnSenderOff() override;
-
-    void setBindSignal() override;
-
     // /////////////////////////////////////////////////////////////////////////
 
-    boost::signals2::signal<void(int, cv::Vec4d)> onControlCommand;
+    boost::signals2::signal<void(int, ControlInput)> onControlCommand;
     boost::signals2::signal<void(int)> onResetCommand;
     boost::signals2::signal<void(int, bool)> onHorizonCommand;
+
+private:
+
+    bool horizon;
 };
 
 #endif //ICARUS_DYSCOMODULE_H

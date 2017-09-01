@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-#include <config/radioconfig.h>
+#include <config/txmoduleconfig.h>
 
 #include <radio/abstracttxmodule.h>
 
@@ -31,33 +31,19 @@ class DSMXModule : public AbstractTxModule
 
 public:
 
-    DSMXModule(int copterId, RadioConfig &config);
+    DSMXModule(int copterId, TxModuleConfig &config);
 
-    /**
-     * Get the radio configuration.
-     * @return The radio configuration.
-     */
-    RadioConfig getRadioConfig();
-
-    void setArmSignal();
-
-    void setDisarmSignal();
-
-    // /////////////////////////////////////////////////////////////////////////
-
-    void toggleSender() override;
-
-    void turnSenderOn() override;
-
-    void turnSenderOff() override;
-
-    void suspend(bool suspended) override;
+    // AbstractTxModule ////////////////////////////////////////////////////////
 
     void toggleSuspension() override;
 
-    void setBindSignal() override;
+    void suspend(bool suspended) override;
 
-    void setControls(double throttle, double roll, double pitch, double yaw) override;
+    void setControls(ControlInput u) override;
+
+    void toggleSender() override;
+
+    void setBindSignal() override;
 
     void toggleGear() override;
 
@@ -65,11 +51,24 @@ public:
 
     void toggleAux1() override;
 
-    void emergencyStop() override;
+    bool isEnabled() override;
+
+    bool isBinding() override;
+
+    // /////////////////////////////////////////////////////////////////////////
+
+    TxModuleConfig getConfig();
+
+    void setArmSignal();
+
+    void setDisarmSignal();
 
 private:
 
-    RadioConfig config;
+    TxModuleConfig config;
+
+    bool enabled;
+    bool binding;
 };
 
 #endif /* DSMXMODULE_H */

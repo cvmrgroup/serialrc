@@ -33,7 +33,6 @@
 
 #include "dsmxmodule.h"
 #include "dsmxconstants.h"
-#include "radioexception.h"
 #include "abstracttxmodule.h"
 #include "i_transmitter.h"
 #include "serialhelper.h"
@@ -45,6 +44,7 @@ class RpiTX : public ITransmitter
 public:
 
     RpiTX(const std::string name,
+          const std::string serialPortName,
           boost::shared_ptr<boost::asio::io_service> io_service);
 
     void open();
@@ -65,6 +65,7 @@ private:
 
     /// the name of the transmitter
     std::string name;
+    std::string serialPortName;
     int serial;
     bool initialized;
 

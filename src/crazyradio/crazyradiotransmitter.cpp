@@ -3,13 +3,14 @@
 //
 
 #include "crazyradiotransmitter.h"
+#include "crazyradiomodule.h"
 
 CrazyRadioTransmitter::CrazyRadioTransmitter(const std::string name, boost::shared_ptr<boost::asio::io_service> ioService)
         :
         name(name),
         ioService(ioService),
         running(false),
-        currentRadio("-1")
+        radioUri("-1")
 {
 }
 
@@ -72,12 +73,12 @@ void CrazyRadioTransmitter::run()
 
             logBlockImu.reset(new LogBlock<logImu>(
                     this->copter, {
-                            {"acc",  "x"},
-                            {"acc",  "y"},
-                            {"acc",  "z"},
-                            {"gyro", "x"},
-                            {"gyro", "y"},
-                            {"gyro", "z"},
+                            { "acc",  "x" },
+                            { "acc",  "y" },
+                            { "acc",  "z" },
+                            { "gyro", "x" },
+                            { "gyro", "y" },
+                            { "gyro", "z" },
                     }, cb));
             logBlockImu->start(1); // 10ms
         }
@@ -91,12 +92,12 @@ void CrazyRadioTransmitter::run()
 
             logBlock2.reset(new LogBlock<log2>(
                     this->copter, {
-                            {"mag",  "x"},
-                            {"mag",  "y"},
-                            {"mag",  "z"},
-                            {"baro", "temp"},
-                            {"baro", "pressure"},
-                            {"pm",   "vbat"},
+                            { "mag",  "x" },
+                            { "mag",  "y" },
+                            { "mag",  "z" },
+                            { "baro", "temp" },
+                            { "baro", "pressure" },
+                            { "pm",   "vbat" },
                     }, cb2));
             logBlock2->start(100); // 1000ms
         }
@@ -163,7 +164,7 @@ void CrazyRadioTransmitter::initialize()
     // see: http://www.solved.online/311063/why-does-qt-change-behaviour-of-sscanf
     setlocale(LC_NUMERIC, "C");
 
-    std::string uri = this->currentRadio;
+    std::string uri = this->radioUri;
 
     BOOST_LOG_TRIVIAL(info) << "Connecting crazyflie with crazyradio url [ " << uri << " ].";
 
@@ -202,14 +203,15 @@ void CrazyRadioTransmitter::update()
     this->ioService->post([this, &latch, &success, &u]()
                           {
                               // check if current radio exists
-                              if (this->radios.find(this->currentRadio) != this->radios.end())
+                              if (this->radios.find(this->radioUri) != this->radios.end())
                               {
-                                  AbstractTxModule *radio = this->radios[this->currentRadio];
+                                  AbstractTxModule *radio = this->radios[this->radioUri];
+                                  std::vector<double> signal = radio->getSignal();
 
-                                  u = cv::Vec4d(radio->getThrottle(),
-                                                radio->getRoll(),
-                                                radio->getPitch(),
-                                                radio->getYaw());
+                                  u = cv::Vec4d(signal[AbstractTxModule::ChannelNames::Throttle],
+                                                signal[AbstractTxModule::ChannelNames::Aileron],
+                                                signal[AbstractTxModule::ChannelNames::Elevation],
+                                                signal[AbstractTxModule::ChannelNames::Rudder]);
 
                                   success = true;
                               }
@@ -329,9 +331,11 @@ bool CrazyRadioTransmitter::hasCapacity()
     return this->radios.size() < 1;
 }
 
-void CrazyRadioTransmitter::addTxModule(AbstractTxModule *radio)
+void CrazyRadioTransmitter::addTxModule(AbstractTxModule *module)
 {
-    std::string radioURI = radio->getModuleId();
+    CrazyRadioModule *crModule = static_cast<CrazyRadioModule *>(module);
+
+    std::string radioURI = crModule->getRadioUri();
 
     if (!this->hasCapacity())
     {
@@ -339,6 +343,6 @@ void CrazyRadioTransmitter::addTxModule(AbstractTxModule *radio)
         throw std::runtime_error(msg);
     }
 
-    this->radios[radioURI] = radio;
-    this->currentRadio = radioURI;
+    this->radios[radioURI] = module;
+    this->radioUri = radioURI;
 }

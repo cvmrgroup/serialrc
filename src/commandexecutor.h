@@ -17,6 +17,8 @@
 #include <radio/commands/controlcommand.h>
 #include <radio/commands/setgearcommand.h>
 
+#include "dsmxmodule.h"
+
 class CommandExecutor
 {
 
@@ -30,19 +32,21 @@ private:
 
     // /////////////////////////////////////////////////////////////////////////
 
-    void onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
+    void onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onControlCommand(IRadioCommand *command, AbstractTxModule *radio);
+    // /////////////////////////////////////////////////////////////////////////
 
-    void onEmergencyCommand(IRadioCommand *command, AbstractTxModule *radio);
-
-    void onResumeCopterCommand(IRadioCommand *command, AbstractTxModule *radio);
+    void onToggleSuspensionCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onSuspendCopterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onTakeOverCommand(IRadioCommand *command, AbstractTxModule *radio);
+    void onResumeCopterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
-    void onToggleSuspensionCommand(IRadioCommand *command, AbstractTxModule *radio);
+    void onControlCommand(IRadioCommand *command, AbstractTxModule *radio);
+
+    // DSMX ////////////////////////////////////////////////////////////////////
+
+    void onBindTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 
     void onToggleTransmitterCommand(IRadioCommand *command, AbstractTxModule *radio);
 

@@ -20,9 +20,14 @@
 #include "dyscotx.h"
 
 DyscoTx::DyscoTx(std::string name)
-        :
-        name(name)
+        : name(name)
 {
+}
+
+void DyscoTx::addTxModule(AbstractTxModule *module)
+{
+    int txId = module->getModuleId();
+    this->modules[txId] = module;
 }
 
 void DyscoTx::open()
@@ -48,10 +53,4 @@ bool DyscoTx::hasCapacity()
     return true;
 }
 
-void DyscoTx::addTxModule(AbstractTxModule *module)
-{
-    // get the transmitter id convert to int
-    std::string txIdStr = module->getModuleId();
-    int txId = boost::lexical_cast<int>(txIdStr);
-    this->modules[txId] = module;
-}
+

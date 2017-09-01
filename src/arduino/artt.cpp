@@ -29,22 +29,26 @@ ArTT::ArTT(std::string name,
     this->token = 0;
 }
 
-void ArTT::addTxModule(AbstractTxModule *txModule)
+void ArTT::addTxModule(AbstractTxModule *module)
 {
-    // this is a dsmx module
-    DSMXModule *module = static_cast<DSMXModule *>(txModule);
+    int id = module->getModuleId();
+    DSMXModule *dsmx = static_cast<DSMXModule *>(module);
 
-    // get id as int
-    int id = boost::lexical_cast<int>(module->getModuleId());
-
-    // add tx module to our configs list
-    this->configs[id] = module->getRadioConfig();
+    this->configs[id] = dsmx->getConfig();
     this->moduleIds.push_back(id);
 
-    this->addToModules(id, txModule);
+    if (this->hasCapacity())
+    {
+        this->modules[id] = dsmx;
+    }
+    else
+    {
+        std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % id % this->portName);
+        throw std::runtime_error(msg);
+    }
 }
 
-void ArTT::stop()
+void ArTT::finalize()
 {
     // todo switch off transmitters
 }
@@ -98,7 +102,7 @@ void ArTT::writeData(int id)
     }
 
     AbstractTxModule *radio = this->modules[id];
-    RadioConfig &config = this->configs[id];
+    TxModuleConfig &config = this->configs[id];
 
     unsigned char frame[ATT_FRAME_LENGTH] = { 0 };
     frame[ATT_TX_ID] = (unsigned char) id;
@@ -116,12 +120,14 @@ void ArTT::writeData(int id)
         frame[ATT_HEADER_1] = (unsigned char) (radio->isBinding() ? header_1_bind_mode : header_1_default);
         frame[ATT_HEADER_2] = (unsigned char) header_2_default;
 
-        int ch1 = ch1_offset + center_value_offset + int(radio->getThrottle() * value_range_scale);
-        int ch2 = ch2_offset + center_value_offset + int(radio->getRoll() * value_range_scale);
-        int ch3 = ch3_offset + center_value_offset + int(radio->getPitch() * value_range_scale);
-        int ch4 = ch4_offset + center_value_offset + int(radio->getYaw() * value_range_scale);
-        int ch5 = ch5_offset + center_value_offset + int(radio->getGear() * value_range_scale);
-        int ch6 = ch6_offset + center_value_offset + int(radio->getAux1() * value_range_scale);
+        std::vector<double> signal = radio->getSignal();
+
+        int ch1 = ch1_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Throttle] * value_range_scale);
+        int ch2 = ch2_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aileron] * value_range_scale);
+        int ch3 = ch3_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Elevation] * value_range_scale);
+        int ch4 = ch4_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Rudder] * value_range_scale);
+        int ch5 = ch5_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Gear] * value_range_scale);
+        int ch6 = ch6_offset + center_value_offset + int(signal[AbstractTxModule::ChannelNames::Aux1] * value_range_scale);
 
         // write to byte frame
         frame[ATT_CH1_HI] = SerialHelper::hiByte(ch1);

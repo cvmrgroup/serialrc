@@ -49,12 +49,12 @@
 #include "radio/radioevent.h"
 
 #include "commandexecutor.h"
-#include "config/radioconfig.h"
+#include "config/txmoduleconfig.h"
 
 class IOServiceRadio : public IRadio
 {
 public:
-    IOServiceRadio(std::vector<RadioConfig> configs,
+    IOServiceRadio(std::vector<TxModuleConfig> configs,
                    boost::shared_ptr<boost::asio::io_service> ioService);
 
     ~IOServiceRadio() override;
@@ -65,9 +65,9 @@ private:
 
     void fireImuData(ImuData data);
 
-    void createRadio(RadioConfig &config);
+    void createRadio(TxModuleConfig &config);
 
-    ITransmitter *createAndGetTransmitter(const RadioConfig &config);
+    ITransmitter *createAndGetTransmitter(const TxModuleConfig &config);
 
     AbstractTxModule *getTxModule(int copterId) override;
 
@@ -108,7 +108,7 @@ private:
     CommandExecutor commandExecutor;
 
     /// the list of radio configs
-    std::vector<RadioConfig> configs;
+    std::vector<TxModuleConfig> configs;
 
     /// the underlying io_service
     boost::shared_ptr<boost::asio::io_service> ioService;

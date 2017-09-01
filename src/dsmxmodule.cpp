@@ -19,12 +19,20 @@
 
 #include "dsmxmodule.h"
 
-DSMXModule::DSMXModule(int copterId, RadioConfig &config)
-        :
-        AbstractTxModule(copterId, config.transmitter, config.txId)
+DSMXModule::DSMXModule(int copterId, TxModuleConfig &config)
+        : AbstractTxModule(copterId, config.transmitter, config.txId)
 {
     this->config = config;
+    this->enabled = false;
+    this->binding = false;
 
+    // add two channels
+    for (int i = 0; i < 2; i++)
+    {
+        this->signal.push_back(0.);
+    }
+
+    // initialize signal
     this->signal[Throttle] = -config.channels[Throttle].travel;
     this->signal[Aileron] = 0.;
     this->signal[Elevation] = 0.;
@@ -32,10 +40,11 @@ DSMXModule::DSMXModule(int copterId, RadioConfig &config)
     this->signal[Gear] = this->config.channels[Gear].getSwitchValue();
     this->signal[Aux1] = this->config.channels[Aux1].getSwitchValue();
 
+    // disarm
     this->setDisarmSignal();
 }
 
-RadioConfig DSMXModule::getRadioConfig()
+TxModuleConfig DSMXModule::getConfig()
 {
     return this->config;
 }
@@ -43,16 +52,6 @@ RadioConfig DSMXModule::getRadioConfig()
 void DSMXModule::toggleSender()
 {
     this->enabled = !this->enabled;
-}
-
-void DSMXModule::turnSenderOn()
-{
-    this->enabled = true;
-}
-
-void DSMXModule::turnSenderOff()
-{
-    this->enabled = false;
 }
 
 void DSMXModule::suspend(bool suspended)
@@ -82,7 +81,7 @@ void DSMXModule::setBindSignal()
     this->binding = true;
 }
 
-void DSMXModule::setControls(double throttle, double roll, double pitch, double yaw)
+void DSMXModule::setControls(ControlInput u)
 {
     if (this->suspended)
     {
@@ -92,10 +91,10 @@ void DSMXModule::setControls(double throttle, double roll, double pitch, double 
 
     this->binding = false;
 
-    this->signal[Throttle] = this->config.channels[Throttle].getServoTravel(throttle);
-    this->signal[Aileron] = this->config.channels[Aileron].getServoTravel(roll);
-    this->signal[Elevation] = this->config.channels[Elevation].getServoTravel(pitch);
-    this->signal[Rudder] = this->config.channels[Rudder].getServoTravel(yaw);
+    this->signal[Throttle] = this->config.channels[Throttle].getServoTravel(u.thrust);
+    this->signal[Aileron] = this->config.channels[Aileron].getServoTravel(u.roll);
+    this->signal[Elevation] = this->config.channels[Elevation].getServoTravel(u.pitch);
+    this->signal[Rudder] = this->config.channels[Rudder].getServoTravel(u.yaw);
 }
 
 void DSMXModule::toggleGear()
@@ -147,7 +146,12 @@ void DSMXModule::setDisarmSignal()
     this->suspended = true;
 }
 
-void DSMXModule::emergencyStop()
+bool DSMXModule::isEnabled()
 {
-    suspend(true);
+    return this->enabled;
+}
+
+bool DSMXModule::isBinding()
+{
+    return this->binding;
 }

@@ -37,21 +37,21 @@ public:
 
     DyscoTx(std::string name);
 
-    virtual ~DyscoTx() = default;
+    ~DyscoTx() override = default;
 
-    virtual void open();
+    void open() override;
 
-    virtual void close();
+    void close() override;
 
     // /////////////////////////////////////////////////////////////////////////
 
-    virtual std::string getName();
+    std::string getName() override;
 
-    virtual bool isOpen();
+    bool isOpen() override;
 
-    virtual bool hasCapacity();
+    bool hasCapacity() override;
 
-    virtual void addTxModule(AbstractTxModule *module);
+    void addTxModule(AbstractTxModule *module) override;
 
 private:
 

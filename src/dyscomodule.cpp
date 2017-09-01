@@ -19,19 +19,21 @@
 
 #include "dyscomodule.h"
 
-DyscoModule::DyscoModule(int copterId, std::string txName, std::string moduleId)
-        : AbstractTxModule(copterId, txName, moduleId)
+DyscoModule::DyscoModule(int copterId, std::string txName, int moduleId)
+        : AbstractTxModule(copterId, txName, moduleId),
+          horizon(false)
 {
 }
 
-void DyscoModule::setControls(double throttle, double roll, double pitch,
-                              double yaw)
+void DyscoModule::setControls(ControlInput u)
 {
+    u.roll = -u.roll;
+
     // set control values
-    this->signal[Throttle] = throttle;
-    this->signal[Aileron] = roll;
-    this->signal[Elevation] = pitch;
-    this->signal[Rudder] = yaw;
+    this->signal[Throttle] = u.thrust;
+    this->signal[Aileron] = u.roll;
+    this->signal[Elevation] = u.pitch;
+    this->signal[Rudder] = u.yaw;
 
     if (this->onControlCommand.empty())
     {
@@ -39,7 +41,7 @@ void DyscoModule::setControls(double throttle, double roll, double pitch,
         return;
     }
 
-    this->onControlCommand(this->copterId, cv::Vec4d(throttle, roll, pitch, yaw));
+    this->onControlCommand(this->copterId, u);
 }
 
 void DyscoModule::toggleGear()
@@ -79,33 +81,10 @@ void DyscoModule::toggleAux1()
     this->onResetCommand(this->copterId);
 }
 
-// not implemented /////////////////////////////////////////////////////////////
-
-void DyscoModule::suspend(bool suspended)
-{
-}
-
 void DyscoModule::toggleSuspension()
 {
 }
 
-void DyscoModule::emergencyStop()
-{
-    this->toggleAux1();
-}
-
-void DyscoModule::toggleSender()
-{
-}
-
-void DyscoModule::turnSenderOn()
-{
-}
-
-void DyscoModule::turnSenderOff()
-{
-}
-
-void DyscoModule::setBindSignal()
+void DyscoModule::suspend(bool suspend)
 {
 }
