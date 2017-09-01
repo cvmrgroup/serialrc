@@ -116,7 +116,7 @@ void DSMXModule::setArmSignal()
 {
     if (this->config.armSignalProvided)
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < this->signal.size(); i++)
         {
             if (this->config.armSignalMask[i])
             {

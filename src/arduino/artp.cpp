@@ -48,7 +48,7 @@ ArTP::ArTP(const std::string name,
 
 void ArTP::updateFrame(AbstractTxModule *module)
 {
-    int id = module->getModuleId();
+    int id = module->getModuleId() - ATP_FIRST_PIN;
     std::vector<double> signal = module->getSignal();
 
     int ch1 = atp_center_value_offset + int(signal[AbstractTxModule::ChannelNames::Throttle] * atp_value_range_scale);

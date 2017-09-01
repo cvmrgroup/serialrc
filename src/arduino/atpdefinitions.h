@@ -23,6 +23,8 @@
 /// Response delimiter
 #define AXX_DELIMITER 0x3b
 
+#define ATP_FIRST_PIN 3
+
 /// Maximum number of radios
 #define ATP_N_RADIOS 5
 
