@@ -22,11 +22,11 @@
 #include <radio/abstracttxmodule.h>
 
 // dsmx tx based modules (arduino and pi)
-#include "dsmxmodule.h"
+#include <arduino/dsmxmodule.h>
 
 // simulation
-#include "dyscotx.h"
-#include "dyscomodule.h"
+#include <simulation/dyscotx.h>
+#include <simulation/dyscomodule.h>
 
 #ifdef WITH_ARDUINO
 
