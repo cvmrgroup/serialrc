@@ -28,6 +28,8 @@
 
 #include <radio/radiocommands.h>
 
+#include <radio/abstracttxmodule.h>
+
 class DyscoTx : public ITransmitter
 {
 
