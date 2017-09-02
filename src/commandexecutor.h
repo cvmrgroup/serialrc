@@ -12,10 +12,9 @@
 #include <boost/function.hpp>
 #include <boost/log/trivial.hpp>
 
-#include <radio/i_radiocommand.h>
+#include <interfaces/i_radiocommand.h>
+#include <radio/radiocommands.h>
 #include <radio/abstracttxmodule.h>
-#include <radio/commands/controlcommand.h>
-#include <radio/commands/setgearcommand.h>
 
 class CommandExecutor
 {

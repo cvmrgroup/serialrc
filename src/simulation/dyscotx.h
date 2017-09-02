@@ -24,18 +24,16 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <radio/i_transmitter.h>
+#include <interfaces/i_transmitter.h>
 
-#include <radio/commands/controlcommand.h>
-#include <radio/commands/switchgearcommand.h>
-#include <radio/commands/switchaux1command.h>
+#include <radio/radiocommands.h>
 
 class DyscoTx : public ITransmitter
 {
 
 public:
 
-    DyscoTx(std::string name);
+    explicit DyscoTx(std::string name);
 
     ~DyscoTx() override = default;
 

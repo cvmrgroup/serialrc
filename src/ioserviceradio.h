@@ -14,10 +14,10 @@
 #include <boost/signals2.hpp>
 #include <boost/log/trivial.hpp>
 
-#include <radio/i_radio.h>
-#include <radio/commands/controlcommand.h>
+#include <interfaces/i_radio.h>
+#include <radio/radiocommands.h>
 
-#include <radio/i_transmitter.h>
+#include <interfaces/i_transmitter.h>
 
 #include <radio/abstracttxmodule.h>
 

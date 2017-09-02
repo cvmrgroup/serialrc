@@ -22,7 +22,7 @@
 #include <mathhelper.h>
 #include <timing/clock.h>
 
-#include <radio/i_transmitter.h>
+#include <interfaces/i_transmitter.h>
 
 class CrazyRadioTransmitter : public ITransmitter
 {
