@@ -59,17 +59,26 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${PROJECT_NAME} PUBLIC
         src
         ${${PROJECT_NAME}_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
-        )
+        ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         utils
         ${${PROJECT_NAME}_LINK_LIBS}
-        ${Boost_LIBRARIES}
-        )
+        ${Boost_LIBRARIES})
 
 # set the compile definition for the BOOST Log
 target_compile_definitions(${PROJECT_NAME} PUBLIC "-DBOOST_LOG_DYN_LINK" ${${PROJECT_NAME}_FLAGS})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+
+# install ######################################################################
+
+install(FILES ${HEADERS}
+        DESTINATION "include/${PROJECT_NAME}"
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+
+install(TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+        COMPONENT library)
