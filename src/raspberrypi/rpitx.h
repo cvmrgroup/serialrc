@@ -20,23 +20,19 @@
 #ifndef RPITX_H
 #define RPITX_H
 
-#include <atomic>
-
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/asio/io_service.hpp>
-#include <boost/log/trivial.hpp>
 
 #include <wiringPi.h>
 
-#include <timing/deadlinetimer.h>
-
-#include "dsmxmodule.h"
-#include "dsmxconstants.h"
-#include "abstracttxmodule.h"
-#include "i_transmitter.h"
-#include "serialhelper.h"
 #include "serial.h"
+#include "serialhelper.h"
+#include "arduino/dsmxmodule.h"
+#include "icarus/i_transmitter.h"
+#include "icarus/deadlinetimer.h"
+#include "arduino/dsmxconstants.h"
+#include "icarus/abstracttxmodule.h"
 
 class RpiTX : public ITransmitter
 {
