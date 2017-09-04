@@ -5,8 +5,9 @@
 #ifndef ICARUS_RADIOCONFIG_H
 #define ICARUS_RADIOCONFIG_H
 
-#include <string>
+#include <map>
 #include <vector>
+#include <string>
 
 #include "servosetup.h"
 
@@ -53,20 +54,14 @@ struct TxModuleConfig
      */
     bool armSignalProvided;
 
-    /// Array with arm signal relevant flags.
-    std::vector<bool> armSignalMask;
-
-    /// The complete arm signal
-    std::vector<double> armSignal;
+    /// a map from channel index to normalized lever position
+    std::map<int, double> armSignalMap;
 
     /// Did the config provide a disarm signal too?
     bool disarmSignalProvided;
 
-    /// Array with arm signal relevant flags
-    std::vector<bool> disarmSignalMask;
-
-    /// The complete disarm signal
-    std::vector<double> disarmSignal;
+    /// a map from channel index to normalized lever position
+    std::map<int, double> disarmSignalMap;
 };
 
 #endif //ICARUS_RADIOCONFIG_H

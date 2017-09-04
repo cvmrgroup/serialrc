@@ -118,9 +118,10 @@ void DSMXModule::setArmSignal()
     {
         for (int i = 0; i < this->signal.size(); i++)
         {
-            if (this->config.armSignalMask[i])
+            if (this->config.armSignalMap.find(i) != this->config.armSignalMap.end())
             {
-                this->signal[i] = this->config.channels[i].getServoTravel(this->config.armSignal[i]);
+                double lever = this->config.armSignalMap[i];
+                this->signal[i] = this->config.channels[i].getServoTravel(lever);
             }
         }
     }
@@ -135,9 +136,10 @@ void DSMXModule::setDisarmSignal()
     {
         for (int i = 0; i < 6; i++)
         {
-            if (this->config.disarmSignalMask[i])
+            if (this->config.disarmSignalMap.find(i) != this->config.disarmSignalMap.end())
             {
-                this->signal[i] = this->config.channels[i].getServoTravel(this->config.disarmSignal[i]);
+                double lever = this->config.disarmSignalMap[i];
+                this->signal[i] = this->config.channels[i].getServoTravel(lever);
             }
         }
     }

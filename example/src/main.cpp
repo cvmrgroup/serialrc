@@ -29,6 +29,7 @@
 
 #include <arduino/arxx.h>
 #include <arduino/artt.h>
+#include <arduino/artp.h>
 
 #ifdef WITH_RASPBERRYPI
 #include <raspberrypi/rpitx.h>
@@ -61,28 +62,62 @@ int main(int argc, char *argv[])
     boost::shared_ptr<boost::asio::io_service> ioService(new boost::asio::io_service());
     boost::asio::io_service::work *work = new boost::asio::io_service::work(*ioService);
 
-    TxModuleConfig config;
-    config.serialPort = serialPortName;
-    config.frameRate = 22;
-    config.channels = std::vector<ServoSetup>(6);
-    config.channels[0] = ServoSetup("throttle", 100, false, 0);
-    config.channels[1] = ServoSetup("roll", 100, false, 0);
-    config.channels[2] = ServoSetup("pitch", 100, false, 0);
-    config.channels[3] = ServoSetup("yaw", 100, false, 0);
-    config.channels[4] = ServoSetup("gear", 100, false, 2);
-    config.channels[5] = ServoSetup("aux1", 100, false, 2);
-    config.armSignalProvided = false;
-    config.disarmSignalProvided = false;
+    int nChannels = 6;
+
+    // Nano QX Setup ///////////////////////////////////////////////////////////
+
+    TxModuleConfig defaultConfig;
+    defaultConfig.txId = 0;
+    defaultConfig.serialPort = serialPortName;
+    defaultConfig.frameRate = 22;
+    defaultConfig.channels = std::vector<ServoSetup>(nChannels);
+    defaultConfig.channels[0] = ServoSetup("throttle", 100, false, 0);
+    defaultConfig.channels[1] = ServoSetup("roll", 100, false, 0);
+    defaultConfig.channels[2] = ServoSetup("pitch", 100, false, 0);
+    defaultConfig.channels[3] = ServoSetup("yaw", 100, false, 0);
+    defaultConfig.channels[4] = ServoSetup("gear", 100, false, 2);
+    defaultConfig.channels[5] = ServoSetup("aux1", 100, false, 2);
+    defaultConfig.armSignalProvided = false;
+    defaultConfig.disarmSignalProvided = false;
+
+    // Blade Torrent 110 Setup /////////////////////////////////////////////////
+
+    TxModuleConfig torrentConfig;
+    torrentConfig.txId = 7;
+    torrentConfig.serialPort = serialPortName;
+    torrentConfig.frameRate = 11;
+    torrentConfig.channels = std::vector<ServoSetup>(nChannels);
+    torrentConfig.channels[0] = ServoSetup("throttle", 150, false, 0);
+    torrentConfig.channels[1] = ServoSetup("roll", 148, true, 0);
+    torrentConfig.channels[2] = ServoSetup("pitch", 148, false, 0);
+    torrentConfig.channels[3] = ServoSetup("yaw", 148, true, 0);
+    torrentConfig.channels[4] = ServoSetup("gear", 100, false, 3);
+    torrentConfig.channels[5] = ServoSetup("aux1", 100, false, 2);
+
+    defaultConfig.armSignalProvided = true;
+    defaultConfig.disarmSignalProvided = true;
+
+    torrentConfig.armSignalMap[0] = -1.;
+    torrentConfig.armSignalMap[5] = 1.;
+
+    torrentConfig.disarmSignalMap[5] = -1;
 
     ITransmitter *tx;
+    DSMXModule *module;
 
 #ifdef WITH_RASPBERRYPI
     tx = new RpiTX(config.transmitter, config.serialPort, ioService);
+    module = new DSMXModule(0, defaultConfig);
 #else
-    tx = new ArTT(config.transmitter, config.serialPort, ioService);
+    // Example for the dsmx module solution with a default servo configuration
+    //tx = new ArTT(defaultConfig.transmitter, defaultConfig.serialPort, ioService);
+    //module = new DSMXModule(0, defaultConfig);
+
+    // Example for the trainer port solution with a more sophisticated servo configuration
+    tx = new ArTP(defaultConfig.transmitter, torrentConfig.serialPort, ioService);
+    module = new DSMXModule(0, torrentConfig);
 #endif
 
-    DSMXModule *module = new DSMXModule(0, config);
     tx->addTxModule(module);
     tx->open();
 
