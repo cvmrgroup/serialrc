@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <cstring>
 #include <iostream>
 
 // SDL defines its own main function. This leads to problems using MS Windows.
