@@ -35,7 +35,7 @@ RpiTX::RpiTX(const std::string name,
 
 void RpiTX::open()
 {
-    if ((this->serial = Serial::serialOpen(this->serialPortName, DSM_BAUD_RATE)) < 0)
+    if ((this->serial = Serial::serialOpen(this->serialPortName.c_str(), DSM_BAUD_RATE)) < 0)
     {
         std::string msg = "Unable to open serial device.";
         throw std::runtime_error(msg);
