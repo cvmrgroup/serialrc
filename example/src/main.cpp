@@ -30,6 +30,10 @@
 #include <arduino/arxx.h>
 #include <arduino/artt.h>
 
+#ifdef WITH_RASPBERRYPI
+#include <raspberrypi/rpitx.h>
+#endif
+
 #include "icarus/gamepaddevice.h"
 
 volatile sig_atomic_t signaled = 0;
