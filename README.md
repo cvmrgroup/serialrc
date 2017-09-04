@@ -60,7 +60,48 @@ The examples let the user control a quadrotor with a gamepad (only DualShock 3 a
 Gamepad buttons:
 * __Square__: Toggle Transmitter on/off (bare DSMX module only)
 * __Circle__: Bind the transmitter (bare DSMX module only)
-* __Triangle__: Arm
-* __Cross__: Disarm
-* __L1__: Gear (Channel 5) 
-* __L2__: Aux1 (Channel 6)
+* __Triangle__: Set arm signal
+* __Cross__: Set disarm signal
+* __L1__: Toggle Gear (Channel 5) 
+* __L2__: Toggle Aux1 (Channel 6)
+
+### Use installed Library in your Project
+
+Use the ```Findserialrc.cmake``` located in ```cmake/Modules/```.
+
+Example ```CMakeLists.txt```:
+
+```
+cmake_minimum_required(VERSION 3.0.2)
+
+project(serialrc-example)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/")
+
+find_package(serialrc REQUIRED)
+find_package(SDL REQUIRED)
+find_package(Boost COMPONENTS system log REQUIRED)
+
+file(GLOB_RECURSE ${PROJECT_NAME}_HEADERS src/*.h)
+file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES src/*.cpp)
+
+add_executable(${PROJECT_NAME}
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_HEADERS})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        src
+        ${serialrc_INCLUDE_DIR}
+        ${SDL_INCLUDE_DIR})
+
+target_link_libraries(${PROJECT_NAME}
+        ${serialrc_LIBRARY}
+        ${SDL_LIBRARY}
+        ${Boost_LIBRARIES})
+
+# boost log
+target_compile_definitions(${PROJECT_NAME} PUBLIC "-DBOOST_LOG_DYN_LINK" ${${PROJECT_NAME}_FLAGS})
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+```
