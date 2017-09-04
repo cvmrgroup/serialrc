@@ -43,6 +43,14 @@ int main(int argc, char *argv[])
 {
     signal(SIGINT, signalHandler);
 
+    if (argc != 2)
+    {
+        std::cout << "Usage: ./serialrc-example <serial-port-name>" << std::endl;
+        return 0;
+    }
+
+    std::string serialPortName(argv[1]);
+
     GamepadDevice input("Gamepad", 0);
     input.open();
 
@@ -50,15 +58,8 @@ int main(int argc, char *argv[])
     boost::asio::io_service::work *work = new boost::asio::io_service::work(*ioService);
 
     TxModuleConfig config;
-
-    config.id = 0;
-    config.txId = 0;
-    config.copterId = 0;
-
-    config.serialPort = "/dev/cu.usbmodem1421";
-
+    config.serialPort = serialPortName;
     config.frameRate = 22;
-
     config.channels = std::vector<ServoSetup>(6);
     config.channels[0] = ServoSetup("throttle", 100, false, 0);
     config.channels[1] = ServoSetup("roll", 100, false, 0);
@@ -66,7 +67,6 @@ int main(int argc, char *argv[])
     config.channels[3] = ServoSetup("yaw", 100, false, 0);
     config.channels[4] = ServoSetup("gear", 100, false, 2);
     config.channels[5] = ServoSetup("aux1", 100, false, 2);
-
     config.armSignalProvided = false;
     config.disarmSignalProvided = false;
 
