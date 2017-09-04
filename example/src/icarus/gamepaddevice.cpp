@@ -41,10 +41,11 @@ void GamepadDevice::open()
     std::string deviceName = this->gamepad->getDeviceName();
 
     // DualShock 3
-    if (deviceName == "PLAYSTATION(R)3 Controller")
+    if (deviceName == "PLAYSTATION(R)3 Controller"
+        || deviceName == "Sony PLAYSTATION(R)3 Controller") // linux
     {
         this->buttonMap[DeviceState::ARM] = 12; // TRIANGLE
-        this->buttonMap[DeviceState::DISARM] = 15; // CROSS
+        this->buttonMap[DeviceState::DISARM] = 14; // CROSS
         this->buttonMap[DeviceState::TRANSMITTER] = 15; // SQUARE
         this->buttonMap[DeviceState::BIND] = 13; // CIRCLE
         this->buttonMap[DeviceState::SUSPENSION] = 3; // START
