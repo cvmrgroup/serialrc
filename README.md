@@ -51,5 +51,16 @@ Pass the cmake flag
 
     -DBUILD_EXAMPLE=True
     
-The example creates a typical DSMX servo setup and starts the bare DSMX approach ("artt").
-To control a quadrotor with a gamepad (only DualShock 3 and 4 are supported, but the implementation can be adjusted with a reasonable effort.
+If ```WITH_RASPBERRY``` is defined, the example will create the Raspberry Pi bare DSMX module approach with a default configuration.
+
+If not, the trainer port solution with a more sophisticated configuration will be build.
+
+The examples let the user control a quadrotor with a gamepad (only DualShock 3 and 4 are supported, but the implementation can be adjusted with a reasonable effort).
+
+Gamepad buttons:
+* __Square__: Toggle Transmitter on/off (bare DSMX module only)
+* __Circle__: Bind the transmitter (bare DSMX module only)
+* __Triangle__: Arm
+* __Cross__: Disarm
+* __L1__: Gear (Channel 5) 
+* __L2__: Aux1 (Channel 6)

@@ -133,27 +133,39 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        if (input.checkState(DeviceState::SUSPENSION))
-        {
-            ioService->post(boost::bind(&DSMXModule::toggleSuspension, module));
-        }
-
         if (input.checkState(DeviceState::TRANSMITTER))
         {
             ioService->post(boost::bind(&DSMXModule::toggleSender, module));
         }
 
-        if (input.checkState(DeviceState::BIND))
+        if (input.checkState(DeviceState::SUSPENSION))
         {
-            ioService->post(boost::bind(&DSMXModule::setBindSignal, module));
+            ioService->post(boost::bind(&DSMXModule::toggleSuspension, module));
         }
-        else if (input.checkState(DeviceState::TOGGLE_GEAR))
+
+        if (input.checkState(DeviceState::ARM))
+        {
+            ioService->post(boost::bind(&DSMXModule::setArmSignal, module));
+        }
+
+        if (input.checkState(DeviceState::DISARM))
+        {
+            ioService->post(boost::bind(&DSMXModule::setDisarmSignal, module));
+        }
+
+        if (input.checkState(DeviceState::TOGGLE_GEAR))
         {
             ioService->post(boost::bind(&DSMXModule::toggleGear, module));
         }
-        else if (input.checkState(DeviceState::TOGGLE_AUX1))
+
+        if (input.checkState(DeviceState::TOGGLE_AUX1))
         {
             ioService->post(boost::bind(&DSMXModule::toggleAux1, module));
+        }
+
+        if (input.checkState(DeviceState::BIND))
+        {
+            ioService->post(boost::bind(&DSMXModule::setBindSignal, module));
         }
         else
         {
