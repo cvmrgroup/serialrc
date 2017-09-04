@@ -21,5 +21,9 @@ target_link_libraries(${PROJECT_NAME}
         ${SDL_LIBRARY}
         ${Boost_LIBRARIES})
 
+if (${WITH_RASPBERRYPI})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_RASPBERRYPI)
+endif ()
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)

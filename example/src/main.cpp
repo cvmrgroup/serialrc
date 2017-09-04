@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     config.id = 0;
     config.txId = 0;
     config.copterId = 0;
-    config.transmitter = "artt";
+
     config.serialPort = "/dev/cu.usbmodem1421";
 
     config.frameRate = 22;
@@ -70,12 +70,17 @@ int main(int argc, char *argv[])
     config.armSignalProvided = false;
     config.disarmSignalProvided = false;
 
-    ArXX *transmitter = new ArTT(config.transmitter, config.serialPort, ioService);
+    ITransmitter *tx;
+
+#ifdef WITH_RASPBERRYPI
+    tx = new RpiTX(config.transmitter, config.serialPort, ioService);
+#else
+    tx = new ArTT(config.transmitter, config.serialPort, ioService);
+#endif
 
     DSMXModule *module = new DSMXModule(0, config);
-    transmitter->addTxModule(module);
-
-    transmitter->open();
+    tx->addTxModule(module);
+    tx->open();
 
     // /////////////////////////////////////////////////////////////////////////
 
@@ -121,11 +126,11 @@ int main(int argc, char *argv[])
     // /////////////////////////////////////////////////////////////////////////
 
     input.close();
-    transmitter->close();
+    tx->close();
 
     // clean up application
     delete module;
-    delete transmitter;
+    delete tx;
 
     BOOST_LOG_TRIVIAL(info) << "Goodbye.";
 

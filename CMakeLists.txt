@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modu
 
 # Build Example ################################################################
 
-if (DEFINED WITH_EXAMPLE)
+if (${BUILD_EXAMPLE})
     add_subdirectory(example)
 endif ()
 

@@ -49,7 +49,7 @@ Building then requires to pass the cmake flag
 
 Pass the cmake flag
 
-    -DWITH_EXAMPLE=True
+    -DBUILD_EXAMPLE=True
     
 The example creates a typical DSMX servo setup and starts the bare DSMX approach ("artt").
 To control a quadrotor with a gamepad (only DualShock 3 and 4 are supported, but the implementation can be adjusted with a reasonable effort.
