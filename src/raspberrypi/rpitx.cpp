@@ -102,7 +102,7 @@ void RpiTX::addTxModule(AbstractTxModule *txModule)
     this->module = static_cast<DSMXModule *>(txModule);
 
     // add the radio config to our map of configs
-    RadioConfig config = this->module->getRadioConfig();
+    TxModuleConfig config = this->module->getConfig();
     int frameRate = config.frameRate;
 
     BOOST_LOG_TRIVIAL(info) << "DSMX frame rate set to " << frameRate << "ms.";
