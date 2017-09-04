@@ -1,0 +1,17 @@
+/usr/local/include/serialrc/arduino/artp.h
+/usr/local/include/serialrc/arduino/artt.h
+/usr/local/include/serialrc/arduino/arxx.h
+/usr/local/include/serialrc/arduino/atpdefinitions.h
+/usr/local/include/serialrc/arduino/attdefinitions.h
+/usr/local/include/serialrc/arduino/dsmxconstants.h
+/usr/local/include/serialrc/arduino/dsmxmodule.h
+/usr/local/include/serialrc/arduino/trainerportconstants.h
+/usr/local/include/serialrc/icarus/abstracttxmodule.h
+/usr/local/include/serialrc/icarus/controlinput.h
+/usr/local/include/serialrc/icarus/i_transmitter.h
+/usr/local/include/serialrc/icarus/servosetup.h
+/usr/local/include/serialrc/icarus/txmoduleconfig.h
+/usr/local/include/serialrc/raspberrypi/rpitx.h
+/usr/local/include/serialrc/raspberrypi/serial.h
+/usr/local/include/serialrc/serialhelper.h
+/usr/local/lib/libserialrc.a

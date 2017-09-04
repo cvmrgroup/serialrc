@@ -22,9 +22,8 @@
 
 #include <algorithm>
 
-#include <config/txmoduleconfig.h>
-
-#include <radio/abstracttxmodule.h>
+#include "icarus/txmoduleconfig.h"
+#include "icarus/abstracttxmodule.h"
 
 class DSMXModule : public AbstractTxModule
 {

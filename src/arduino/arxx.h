@@ -31,7 +31,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
-#include <interfaces/i_transmitter.h>
+#include "icarus/i_transmitter.h"
 
 #include "dsmxmodule.h"
 #include "serialhelper.h"
