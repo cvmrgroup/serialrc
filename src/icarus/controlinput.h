@@ -21,6 +21,7 @@
 #define QUADCOPTIC_CONTROLINPUT_H
 
 #include <iostream>
+#include <stdexcept>
 
 struct ControlInput
 {

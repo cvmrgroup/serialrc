@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
     config.txId = 0;
     config.copterId = 0;
     config.transmitter = "artt";
-    config.serialNumber = "";
     config.serialPort = "/dev/cu.usbmodem1421";
 
     config.frameRate = 22;
