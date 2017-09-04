@@ -186,7 +186,13 @@ bool Gamepad::update()
 
     for (int i = 0; i < this->nAxes; i++)
     {
-        if (this->axes[i] != this->prevAxes[i])
+	if (i > 3)
+	{
+	    // ignore events from other axes than the 4 control levers
+	    break;
+	}
+	
+	if (this->axes[i] != this->prevAxes[i])
         {
             axesChanged = true;
             break;
