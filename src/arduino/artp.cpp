@@ -74,19 +74,26 @@ void ArTP::updateFrame(AbstractTxModule *module)
 
 void ArTP::addTxModule(AbstractTxModule *module)
 {
-    this->updateFrame(module);
-
     int id = module->getModuleId();
 
-    if (this->hasCapacity())
+    int firstPin = ATP_FIRST_PIN; // 3
+    int lastPin = ATP_FIRST_PIN + ATP_N_RADIOS - 1; // 7
+
+    if (id < firstPin || id > lastPin)
     {
-        this->modules[id] = static_cast<DSMXModule *>(module);
+        std::string msg = boost::str(boost::format("Failed to add transmitter with id [ %1% ] to serial port [ %2% ]. Transmitter id has to match the Arduino PIN [ %3% - %4% ].") % id % this->portName % firstPin % lastPin);
+        throw std::runtime_error(msg);
     }
-    else
+
+    this->updateFrame(module);
+
+    if (!this->hasCapacity())
     {
         std::string msg = boost::str(boost::format("Cannot add txModule with transmitter id [ %1% ] to serial port [ %2% ]. No capacity free.") % id % this->portName);
         throw std::runtime_error(msg);
     }
+
+    this->modules[id] = static_cast<DSMXModule *>(module);
 }
 
 void ArTP::onData(std::string frame)

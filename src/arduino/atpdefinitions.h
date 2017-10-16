@@ -23,6 +23,7 @@
 /// Response delimiter
 #define AXX_DELIMITER 0x3b
 
+/// First PIN of the register block
 #define ATP_FIRST_PIN 3
 
 /// Maximum number of radios

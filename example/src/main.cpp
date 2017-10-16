@@ -94,13 +94,15 @@ int main(int argc, char *argv[])
     torrentConfig.channels[4] = ServoSetup("gear", 100, false, 3);
     torrentConfig.channels[5] = ServoSetup("aux1", 100, false, 2);
 
-    defaultConfig.armSignalProvided = true;
-    defaultConfig.disarmSignalProvided = true;
+    torrentConfig.armSignalProvided = true;
+    torrentConfig.disarmSignalProvided = true;
 
     torrentConfig.armSignalMap[0] = -1.;
     torrentConfig.armSignalMap[5] = 1.;
 
     torrentConfig.disarmSignalMap[5] = -1;
+
+    // /////////////////////////////////////////////////////////////////////////
 
     ITransmitter *tx;
     DSMXModule *module;
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
     //module = new DSMXModule(0, defaultConfig);
 
     // Example for the trainer port solution with a more sophisticated servo configuration
-    tx = new ArTP(defaultConfig.transmitter, torrentConfig.serialPort, ioService);
+    tx = new ArTP(torrentConfig.transmitter, torrentConfig.serialPort, ioService);
     module = new DSMXModule(0, torrentConfig);
 #endif
 
